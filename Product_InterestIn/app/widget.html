@@ -207,7 +207,7 @@
         productsContainer.innerHTML = '<div class="loading">Loading products...</div>';
         
         var config = {
-            select_query: "select Product_Name, Unit_Price, Unit_Price_2nd_period, Lead_Product_Description from Products where ((Usage_Unit = 'Monthly Package') and (Product_Category = '" + productCategory + "'))"
+            select_query: "select Product_Name, Unit_Price, Unit_Price_2nd_period, Description from Products where ((Usage_Unit = 'Monthly Package') and (Product_Category = '" + productCategory + "'))"
         };
         
         if (ZOHO.CRM && ZOHO.CRM.API && typeof ZOHO.CRM.API.coql === "function") {
@@ -243,7 +243,7 @@
             var productName = product.Product_Name || '[Product Name]';
             var unitPrice = product.Unit_Price || '[Product. Unit Price]';
             var unitPrice2nd = product.Unit_Price_2nd_period || '[Product. Unit Price 2nd period]';
-            var description = product.Lead_Product_Description || '[Lead Product Description]';
+            var description = product.Description || '[Lead Product Description]';
             
             card.innerHTML = `
                 <div class="product-name">${productName}</div>
