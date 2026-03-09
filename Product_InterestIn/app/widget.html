@@ -206,12 +206,43 @@
         var productsContainer = document.getElementById('products-grid');
         productsContainer.innerHTML = '<div class="loading">Loading products...</div>';
         
-        var config = {
-            "select_query": "select Product_Name, Unit_Price, Unit_Price_2nd_period, Lead_Product_Description from Products where ((Usage_Unit = 'Monthly Package') and (Product_Category = '" + productCategory + "'))"
-        };
+        var safeCategory = (productCategory || '').replace(/'/g, "\\'");
+        var fields = ["Product_Name", "Unit_Price", "Unit_Price_2nd_period", "Lead_Product_Description", "id"];
+        var api = ZOHO && ZOHO.CRM && ZOHO.CRM.API ? ZOHO.CRM.API : null;
         
+        if (api && typeof api.coql === "function") {
+            var config = {
+                "select_query": "select Product_Name, Unit_Price, Unit_Price_2nd_period, Lead_Product_Description from Products where ((Usage_Unit = 'Monthly Package') and (Product_Category = '" + safeCategory + "'))"
+            };
+            
+            api.coql(config)
+                .then(function(response) {
+                    console.log("Products response:", response);
+                    if (response.data && response.data.length > 0) {
+                        displayProducts(response.data);
+                    } else {
+                        productsContainer.innerHTML = '<div class="no-data">No products found for this category</div>';
+                    }
+                })
+                .catch(function(error) {
+                    console.error("Error fetching products:", error);
+                    productsContainer.innerHTML = '<div class="error">Error loading products: ' + JSON.stringify(error) + '</div>';
+                });
+            return;
+        }
         
-        ZOHO.CRM.API.coql(config)
+        if (!api || typeof api.searchRecord !== "function") {
+            productsContainer.innerHTML = '<div class="error">CRM API not available to fetch products</div>';
+            return;
+        }
+        
+        var criteria = "((Usage_Unit:equals:Monthly Package) and (Product_Category:equals:" + safeCategory + "))";
+        api.searchRecord({
+            Entity: "Products",
+            Type: "criteria",
+            Criteria: criteria,
+            fields: fields.join(",")
+        })
             .then(function(response) {
                 console.log("Products response:", response);
                 if (response.data && response.data.length > 0) {
