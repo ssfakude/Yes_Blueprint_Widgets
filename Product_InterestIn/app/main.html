@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<link rel="stylesheet" href="../css/style.css">
+	<script src="../js/lib/ZohoEmbededAppSDK.min.js"></script>
+	<script src="../js/custom.js"></script>
+	<script src="../js/jquery-min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Policy Summary</title>
+    <style>
+        body {
+            background-color: orange;
+            color: white;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            padding: 20px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 50%;
+            margin: 20px auto;
+        }
+
+        th, td {
+            border: 1px solid white;
+            padding: 10px;
+            text-align: left;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Customer Policy Summary</h1>
+    
+
+    <table>
+        <thead>
+            <tr>
+                <th>Policy Data</th>
+               
+                <th>Count</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Active Policy</td>
+                
+              <td>
+    <input style="color: white; font-family: Arial, sans-serif; background-color: orange; border: none;" type="text" name="active_policies" id="active_policies" />
+</td>
+
+            </tr>
+            <tr>
+                <td>Non-Active Policy</td>
+                              <td>
+    <input style="color: white; font-family: Arial, sans-serif; background-color: orange; border: none;" type="text" name="no_active" id="no_active" />
+</td>
+            </tr>
+            <tr>
+                <td>Number of Claims</td>
+                              <td>
+    <input style="color: white; font-family: Arial, sans-serif; background-color: orange; border: none;" type="text" name="claims" id="claims" />
+</td>
+            </tr>
+        </tbody>
+    </table>
+    <script type="text/javascript">
+        $(document).ready(function(){
+          ZOHO.embeddedApp.init();
+        })
+      </script>
+</body>
+
+</html>
+
+
+<!-- <html>
+	<head>
+		  <br><label for="customeremail">Customer Email</label>&nbsp;&nbsp;&nbsp;
+    <input type="text" name="customeremail" id="customeremail" width="500" height="150" ></input><br><br>
+ 
+	  <link rel="stylesheet" href="../css/style.css">
+	  <script src="../js/lib/ZohoEmbededAppSDK.min.js"></script>
+	  <script src="../js/custom.js"></script>
+	  <script src="../js/jquery-min.js"></script>
+	</head>
+	<body>
+		<div class="topband">
+			Hello World - Api Responses
+		</div>
+		<div class="blockQuote">
+			<p class="title">User Info</p>
+			<textarea id="userInfo" contentEditable>
+			</textarea>
+		</div>
+		<div class="blockQuote">
+		<p class="title">Records Info</p>
+			<textarea id="recordInfo" contentEditable>		
+			</textarea>
+		</div>
+		<script type="text/javascript">
+			$(document).ready(function(){
+				initializeWidget();
+			})
+		</script>
+	</body>
+</html> -->
+
+
+
