@@ -512,6 +512,16 @@
     .btn-warning { background: #ef4444; color: white; box-shadow: 0 2px 8px rgba(239,68,68,0.25); }
     .btn-warning:hover { background: #dc2626; box-shadow: 0 6px 16px rgba(239,68,68,0.3); }
 
+    .action-btn svg.spin {
+        animation: spinIcon 0.8s linear infinite;
+        stroke-linecap: round;
+    }
+
+    @keyframes spinIcon {
+        from { transform: rotate(0deg); }
+        to   { transform: rotate(360deg); }
+    }
+
     .action-btn:disabled {
         opacity: 0.65;
         cursor: not-allowed;
@@ -734,46 +744,68 @@
 
     // ─── UI feedback helpers ──────────────────────────────────────────────────
     function setButtonState(action, state) {
-        // state: 'loading' | 'done' | 'error' | 'idle'
         var btn = document.querySelector('.action-btn[data-action="' + action + '"]');
         if (!btn) return;
-        var labels = {
-            not_interested:  { idle: "Not Interested",  loading: "Saving…", done: "Done ✓", error: "Failed – retry" },
-            matching_process:{ idle: "Matching Process", loading: "Saving…", done: "Proceeding…", error: "Failed – retry" },
-            unservable:      { idle: "Unservable",       loading: "Saving…", done: "Done ✓", error: "Failed – retry" }
+
+        var configs = {
+            not_interested: {
+                idle:    { icon: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>', label: "Not Interested" },
+                loading: { icon: '<svg viewBox="0 0 24 24" class="spin"><circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="10"/></svg>', label: "Saving…" },
+                done:    { icon: '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>', label: "Saved ✓" },
+                error:   { icon: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>', label: "Failed – retry" }
+            },
+            matching_process: {
+                idle:    { icon: '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>', label: "Matching Process" },
+                loading: { icon: '<svg viewBox="0 0 24 24" class="spin"><circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="10"/></svg>', label: "Saving…" },
+                done:    { icon: '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>', label: "Proceeding…" },
+                error:   { icon: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>', label: "Failed – retry" }
+            },
+            unservable: {
+                idle:    { icon: '<svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>', label: "Unservable" },
+                loading: { icon: '<svg viewBox="0 0 24 24" class="spin"><circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="10"/></svg>', label: "Saving…" },
+                done:    { icon: '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>', label: "Saved ✓" },
+                error:   { icon: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>', label: "Failed – retry" }
+            }
         };
-        btn.textContent = (labels[action] && labels[action][state]) || state;
-        btn.disabled    = (state === "loading");
+
+        var cfg = configs[action] && configs[action][state];
+        if (!cfg) return;
+        btn.innerHTML    = cfg.icon + " " + cfg.label;
+        btn.disabled     = (state === "loading");
         btn.classList.toggle("btn-loading", state === "loading");
     }
 
     function showToast(msg, type) {
-        // type: 'success' | 'error'
         var toast = document.getElementById("toast");
-        toast.textContent   = msg;
-        toast.className     = "toast toast-" + (type || "success") + " visible";
+        toast.textContent = msg;
+        toast.className   = "toast toast-" + (type || "success") + " visible";
         clearTimeout(toast._t);
         toast._t = setTimeout(function () { toast.classList.remove("visible"); }, 3500);
     }
 
     // ─── Build the lead update payload ───────────────────────────────────────
+    // Always includes ALL fields so nothing is silently dropped on any action.
     function buildLeadPayload(statusValue) {
-        var description = document.getElementById("lead-description").value.trim();
-
-        // Get the currently selected "Interested In" value
+        var description  = document.getElementById("lead-description").value.trim();
         var interestedBtn = document.querySelector(".interest-btn.active");
         var interestedIn  = interestedBtn ? interestedBtn.getAttribute("data-value") : null;
 
         var payload = { id: currentLeadId };
 
-        if (statusValue)    payload.Lead_Status   = statusValue;
-        if (interestedIn)   payload.Interested_In = interestedIn;
-        if (description)    payload.Description   = description;
-
-        // Attach selected product IDs (comma-separated) if your schema supports it
-        if (selectedProducts.length > 0) {
-            payload.Product_Details = selectedProducts.map(function (p) { return p.id; }).join(",");
+        // Status — only set when explicitly passed (not_interested / unservable)
+        if (statusValue) {
+            payload.Lead_Status = statusValue;
         }
+
+        // Always write these fields (even if empty — lets the user clear them)
+        payload.Description   = description;
+
+        if (interestedIn) {
+            payload.Interested_In = interestedIn;
+        }
+
+        // Always write the selected product (or clear it if none selected)
+        payload.Product_Offerd = selectedProducts.length > 0 ? selectedProducts[0].id : null;
 
         return payload;
     }
@@ -781,9 +813,9 @@
     // ─── Core: update lead record ─────────────────────────────────────────────
     function updateLeadRecord(payload) {
         return ZOHO.CRM.API.updateRecord({
-            Entity: "Leads",
+            Entity : "Leads",
             APIData: payload,
-            Trigger: []   // skip workflows/blueprints here; we call blueprint separately when needed
+            Trigger: []   // skip auto-triggers; blueprint is called explicitly when needed
         });
     }
 
@@ -791,29 +823,25 @@
 
     /**
      * NOT INTERESTED
-     * 1. Update lead: Lead_Status = "Not Interested", Description, Interested_In
-     * 2. Close the widget popup
+     * 1. Always save: Description, Interested_In, Product_Offerd, Lead_Status = "Not Interested"
+     * 2. Close popup
      */
     function handleNotInterested() {
         if (isProcessing) return;
         isProcessing = true;
         setButtonState("not_interested", "loading");
 
-        var payload = buildLeadPayload("Not Interested");
-
-        updateLeadRecord(payload)
+        updateLeadRecord(buildLeadPayload("Not Interested"))
             .then(function (response) {
-                console.log("Lead updated (Not Interested):", response);
+                console.log("Lead saved (Not Interested):", response);
                 setButtonState("not_interested", "done");
-                showToast("Lead marked as Not Interested", "success");
-                setTimeout(function () {
-                    ZOHO.CRM.UI.Popup.close();
-                }, 800);
+                showToast("Lead marked as Not Interested — saved", "success");
+                setTimeout(function () { ZOHO.CRM.UI.Popup.close(); }, 900);
             })
             .catch(function (err) {
-                console.error("Update failed:", err);
+                console.error("Save failed:", err);
                 setButtonState("not_interested", "error");
-                showToast("Failed to update lead: " + JSON.stringify(err), "error");
+                showToast("Failed to save: " + JSON.stringify(err), "error");
                 isProcessing = false;
                 setTimeout(function () { setButtonState("not_interested", "idle"); }, 2500);
             });
@@ -821,29 +849,25 @@
 
     /**
      * UNSERVABLE
-     * 1. Update lead: Lead_Status = "Unservable", Description, Interested_In
-     * 2. Close the widget popup
+     * 1. Always save: Description, Interested_In, Product_Offerd, Lead_Status = "Unservable"
+     * 2. Close popup
      */
     function handleUnservable() {
         if (isProcessing) return;
         isProcessing = true;
         setButtonState("unservable", "loading");
 
-        var payload = buildLeadPayload("Unservable");
-
-        updateLeadRecord(payload)
+        updateLeadRecord(buildLeadPayload("Unservable"))
             .then(function (response) {
-                console.log("Lead updated (Unservable):", response);
+                console.log("Lead saved (Unservable):", response);
                 setButtonState("unservable", "done");
-                showToast("Lead marked as Unservable", "success");
-                setTimeout(function () {
-                    ZOHO.CRM.UI.Popup.close();
-                }, 800);
+                showToast("Lead marked as Unservable — saved", "success");
+                setTimeout(function () { ZOHO.CRM.UI.Popup.close(); }, 900);
             })
             .catch(function (err) {
-                console.error("Update failed:", err);
+                console.error("Save failed:", err);
                 setButtonState("unservable", "error");
-                showToast("Failed to update lead: " + JSON.stringify(err), "error");
+                showToast("Failed to save: " + JSON.stringify(err), "error");
                 isProcessing = false;
                 setTimeout(function () { setButtonState("unservable", "idle"); }, 2500);
             });
@@ -851,30 +875,26 @@
 
     /**
      * MATCHING PROCESS
-     * 1. Update lead: Description, Interested_In, selected products (no status change)
-     * 2. Proceed the blueprint transition
+     * 1. Always save: Description, Interested_In, Product_Offerd (no status change)
+     * 2. Proceed blueprint
      */
     function handleMatchingProcess() {
         if (isProcessing) return;
         isProcessing = true;
         setButtonState("matching_process", "loading");
 
-        var payload = buildLeadPayload(null); // no status change for blueprint path
-
-        updateLeadRecord(payload)
+        updateLeadRecord(buildLeadPayload(null))
             .then(function (response) {
-                console.log("Lead updated (Matching Process):", response);
-                // Now proceed the blueprint
+                console.log("Lead saved (Matching Process):", response);
+                // Data is saved — now proceed the blueprint
                 return ZOHO.CRM.BLUEPRINT.proceed();
             })
             .then(function (blueprintResponse) {
                 console.log("Blueprint proceeded:", blueprintResponse);
                 setButtonState("matching_process", "done");
-                showToast("Matching process started!", "success");
-                // Blueprint proceed typically closes/refreshes automatically,
-                // but close just in case after a short delay
+                showToast("Data saved — matching process started!", "success");
                 setTimeout(function () {
-                    try { ZOHO.CRM.UI.Popup.close(); } catch(e) {}
+                    try { ZOHO.CRM.UI.Popup.close(); } catch (e) {}
                 }, 1200);
             })
             .catch(function (err) {
@@ -934,10 +954,10 @@
 
 </div>
 
-<div class="selection-bar" id="selection-bar">
+<!-- <div class="selection-bar" id="selection-bar">
     <span>Products selected <span class="count-badge" id="selection-count">0</span></span>
     <span style="color: rgba(255,255,255,0.5); font-size: 12px; font-weight: 400;">Click any card to deselect</span>
-</div>
+</div> -->
 <div id="toast" class="toast"></div>
 </body>
 </html>
