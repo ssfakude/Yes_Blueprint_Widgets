@@ -512,6 +512,49 @@
     .btn-warning { background: #ef4444; color: white; box-shadow: 0 2px 8px rgba(239,68,68,0.25); }
     .btn-warning:hover { background: #dc2626; box-shadow: 0 6px 16px rgba(239,68,68,0.3); }
 
+    .action-btn:disabled {
+        opacity: 0.65;
+        cursor: not-allowed;
+        transform: none !important;
+    }
+
+    .btn-loading {
+        pointer-events: none;
+    }
+
+    /* Toast notification */
+    .toast {
+        position: fixed;
+        bottom: 72px;
+        left: 50%;
+        transform: translateX(-50%) translateY(16px);
+        background: var(--navy);
+        color: white;
+        font-size: 13px;
+        font-weight: 500;
+        padding: 10px 20px;
+        border-radius: 50px;
+        box-shadow: var(--shadow-lg);
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        white-space: nowrap;
+        z-index: 200;
+    }
+
+    .toast.visible {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+
+    .toast.toast-error {
+        background: #ef4444;
+    }
+
+    .toast.toast-success {
+        background: #16a34a;
+    }
+
     /* Card appear animation */
     .product-card {
         animation: cardIn 0.3s ease both;
@@ -533,182 +576,315 @@
 </style>
 <script src="https://live.zwidgets.com/js-sdk/1.5/ZohoEmbededAppSDK.min.js"></script>
 <script>
+    // ─── State ───────────────────────────────────────────────────────────────
     var selectedProducts = [];
+    var currentLeadId    = null;
+    var isProcessing     = false;
 
+    // ─── Boot ─────────────────────────────────────────────────────────────────
     ZOHO.embeddedApp.on("PageLoad", function (data) {
-        console.log("Widget loaded", data);
+        console.log("PageLoad data:", data);
+
+        // Grab the lead ID from the page-load payload
+        if (data && data.EntityId) {
+            currentLeadId = data.EntityId;
+        } else if (data && data.ID) {
+            currentLeadId = data.ID;
+        }
+
         loadInterestedInOptions();
     });
 
+    ZOHO.embeddedApp.init();
+
+    // ─── Load "Interested In" picklist ────────────────────────────────────────
     function loadInterestedInOptions() {
-        ZOHO.CRM.META.getFields({Entity: "Leads"})
-            .then(function(response) {
+        ZOHO.CRM.META.getFields({ Entity: "Leads" })
+            .then(function (response) {
                 var fields = response.fields;
-                var interestedInField = fields.find(function(field) {
-                    return field.api_name === "Interested_In";
-                });
-                if (interestedInField && interestedInField.pick_list_values) {
-                    displayInterestButtons(interestedInField.pick_list_values);
+                var field  = fields.find(function (f) { return f.api_name === "Interested_In"; });
+                if (field && field.pick_list_values) {
+                    displayInterestButtons(field.pick_list_values);
                 } else {
-                    showButtonError('Interested_In field not found or has no options');
+                    showButtonError("Interested_In field not found or has no options");
                 }
             })
-            .catch(function(error) {
-                console.error("Error fetching fields:", error);
-                showButtonError('Error loading options: ' + JSON.stringify(error));
+            .catch(function (err) {
+                showButtonError("Error loading options: " + JSON.stringify(err));
             });
     }
 
+    // ─── Render interest buttons ──────────────────────────────────────────────
     function showButtonError(msg) {
-        document.getElementById('interest-buttons').innerHTML =
-            '<div class="error-box"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><p>' + msg + '</p></div>';
+        document.getElementById("interest-buttons").innerHTML =
+            '<div class="error-box"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><p>' + msg + "</p></div>";
     }
 
     function displayInterestButtons(options) {
-        var container = document.getElementById('interest-buttons');
-        container.innerHTML = '';
-        options.forEach(function(option, i) {
-            var button = document.createElement('button');
-            button.className = 'interest-btn';
-            button.style.animationDelay = (i * 0.04) + 's';
-            button.textContent = option.display_value || option.actual_value;
-            button.setAttribute('data-value', option.actual_value);
-            button.onclick = function() { selectInterest(this); };
-            container.appendChild(button);
+        var container = document.getElementById("interest-buttons");
+        container.innerHTML = "";
+        options.forEach(function (option, i) {
+            var btn = document.createElement("button");
+            btn.className = "interest-btn";
+            btn.style.animationDelay = (i * 0.04) + "s";
+            btn.textContent = option.display_value || option.actual_value;
+            btn.setAttribute("data-value", option.actual_value);
+            btn.onclick = function () { selectInterest(this); };
+            container.appendChild(btn);
         });
     }
 
     function selectInterest(button) {
-        document.querySelectorAll('.interest-btn').forEach(function(btn) {
-            btn.classList.remove('active');
+        document.querySelectorAll(".interest-btn").forEach(function (b) { b.classList.remove("active"); });
+        button.classList.add("active");
+        fetchProducts(button.getAttribute("data-value"));
+    }
+
+    // ─── Fetch products via COQL ──────────────────────────────────────────────
+    function fetchProducts(category) {
+        var container = document.getElementById("products-grid");
+        container.innerHTML = '<div class="state-box"><div class="loading-dots"><span></span><span></span><span></span></div><p>Loading products…</p></div>';
+
+        ZOHO.CRM.API.coql({
+            select_query: "select Product_Name, Unit_Price, Unit_Price_2nd_period, Description from Products where ((Usage_Unit = 'Monthly Package') and (Product_Category = '" + category + "'))"
+        })
+        .then(function (response) {
+            if (response.data && response.data.length > 0) {
+                displayProducts(response.data);
+            } else {
+                container.innerHTML = '<div class="state-box"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke="currentColor"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg><p>No products found for this category</p></div>';
+            }
+        })
+        .catch(function (err) {
+            container.innerHTML = '<div class="error-box"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><p>Error loading products: ' + JSON.stringify(err) + '</p></div>';
         });
-        button.classList.add('active');
-        fetchProducts(button.getAttribute('data-value'));
     }
 
-    function fetchProducts(productCategory) {
-        var productsContainer = document.getElementById('products-grid');
-        productsContainer.innerHTML = `
-            <div class="state-box">
-                <div class="loading-dots"><span></span><span></span><span></span></div>
-                <p>Loading products…</p>
-            </div>`;
-
-        var config = {
-            select_query: "select Product_Name, Unit_Price, Unit_Price_2nd_period, Description from Products where ((Usage_Unit = 'Monthly Package') and (Product_Category = '" + productCategory + "'))"
-        };
-
-        if (ZOHO.CRM && ZOHO.CRM.API && typeof ZOHO.CRM.API.coql === "function") {
-            ZOHO.CRM.API.coql(config)
-                .then(function(response) {
-                    if (response.data && response.data.length > 0) {
-                        displayProducts(response.data);
-                    } else {
-                        productsContainer.innerHTML = `
-                            <div class="state-box">
-                                <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-                                <p>No products found for this category</p>
-                            </div>`;
-                    }
-                })
-                .catch(function(error) {
-                    productsContainer.innerHTML = `
-                        <div class="error-box">
-                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                            <p>Error loading products: ${JSON.stringify(error)}</p>
-                        </div>`;
-                });
-            return;
-        }
-
-        productsContainer.innerHTML = `
-            <div class="error-box">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                <p>COQL API is not available</p>
-            </div>`;
-    }
-
+    // ─── Render product cards ─────────────────────────────────────────────────
     function formatPrice(val) {
-        if (!val && val !== 0) return '—';
-        return Number(val).toLocaleString('en-IL');
+        if (!val && val !== 0) return "—";
+        return Number(val).toLocaleString("en-IL");
     }
 
     function displayProducts(products) {
-        var container = document.getElementById('products-grid');
-        container.innerHTML = '';
+        var container = document.getElementById("products-grid");
+        container.innerHTML = "";
+        products.forEach(function (product, i) {
+            var card = document.createElement("div");
+            card.className = "product-card";
+            card.style.animationDelay = (i * 0.06) + "s";
+            card.setAttribute("data-product-id", product.id);
 
-        products.forEach(function(product, i) {
-            var card = document.createElement('div');
-            card.className = 'product-card';
-            card.style.animationDelay = (i * 0.06) + 's';
-            card.setAttribute('data-product-id', product.id);
+            var name    = product.Product_Name || "Unnamed Product";
+            var price1  = formatPrice(product.Unit_Price);
+            var price2  = formatPrice(product.Unit_Price_2nd_period);
+            var desc    = product.Description || "";
 
-            var productName = product.Product_Name || 'Unnamed Product';
-            var unitPrice = formatPrice(product.Unit_Price);
-            var unitPrice2nd = formatPrice(product.Unit_Price_2nd_period);
-            var description = product.Description || '';
+            card.innerHTML =
+                '<div class="card-inner">' +
+                  '<div class="card-header">' +
+                    '<div class="product-name">' + name + '</div>' +
+                    '<div class="selected-badge"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>' +
+                  '</div>' +
+                  '<div class="pricing-block">' +
+                    '<div class="price-row"><span class="price-label">First 12 months</span><span class="price-value">' + price1 + '<span class="price-currency">ILS</span></span></div>' +
+                    '<div class="price-divider"></div>' +
+                    '<div class="price-row secondary"><span class="price-label">Thereafter</span><span class="price-value">' + price2 + '<span class="price-currency">ILS</span></span></div>' +
+                  '</div>' +
+                  (desc ? '<div class="product-description">' + desc + '</div>' : '') +
+                '</div>';
 
-            card.innerHTML = `
-                <div class="card-inner">
-                    <div class="card-header">
-                        <div class="product-name">${productName}</div>
-                        <div class="selected-badge">
-                            <svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg>
-                        </div>
-                    </div>
-                    <div class="pricing-block">
-                        <div class="price-row">
-                            <span class="price-label">First 12 months</span>
-                            <span class="price-value">${unitPrice}<span class="price-currency">ILS</span></span>
-                        </div>
-                        <div class="price-divider"></div>
-                        <div class="price-row secondary">
-                            <span class="price-label">Thereafter</span>
-                            <span class="price-value">${unitPrice2nd}<span class="price-currency">ILS</span></span>
-                        </div>
-                    </div>
-                    ${description ? `<div class="product-description">${description}</div>` : ''}
-                </div>`;
-
-            card.onclick = function() { toggleProductSelection(this, product); };
+            card.onclick = function () { toggleProductSelection(this, product); };
             container.appendChild(card);
         });
     }
 
     function toggleProductSelection(card, product) {
-        var productId = card.getAttribute('data-product-id');
-        var index = selectedProducts.findIndex(function(p) { return p.id === productId; });
+        var id = card.getAttribute("data-product-id");
 
-        if (index > -1) {
-            selectedProducts.splice(index, 1);
-            card.classList.remove('selected');
-        } else {
-            selectedProducts.push(product);
-            card.classList.add('selected');
+        // If already selected, deselect it
+        if (card.classList.contains("selected")) {
+            selectedProducts = [];
+            card.classList.remove("selected");
+            updateSelectionBar();
+            return;
         }
 
+        // Deselect any previously selected card
+        document.querySelectorAll(".product-card.selected").forEach(function (c) {
+            c.classList.remove("selected");
+        });
+
+        // Select the new one
+        selectedProducts = [product];
+        card.classList.add("selected");
         updateSelectionBar();
-        console.log("Selected products:", selectedProducts);
     }
 
     function updateSelectionBar() {
-        var bar = document.getElementById('selection-bar');
-        var countEl = document.getElementById('selection-count');
+        var bar   = document.getElementById("selection-bar");
+        var count = document.getElementById("selection-count");
         if (selectedProducts.length > 0) {
-            countEl.textContent = selectedProducts.length;
-            bar.classList.add('visible');
+            count.textContent = selectedProducts.length;
+            bar.classList.add("visible");
         } else {
-            bar.classList.remove('visible');
+            bar.classList.remove("visible");
         }
     }
 
-    function handleAction(action) {
-        var description = document.getElementById('lead-description').value;
-        console.log("Action:", action, "| Description:", description, "| Selected products:", selectedProducts);
-        // TODO: wire up to ZOHO CRM API calls as needed
+    // ─── UI feedback helpers ──────────────────────────────────────────────────
+    function setButtonState(action, state) {
+        // state: 'loading' | 'done' | 'error' | 'idle'
+        var btn = document.querySelector('.action-btn[data-action="' + action + '"]');
+        if (!btn) return;
+        var labels = {
+            not_interested:  { idle: "Not Interested",  loading: "Saving…", done: "Done ✓", error: "Failed – retry" },
+            matching_process:{ idle: "Matching Process", loading: "Saving…", done: "Proceeding…", error: "Failed – retry" },
+            unservable:      { idle: "Unservable",       loading: "Saving…", done: "Done ✓", error: "Failed – retry" }
+        };
+        btn.textContent = (labels[action] && labels[action][state]) || state;
+        btn.disabled    = (state === "loading");
+        btn.classList.toggle("btn-loading", state === "loading");
     }
 
-    ZOHO.embeddedApp.init();
+    function showToast(msg, type) {
+        // type: 'success' | 'error'
+        var toast = document.getElementById("toast");
+        toast.textContent   = msg;
+        toast.className     = "toast toast-" + (type || "success") + " visible";
+        clearTimeout(toast._t);
+        toast._t = setTimeout(function () { toast.classList.remove("visible"); }, 3500);
+    }
+
+    // ─── Build the lead update payload ───────────────────────────────────────
+    function buildLeadPayload(statusValue) {
+        var description = document.getElementById("lead-description").value.trim();
+
+        // Get the currently selected "Interested In" value
+        var interestedBtn = document.querySelector(".interest-btn.active");
+        var interestedIn  = interestedBtn ? interestedBtn.getAttribute("data-value") : null;
+
+        var payload = { id: currentLeadId };
+
+        if (statusValue)    payload.Lead_Status   = statusValue;
+        if (interestedIn)   payload.Interested_In = interestedIn;
+        if (description)    payload.Description   = description;
+
+        // Attach selected product IDs (comma-separated) if your schema supports it
+        if (selectedProducts.length > 0) {
+            payload.Product_Details = selectedProducts.map(function (p) { return p.id; }).join(",");
+        }
+
+        return payload;
+    }
+
+    // ─── Core: update lead record ─────────────────────────────────────────────
+    function updateLeadRecord(payload) {
+        return ZOHO.CRM.API.updateRecord({
+            Entity: "Leads",
+            APIData: payload,
+            Trigger: []   // skip workflows/blueprints here; we call blueprint separately when needed
+        });
+    }
+
+    // ─── Action handlers ──────────────────────────────────────────────────────
+
+    /**
+     * NOT INTERESTED
+     * 1. Update lead: Lead_Status = "Not Interested", Description, Interested_In
+     * 2. Close the widget popup
+     */
+    function handleNotInterested() {
+        if (isProcessing) return;
+        isProcessing = true;
+        setButtonState("not_interested", "loading");
+
+        var payload = buildLeadPayload("Not Interested");
+
+        updateLeadRecord(payload)
+            .then(function (response) {
+                console.log("Lead updated (Not Interested):", response);
+                setButtonState("not_interested", "done");
+                showToast("Lead marked as Not Interested", "success");
+                setTimeout(function () {
+                    ZOHO.CRM.UI.Popup.close();
+                }, 800);
+            })
+            .catch(function (err) {
+                console.error("Update failed:", err);
+                setButtonState("not_interested", "error");
+                showToast("Failed to update lead: " + JSON.stringify(err), "error");
+                isProcessing = false;
+                setTimeout(function () { setButtonState("not_interested", "idle"); }, 2500);
+            });
+    }
+
+    /**
+     * UNSERVABLE
+     * 1. Update lead: Lead_Status = "Unservable", Description, Interested_In
+     * 2. Close the widget popup
+     */
+    function handleUnservable() {
+        if (isProcessing) return;
+        isProcessing = true;
+        setButtonState("unservable", "loading");
+
+        var payload = buildLeadPayload("Unservable");
+
+        updateLeadRecord(payload)
+            .then(function (response) {
+                console.log("Lead updated (Unservable):", response);
+                setButtonState("unservable", "done");
+                showToast("Lead marked as Unservable", "success");
+                setTimeout(function () {
+                    ZOHO.CRM.UI.Popup.close();
+                }, 800);
+            })
+            .catch(function (err) {
+                console.error("Update failed:", err);
+                setButtonState("unservable", "error");
+                showToast("Failed to update lead: " + JSON.stringify(err), "error");
+                isProcessing = false;
+                setTimeout(function () { setButtonState("unservable", "idle"); }, 2500);
+            });
+    }
+
+    /**
+     * MATCHING PROCESS
+     * 1. Update lead: Description, Interested_In, selected products (no status change)
+     * 2. Proceed the blueprint transition
+     */
+    function handleMatchingProcess() {
+        if (isProcessing) return;
+        isProcessing = true;
+        setButtonState("matching_process", "loading");
+
+        var payload = buildLeadPayload(null); // no status change for blueprint path
+
+        updateLeadRecord(payload)
+            .then(function (response) {
+                console.log("Lead updated (Matching Process):", response);
+                // Now proceed the blueprint
+                return ZOHO.CRM.BLUEPRINT.proceed();
+            })
+            .then(function (blueprintResponse) {
+                console.log("Blueprint proceeded:", blueprintResponse);
+                setButtonState("matching_process", "done");
+                showToast("Matching process started!", "success");
+                // Blueprint proceed typically closes/refreshes automatically,
+                // but close just in case after a short delay
+                setTimeout(function () {
+                    try { ZOHO.CRM.UI.Popup.close(); } catch(e) {}
+                }, 1200);
+            })
+            .catch(function (err) {
+                console.error("Matching process failed:", err);
+                setButtonState("matching_process", "error");
+                showToast("Failed: " + JSON.stringify(err), "error");
+                isProcessing = false;
+                setTimeout(function () { setButtonState("matching_process", "idle"); }, 2500);
+            });
+    }
 </script>
 </head>
 <body>
@@ -741,15 +917,15 @@
         <textarea id="lead-description" class="description-field" placeholder="Add notes or context about this lead…"></textarea>
 
         <div class="action-bar">
-            <button class="action-btn btn-danger" onclick="handleAction('not_interested')">
+            <button class="action-btn btn-danger" data-action="not_interested" onclick="handleNotInterested()">
                 <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
                 Not Interested
             </button>
-            <button class="action-btn btn-success" onclick="handleAction('matching_process')">
+            <button class="action-btn btn-success" data-action="matching_process" onclick="handleMatchingProcess()">
                 <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
                 Matching Process
             </button>
-            <button class="action-btn btn-warning" onclick="handleAction('unservable')">
+            <button class="action-btn btn-warning" data-action="unservable" onclick="handleUnservable()">
                 <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                 Unservable
             </button>
@@ -762,5 +938,6 @@
     <span>Products selected <span class="count-badge" id="selection-count">0</span></span>
     <span style="color: rgba(255,255,255,0.5); font-size: 12px; font-weight: 400;">Click any card to deselect</span>
 </div>
+<div id="toast" class="toast"></div>
 </body>
 </html>
