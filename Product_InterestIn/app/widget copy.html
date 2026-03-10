@@ -568,46 +568,6 @@
         background: #16a34a;
     }
 
-    /* Required field error states */
-    .field-error .interest-btn:not(.active),
-    .button-group.field-error {
-        animation: shakeX 0.4s ease;
-    }
-
-    .description-field.field-error {
-        border-color: #ef4444;
-        box-shadow: 0 0 0 3px rgba(239,68,68,0.12);
-        animation: shakeX 0.4s ease;
-    }
-
-    .products-grid.field-error {
-        animation: shakeX 0.4s ease;
-    }
-
-    .products-grid.field-error .state-box,
-    .products-grid.field-error .product-card {
-        border-color: #ef4444;
-        box-shadow: 0 0 0 2px rgba(239,68,68,0.1);
-    }
-
-    .button-group.field-error .interest-btn {
-        border-color: #ef4444;
-    }
-
-    .required-star {
-        color: #ef4444;
-        margin-left: 3px;
-        font-size: 12px;
-    }
-
-    @keyframes shakeX {
-        0%, 100% { transform: translateX(0); }
-        20%       { transform: translateX(-5px); }
-        40%       { transform: translateX(5px); }
-        60%       { transform: translateX(-4px); }
-        80%       { transform: translateX(4px); }
-    }
-
     /* Card appear animation */
     .product-card {
         animation: cardIn 0.3s ease both;
@@ -690,7 +650,6 @@
     function selectInterest(button) {
         document.querySelectorAll(".interest-btn").forEach(function (b) { b.classList.remove("active"); });
         button.classList.add("active");
-        document.getElementById("interest-buttons").classList.remove("field-error");
         fetchProducts(button.getAttribute("data-value"));
     }
 
@@ -772,7 +731,6 @@
         // Select the new one
         selectedProducts = [product];
         card.classList.add("selected");
-        document.getElementById("products-grid").classList.remove("field-error");
         updateSelectionBar();
     }
 
@@ -843,51 +801,12 @@
         return payload;
     }
 
-    // ─── Validation ───────────────────────────────────────────────────────────
-    function validate() {
-        var errors = [];
-
-        var interestedBtn = document.querySelector(".interest-btn.active");
-        if (!interestedBtn) {
-            errors.push("interested");
-            document.getElementById("interest-buttons").classList.add("field-error");
-        } else {
-            document.getElementById("interest-buttons").classList.remove("field-error");
-        }
-
-        if (selectedProducts.length === 0) {
-            errors.push("product");
-            document.getElementById("products-grid").classList.add("field-error");
-        } else {
-            document.getElementById("products-grid").classList.remove("field-error");
-        }
-
-        var description = document.getElementById("lead-description").value.trim();
-        if (!description) {
-            errors.push("description");
-            document.getElementById("lead-description").classList.add("field-error");
-        } else {
-            document.getElementById("lead-description").classList.remove("field-error");
-        }
-
-        if (errors.length > 0) {
-            var msgs = {
-                interested:  "Please select an interest category",
-                product:     "Please select a package",
-                description: "Please enter a description"
-            };
-            showToast(msgs[errors[0]], "error");
-            return false;
-        }
-        return true;
-    }
-
     // ─── Core: update lead record ─────────────────────────────────────────────
     function updateLeadRecord(payload) {
         return ZOHO.CRM.API.updateRecord({
             Entity : "Leads",
             APIData: payload,
-            Trigger: []
+            Trigger: []   // skip auto-triggers; blueprint is called explicitly when needed
         });
     }
 
@@ -899,25 +818,24 @@
 
     /**
      * NEXT (Matching Process)
-     * 1. Validate all mandatory fields
-     * 2. Save: Description, Interested_In, Product_Offerd
-     * 3. Proceed blueprint
+     * 1. Always save: Description, Interested_In, Product_Offerd
+     * 2. Proceed blueprint
      */
     function handleMatchingProcess() {
         if (isProcessing) return;
-        if (!validate()) return;
-
         isProcessing = true;
         setButtonState("matching_process", "loading");
 
         updateLeadRecord(buildLeadPayload(null))
             .then(function (response) {
                 console.log("Lead saved (Matching Process):", response);
+                // Data is saved — now proceed the blueprint
                 return ZOHO.CRM.BLUEPRINT.proceed();
             })
             .then(function (blueprintResponse) {
                 console.log("Blueprint proceeded:", blueprintResponse);
                 setButtonState("matching_process", "done");
+                showToast("Data saved — matching process started!", "success");
                 setTimeout(function () {
                     try { ZOHO.CRM.UI.Popup.close(); } catch (e) {}
                 }, 1200);
@@ -943,12 +861,12 @@
         <p>Select a category, then choose packages</p>
     </div>
 
-    <div class="section-label">Interested In<span class="required-star">*</span></div>
+    <div class="section-label">Interested In</div>
     <div id="interest-buttons" class="button-group">
         <div class="loading-dots" style="padding: 8px 0;"><span></span><span></span><span></span></div>
     </div>
 
-    <div class="section-label">Main Package<span class="required-star">*</span></div>
+    <div class="section-label">Main Package</div>
     <div id="products-grid" class="products-grid">
         <div class="state-box">
             <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -958,8 +876,8 @@
 
     <!-- Description + Actions -->
     <div class="bottom-section">
-        <div class="section-label" style="margin-top: 28px;">Description<span class="required-star">*</span></div>
-        <textarea id="lead-description" class="description-field" placeholder="Add notes or context about this lead…" oninput="this.classList.remove('field-error')"></textarea>
+        <div class="section-label" style="margin-top: 28px;">Description</div>
+        <textarea id="lead-description" class="description-field" placeholder="Add notes or context about this lead…"></textarea>
 
         <div class="action-bar">
             <button class="action-btn btn-cancel" data-action="cancel" onclick="handleCancel()">
