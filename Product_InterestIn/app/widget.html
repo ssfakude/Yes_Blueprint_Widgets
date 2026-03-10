@@ -505,6 +505,9 @@
     .action-btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
     .action-btn:active { transform: translateY(0); }
 
+    .btn-cancel { background: var(--surface); color: var(--text-secondary); border: 1.5px solid var(--border); box-shadow: var(--shadow-sm); }
+    .btn-cancel:hover { background: #e8edf3; border-color: #b0bfce; box-shadow: var(--shadow-md); }
+
     .btn-danger  { background: #ef4444; color: white; box-shadow: 0 2px 8px rgba(239,68,68,0.25); }
     .btn-danger:hover  { background: #dc2626; box-shadow: 0 6px 16px rgba(239,68,68,0.3); }
     .btn-success { background: #22c55e; color: white; box-shadow: 0 2px 8px rgba(34,197,94,0.25); }
@@ -748,22 +751,10 @@
         if (!btn) return;
 
         var configs = {
-            not_interested: {
-                idle:    { icon: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>', label: "Not Interested" },
-                loading: { icon: '<svg viewBox="0 0 24 24" class="spin"><circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="10"/></svg>', label: "Saving…" },
-                done:    { icon: '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>', label: "Saved ✓" },
-                error:   { icon: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>', label: "Failed – retry" }
-            },
             matching_process: {
-                idle:    { icon: '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>', label: "Matching Process" },
+                idle:    { icon: '<svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>', label: "Next" },
                 loading: { icon: '<svg viewBox="0 0 24 24" class="spin"><circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="10"/></svg>', label: "Saving…" },
                 done:    { icon: '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>', label: "Proceeding…" },
-                error:   { icon: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>', label: "Failed – retry" }
-            },
-            unservable: {
-                idle:    { icon: '<svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>', label: "Unservable" },
-                loading: { icon: '<svg viewBox="0 0 24 24" class="spin"><circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="10"/></svg>', label: "Saving…" },
-                done:    { icon: '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>', label: "Saved ✓" },
                 error:   { icon: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>', label: "Failed – retry" }
             }
         };
@@ -821,61 +812,13 @@
 
     // ─── Action handlers ──────────────────────────────────────────────────────
 
-    /**
-     * NOT INTERESTED
-     * 1. Always save: Description, Interested_In, Product_Offerd, Lead_Status = "Not Interested"
-     * 2. Close popup
-     */
-    function handleNotInterested() {
-        if (isProcessing) return;
-        isProcessing = true;
-        setButtonState("not_interested", "loading");
-
-        updateLeadRecord(buildLeadPayload("Not Interested"))
-            .then(function (response) {
-                console.log("Lead saved (Not Interested):", response);
-                setButtonState("not_interested", "done");
-                showToast("Lead marked as Not Interested — saved", "success");
-                setTimeout(function () { ZOHO.CRM.UI.Popup.close(); }, 900);
-            })
-            .catch(function (err) {
-                console.error("Save failed:", err);
-                setButtonState("not_interested", "error");
-                showToast("Failed to save: " + JSON.stringify(err), "error");
-                isProcessing = false;
-                setTimeout(function () { setButtonState("not_interested", "idle"); }, 2500);
-            });
+    function handleCancel() {
+        ZOHO.CRM.UI.Popup.close();
     }
 
     /**
-     * UNSERVABLE
-     * 1. Always save: Description, Interested_In, Product_Offerd, Lead_Status = "Unservable"
-     * 2. Close popup
-     */
-    function handleUnservable() {
-        if (isProcessing) return;
-        isProcessing = true;
-        setButtonState("unservable", "loading");
-
-        updateLeadRecord(buildLeadPayload("Unservable"))
-            .then(function (response) {
-                console.log("Lead saved (Unservable):", response);
-                setButtonState("unservable", "done");
-                showToast("Lead marked as Unservable — saved", "success");
-                setTimeout(function () { ZOHO.CRM.UI.Popup.close(); }, 900);
-            })
-            .catch(function (err) {
-                console.error("Save failed:", err);
-                setButtonState("unservable", "error");
-                showToast("Failed to save: " + JSON.stringify(err), "error");
-                isProcessing = false;
-                setTimeout(function () { setButtonState("unservable", "idle"); }, 2500);
-            });
-    }
-
-    /**
-     * MATCHING PROCESS
-     * 1. Always save: Description, Interested_In, Product_Offerd (no status change)
+     * NEXT (Matching Process)
+     * 1. Always save: Description, Interested_In, Product_Offerd
      * 2. Proceed blueprint
      */
     function handleMatchingProcess() {
@@ -937,17 +880,13 @@
         <textarea id="lead-description" class="description-field" placeholder="Add notes or context about this lead…"></textarea>
 
         <div class="action-bar">
-            <button class="action-btn btn-danger" data-action="not_interested" onclick="handleNotInterested()">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-                Not Interested
+            <button class="action-btn btn-cancel" data-action="cancel" onclick="handleCancel()">
+                <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                Cancel
             </button>
             <button class="action-btn btn-success" data-action="matching_process" onclick="handleMatchingProcess()">
-                <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-                Matching Process
-            </button>
-            <button class="action-btn btn-warning" data-action="unservable" onclick="handleUnservable()">
-                <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                Unservable
+                <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                Next
             </button>
         </div>
     </div>
