@@ -330,6 +330,35 @@
     @keyframes pulse { 0%, 80%, 100% { transform: scale(0.7); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
 
 
+    /* ── Combo-box (type-to-filter dropdown) ── */
+    .combo-wrap { position: relative; }
+
+    .combo-list {
+        position: absolute;
+        top: calc(100% + 3px);
+        left: 0; right: 0;
+        background: var(--surface-card);
+        border: 1.5px solid var(--border-active);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-lg);
+        z-index: 500;
+        max-height: 220px;
+        overflow-y: auto;
+    }
+
+    .combo-row {
+        padding: 9px 14px;
+        font-size: 13px;
+        color: var(--text-primary);
+        cursor: pointer;
+        border-bottom: 1px solid var(--border);
+        transition: background 0.12s;
+    }
+    .combo-row:last-child { border-bottom: none; }
+    .combo-row:hover,
+    .combo-row.combo-highlighted { background: var(--accent-glow); color: var(--accent); }
+    .combo-empty { color: var(--text-muted); cursor: default; }
+    .combo-empty:hover { background: none; color: var(--text-muted); }
 </style>
 <script src="https://live.zwidgets.com/js-sdk/1.5/ZohoEmbededAppSDK.min.js"></script>
 <script>
@@ -372,6 +401,14 @@
     });
 
     ZOHO.embeddedApp.init();
+
+    // Close combos when clicking outside
+    document.addEventListener("mousedown", function (e) {
+        ["city", "street"].forEach(function (which) {
+            var wrap = document.getElementById(which + "-combo-wrap");
+            if (wrap && !wrap.contains(e.target)) closeCombo(which);
+        });
+    });
 
     function initWidget() {
         Promise.all([
@@ -515,20 +552,20 @@
             document.getElementById("email-input").value = record.Email;
         }
 
-        // City_LP and Street_LP are lookup fields — set the <select> elements
+        // City_LP and Street_LP are lookup fields — set the combo inputs
         if (record.City_LP && record.City_LP.id) {
             selectedCity = { id: String(record.City_LP.id), name: record.City_LP.name };
-            var citySel = document.getElementById("city-lp-select");
-            if (citySel) citySel.value = String(record.City_LP.id);
+            var cityInp = document.getElementById("city-lp-input");
+            if (cityInp) cityInp.value = record.City_LP.name;
 
-            // Load streets for this city then set the street select
+            // Load streets for this city then prefill street
+            var streetRecord = record["Street LP"] || record.Street_LP;
             loadStreetsForCity(record.City_LP.name).then(function (streets) {
                 populateStreetSelect(streets);
-                var streetRecord = record["Street LP"] || record.Street_LP;
                 if (streetRecord && streetRecord.id) {
                     selectedStreet = { id: String(streetRecord.id), name: streetRecord.name };
-                    var streetSel = document.getElementById("street-lp-select");
-                    if (streetSel) streetSel.value = String(streetRecord.id);
+                    var streetInp = document.getElementById("street-lp-input");
+                    if (streetInp) streetInp.value = streetRecord.name;
                 }
             });
         }
@@ -573,74 +610,145 @@
         });
     }
 
-    // ─── Populate City <select> ──────────────────────────────────────────────
+    // ─── Combo-box state ────────────────────────────────────────────────────
+    var comboData   = { city: [], street: [] };   // full item arrays
+    var comboActive = { city: -1, street: -1 };   // keyboard-focused index
+
+    // ─── Populate city combo after cities load ───────────────────────────────
     function populateCitySelect(cities) {
-        var sel = document.getElementById("city-lp-select");
-        sel.innerHTML = '<option value="">— Select City —</option>';
-        cities.forEach(function (c) {
-            var o = document.createElement("option");
-            o.value       = c.id;
-            o.textContent = c.name;
-            o.setAttribute("data-name", c.name);
-            sel.appendChild(o);
-        });
+        comboData.city = cities;
     }
 
-    // ─── Populate Street <select> ────────────────────────────────────────────
+    // ─── Populate street combo ───────────────────────────────────────────────
     function populateStreetSelect(streets) {
-        var sel = document.getElementById("street-lp-select");
-        sel.innerHTML = '<option value="">— Select Street —</option>';
-        if (streets.length === 0) {
-            sel.innerHTML = '<option value="">No streets found</option>';
-            sel.disabled = true;
-            return;
-        }
-        streets.forEach(function (s) {
-            var o = document.createElement("option");
-            o.value       = s.id;
-            o.textContent = s.name;
-            o.setAttribute("data-name", s.name);
-            sel.appendChild(o);
-        });
-        sel.disabled = false;
+        comboData.street = streets;
+        var inp = document.getElementById("street-lp-input");
+        inp.disabled    = streets.length === 0;
+        inp.placeholder = streets.length === 0 ? "No streets found" : "Type or select a street…";
+        inp.value       = "";
+        selectedStreet  = null;
+        closeCombo("street");
     }
 
-    // ─── City change handler ─────────────────────────────────────────────────
-    function onCitySelectChange(sel) {
-        var opt = sel.options[sel.selectedIndex];
-        if (!opt || !opt.value) {
-            selectedCity   = null;
-            selectedStreet = null;
-            var streetSel  = document.getElementById("street-lp-select");
-            streetSel.innerHTML = '<option value="">— Select Street —</option>';
-            streetSel.disabled  = true;
+    // ─── Open combo list ─────────────────────────────────────────────────────
+    function openCombo(which) {
+        if (which === "street" && comboData.street.length === 0) return;
+        renderComboList(which, document.getElementById(which + "-lp-input").value);
+        document.getElementById(which + "-combo-list").style.display = "block";
+    }
+
+    // ─── Close combo list ────────────────────────────────────────────────────
+    function closeCombo(which) {
+        document.getElementById(which + "-combo-list").style.display = "none";
+        comboActive[which] = -1;
+    }
+
+    // ─── Filter as user types ────────────────────────────────────────────────
+    function filterCombo(which) {
+        var val = document.getElementById(which + "-lp-input").value;
+        // If user clears the input, clear the selection
+        if (!val) {
+            if (which === "city") { selectedCity = null; resetStreetCombo(); }
+            else                  { selectedStreet = null; }
+        }
+        renderComboList(which, val);
+        document.getElementById(which + "-combo-list").style.display = "block";
+        comboActive[which] = -1;
+    }
+
+    // ─── Render filtered rows ────────────────────────────────────────────────
+    function renderComboList(which, filterStr) {
+        var list  = document.getElementById(which + "-combo-list");
+        var lower = (filterStr || "").toLowerCase();
+        var items = comboData[which];
+        var filtered = lower
+            ? items.filter(function (it) { return it.name.toLowerCase().indexOf(lower) !== -1; })
+            : items;
+
+        list.innerHTML = "";
+        if (filtered.length === 0) {
+            list.innerHTML = '<div class="combo-row combo-empty">No results</div>';
             return;
         }
-
-        selectedCity   = { id: opt.value, name: opt.getAttribute("data-name") };
-        selectedStreet = null;
-
-        // Reset + disable street while loading
-        var streetSel = document.getElementById("street-lp-select");
-        streetSel.innerHTML = '<option value="">Loading…</option>';
-        streetSel.disabled  = true;
-
-        loadStreetsForCity(selectedCity.name).then(function (streets) {
-            populateStreetSelect(streets);
-        }).catch(function (err) {
-            streetSel.innerHTML = '<option value="">Error loading streets</option>';
-            showToast("Error loading streets: " + JSON.stringify(err), "error");
+        filtered.forEach(function (item, idx) {
+            var row = document.createElement("div");
+            row.className   = "combo-row";
+            row.textContent = item.name;
+            row.setAttribute("data-idx", idx);
+            row.onmousedown = function (e) {
+                e.preventDefault();
+                selectComboItem(which, item);
+            };
+            list.appendChild(row);
         });
     }
 
-    // ─── Street change handler ───────────────────────────────────────────────
-    function onStreetSelectChange(sel) {
-        var opt = sel.options[sel.selectedIndex];
-        if (!opt || !opt.value) {
+    // ─── Select an item ──────────────────────────────────────────────────────
+    function selectComboItem(which, item) {
+        document.getElementById(which + "-lp-input").value = item.name;
+        closeCombo(which);
+
+        if (which === "city") {
+            selectedCity   = item;
             selectedStreet = null;
+            resetStreetCombo();
+            // Load streets for this city
+            var streetInp = document.getElementById("street-lp-input");
+            streetInp.disabled    = true;
+            streetInp.placeholder = "Loading streets…";
+            comboData.street      = [];
+            loadStreetsForCity(item.name).then(function (streets) {
+                populateStreetSelect(streets);
+            }).catch(function (err) {
+                showToast("Error loading streets: " + JSON.stringify(err), "error");
+            });
+        } else {
+            selectedStreet = item;
+        }
+    }
+
+    function resetStreetCombo() {
+        comboData.street = [];
+        var inp = document.getElementById("street-lp-input");
+        inp.value       = "";
+        inp.disabled    = true;
+        inp.placeholder = "Select a city first…";
+        closeCombo("street");
+        selectedStreet  = null;
+    }
+
+    // ─── Keyboard navigation ─────────────────────────────────────────────────
+    function comboKeydown(e, which) {
+        var list = document.getElementById(which + "-combo-list");
+        if (list.style.display === "none") {
+            if (e.key === "ArrowDown" || e.key === "Enter") openCombo(which);
             return;
         }
-        selectedStreet = { id: opt.value, name: opt.getAttribute("data-name") };
+        var rows = list.querySelectorAll(".combo-row:not(.combo-empty)");
+        if (e.key === "ArrowDown") {
+            e.preventDefault();
+            comboActive[which] = Math.min(comboActive[which] + 1, rows.length - 1);
+            highlightComboRow(rows, comboActive[which]);
+        } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            comboActive[which] = Math.max(comboActive[which] - 1, 0);
+            highlightComboRow(rows, comboActive[which]);
+        } else if (e.key === "Enter") {
+            e.preventDefault();
+            if (comboActive[which] >= 0 && rows[comboActive[which]]) {
+                rows[comboActive[which]].onmousedown(e);
+            }
+        } else if (e.key === "Escape") {
+            closeCombo(which);
+        }
+    }
+
+    function highlightComboRow(rows, idx) {
+        rows.forEach(function (r) { r.classList.remove("combo-highlighted"); });
+        if (rows[idx]) {
+            rows[idx].classList.add("combo-highlighted");
+            rows[idx].scrollIntoView({ block: "nearest" });
+        }
     }
 
     // ─── Build save payload ──────────────────────────────────────────────────
@@ -767,26 +875,33 @@
     </div>
 </div>
 
-<!-- City LP (lookup → Cities module) -->
+<!-- City LP -->
 <div class="form-row">
     <div class="form-label">City LP</div>
     <div class="form-control-wrap">
-        <div class="select-wrap">
-            <select id="city-lp-select" class="form-select" onchange="onCitySelectChange(this)">
-                <option value="">— Select City —</option>
-            </select>
+        <div class="combo-wrap" id="city-combo-wrap">
+            <input id="city-lp-input" type="text" class="form-input combo-input"
+                   placeholder="Type or select a city…" autocomplete="off"
+                   oninput="filterCombo('city')"
+                   onfocus="openCombo('city')"
+                   onkeydown="comboKeydown(event,'city')" />
+            <div id="city-combo-list" class="combo-list" style="display:none"></div>
         </div>
     </div>
 </div>
 
-<!-- Street LP (lookup → Streets module) -->
+<!-- Street LP -->
 <div class="form-row">
     <div class="form-label">Street LP</div>
     <div class="form-control-wrap">
-        <div class="select-wrap">
-            <select id="street-lp-select" class="form-select" onchange="onStreetSelectChange(this)" disabled>
-                <option value="">— Select Street —</option>
-            </select>
+        <div class="combo-wrap" id="street-combo-wrap">
+            <input id="street-lp-input" type="text" class="form-input combo-input"
+                   placeholder="Select a city first…" autocomplete="off"
+                   oninput="filterCombo('street')"
+                   onfocus="openCombo('street')"
+                   onkeydown="comboKeydown(event,'street')"
+                   disabled />
+            <div id="street-combo-list" class="combo-list" style="display:none"></div>
         </div>
     </div>
 </div>
