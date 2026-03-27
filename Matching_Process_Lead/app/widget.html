@@ -577,41 +577,29 @@
         if (el) el.value = name || "";
     }
 
-    // ─── Preloaded lookup caches ─────────────────────────────────────────────
-    // All cities are fetched once on init. Streets are fetched per city.
-    // Dropdowns filter client-side — no round-trips on each keystroke.
-    var allCities = null;  // [{ id, name }]
+    // ─── Lookup caches ───────────────────────────────────────────────────────
+    var allCities = null;  // [{ id, name }] — loaded once
 
     function loadAllCities() {
         if (allCities !== null) return Promise.resolve(allCities);
-        return fetchAllPages("Cities", "Name", null).then(function (items) {
-            allCities = items;
-            return items;
+        return ZOHO.CRM.API.coql({
+            select_query: "select id, Name from Cities WHERE id is not null LIMIT 2000"
+        }).then(function (resp) {
+            allCities = (resp.data || []).map(function (r) {
+                return { id: String(r.id), name: r.Name };
+            });
+            return allCities;
         });
     }
 
-    function loadStreetsForCity(cityId) {
-        if (!cityId) return Promise.resolve([]);   // streets need a city filter
-        var where = " where (City_Name.id = '" + cityId + "')";
-        return fetchAllPages("Streets", "Name", where);
-    }
-
-    // Fetch all records across pages (COQL max 200 per call)
-    function fetchAllPages(module, nameField, whereClause, accum, offset) {
-        accum  = accum  || [];
-        offset = offset || 0;
-        var where = (whereClause && whereClause.trim()) ? whereClause : "";
-        var query = "select id, " + nameField + " from " + module +
-                    where +
-                    " limit 200 offset " + offset;
-
-        return ZOHO.CRM.API.coql({ select_query: query }).then(function (resp) {
-            var rows = resp.data || [];
-            rows.forEach(function (r) { accum.push({ id: r.id, name: r[nameField] }); });
-            if (rows.length === 200) {
-                return fetchAllPages(module, nameField, whereClause, accum, offset + 200);
-            }
-            return accum;
+    function loadStreetsForCity(cityName) {
+        if (!cityName) return Promise.resolve([]);
+        return ZOHO.CRM.API.coql({
+            select_query: "select id, Name from Streets WHERE City = '" + cityName.replace(/'/g, "\'") + "'"
+        }).then(function (resp) {
+            return (resp.data || []).map(function (r) {
+                return { id: String(r.id), name: r.Name };
+            });
         });
     }
 
@@ -632,7 +620,7 @@
         });
     }
 
-    // ─── Street LP picklist (filtered by selected city) ──────────────────────
+    // ─── Street LP picklist (filtered by selected city name) ────────────────
     function openStreetPicklist() {
         if (!selectedCity) {
             showToast("Please select a City first", "error");
@@ -640,7 +628,7 @@
         }
         closeAllDropdowns();
         showLoadingDropdown("street-lp-input");
-        loadStreetsForCity(selectedCity.id).then(function (streets) {
+        loadStreetsForCity(selectedCity.name).then(function (streets) {
             showPicklistDropdown("street-lp-input", streets, function (item) {
                 selectedStreet = item;
                 setLookupDisplay("street-lp-input", item.name);
@@ -743,9 +731,9 @@
 
         payload.Email  = document.getElementById("email-input").value.trim() || null;
 
-        // FIX 2 & 3: Save lookup fields as { id } objects (Zoho CRM lookup format)
-        payload.City_LP      = selectedCity   ? { id: selectedCity.id }   : null;
-        payload["Street LP"] = selectedStreet ? { id: selectedStreet.id } : null;
+        // Lookup fields: pass id as a number (Zoho CRM requires numeric id for lookups)
+        payload.City_LP      = selectedCity   ? { id: parseInt(selectedCity.id,   10) } : null;
+        payload["Street LP"] = selectedStreet ? { id: parseInt(selectedStreet.id, 10) } : null;
 
         payload.Number = document.getElementById("number-input").value.trim() || null;
 
