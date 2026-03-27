@@ -595,6 +595,10 @@
                 return fetchCitiesPage(accum, offset + 200);
             }
             allCities = accum;
+            console.log("=== ALL CITIES LOADED (" + allCities.length + ") ===");
+            allCities.forEach(function (c) {
+                console.log("City | id:", c.id, "| name:", c.name);
+            });
             return allCities;
         });
     }
@@ -604,9 +608,14 @@
         return ZOHO.CRM.API.coql({
             select_query: "select id, Name from Streets WHERE City = '" + cityName.replace(/'/g, "\'") + "'"
         }).then(function (resp) {
-            return (resp.data || []).map(function (r) {
+            var streets = (resp.data || []).map(function (r) {
                 return { id: String(r.id), name: r.Name };
             });
+            console.log("=== STREETS LOADED FOR CITY: " + cityName + " (" + streets.length + ") ===");
+            streets.forEach(function (s) {
+                console.log("Street | id:", s.id, "| name:", s.name);
+            });
+            return streets;
         });
     }
 
@@ -691,6 +700,8 @@
         if (which === "city") {
             selectedCity   = item;
             selectedStreet = null;
+            console.log("=== CITY SELECTED ===");
+            console.log("City id:", selectedCity.id, "| name:", selectedCity.name);
             resetStreetCombo();
             // Load streets for this city
             var streetInp = document.getElementById("street-lp-input");
@@ -704,6 +715,8 @@
             });
         } else {
             selectedStreet = item;
+            console.log("=== STREET SELECTED ===");
+            console.log("Street id:", selectedStreet.id, "| name:", selectedStreet.name);
         }
     }
 
