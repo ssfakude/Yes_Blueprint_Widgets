@@ -362,24 +362,96 @@
   var address = record['Full_Address']   || '';
           document.getElementById('address-line').textContent = address || 'No address on record';
 
-          // Hardcoded infrastructure values — no external function needed
-          window._infraResult = {
-            Fibers_Available: 'Available',
-            Fiber_Max_Speed:  '1GB',
-            Copper_Max_Speed: '250kbs'
-          };
+          // Execute Deluge function
+          var func_name = "CheckInfrastructure";
+          ZOHO.CRM.FUNCTIONS.execute(func_name, {})
+            .then(function(fnData) {
 
-          // Always show as active
-          document.getElementById('card-header').classList.remove('inactive');
-          document.getElementById('pulse-dot').classList.remove('inactive');
-          document.getElementById('header-badge').textContent = 'ACTIVE';
-          document.getElementById('header-title').textContent = 'Fiber Service Available';
+              // Log full response so we can inspect the shape in DevTools
+              console.log("CheckInfrastructure raw response:", JSON.stringify(fnData, null, 2));
 
-          document.getElementById('optical-wiring').innerHTML = renderOpticalWiring('Available');
-          document.getElementById('fiber-speed').innerHTML   = '<span class="speed-tag">1GB</span>';
-          document.getElementById('copper-speed').innerHTML  = '<span class="speed-tag copper">250kbs</span>';
+              // Zoho can nest the output in several different ways depending on
+              // how the Deluge function returns its value. Try each path in order.
+              var raw =
+                (fnData && fnData.details && fnData.details.output)   ||  // most common
+                (fnData && fnData.details && fnData.details.userMessage) || // alternate key
+                (fnData && fnData.output)                              ||  // flat
+                (fnData && fnData.data)                                ||  // data key
+                fnData;                                                    // the object itself
 
-          showWidget();
+              console.log("Raw value before parse:", raw, "| type:", typeof raw);
+
+              var result;
+              try {
+                if (typeof raw === 'string') {
+                  // Deluge string maps sometimes come back as
+                  // {"Optical wiring":"true","Max fiber speed":"2GB",...}
+                  result = JSON.parse(raw);
+                } else if (raw && typeof raw === 'object') {
+                  result = raw;
+                } else {
+                  throw new Error("Unexpected type: " + typeof raw);
+                }
+              } catch(e) {
+                console.error("Parse error:", e, "| raw was:", raw);
+                showError('Could not parse service data. Check console for details.');
+                return;
+              }
+
+              console.log("Parsed result:", result);
+
+              if (!result || typeof result !== 'object') {
+                showError('Service data was empty or malformed.');
+                return;
+              }
+
+              // Determine active/inactive from Optical wiring
+              var opticalValue = result['Optical wiring'];
+              var isActive = (opticalValue === 'Available');
+
+              // Store result values on window for use in handleNext
+              window._infraResult = {
+                Fibers_Available:  opticalValue        || '',
+                Fiber_Max_Speed:   result['Max fiber speed']   || '',
+                Copper_Max_Speed:  result['Max copper speed']  || ''
+              };
+
+              // Toggle header appearance
+              var cardHeader = document.getElementById('card-header');
+              var pulseDot   = document.getElementById('pulse-dot');
+              var badge      = document.getElementById('header-badge');
+              var title      = document.getElementById('header-title');
+
+              if (isActive) {
+                cardHeader.classList.remove('inactive');
+                pulseDot.classList.remove('inactive');
+                badge.textContent = 'ACTIVE';
+                title.textContent = 'Fiber Service Available';
+              } else {
+                cardHeader.classList.add('inactive');
+                pulseDot.classList.add('inactive');
+                badge.textContent = 'INACTIVE';
+                title.textContent = 'Fiber Service Unavailable';
+              }
+
+              // Render optical wiring
+              document.getElementById('optical-wiring').innerHTML =
+                renderOpticalWiring(opticalValue);
+
+              // Render fiber speed
+              document.getElementById('fiber-speed').innerHTML =
+                `<span class="speed-tag">${result['Max fiber speed'] || '—'}</span>`;
+
+              // Render copper speed
+              document.getElementById('copper-speed').innerHTML =
+                `<span class="speed-tag copper">${result['Max copper speed'] || '—'}</span>`;
+
+              showWidget();
+            })
+            .catch(function(err) {
+              console.error('Function error:', err);
+              showError('CheckInfrastructure function failed: ' + (err && err.message ? err.message : JSON.stringify(err)));
+            });
         })
         .catch(function(err) {
           console.error('Record fetch error:', err);
@@ -421,13 +493,9 @@
       })
       .then(function(blueprintResp) {
         console.log('Blueprint proceed response:', blueprintResp);
-        try {
-          ZOHO.CRM.UI.Popup.closeReload().then(function(data) {
-            console.log(data);
-          });
-        } catch(e) {
-          ZOHO.CRM.UI.Popup.close();
-        }
+        ZOHO.CRM.UI.Popup.closeReload().then(function(data) {
+          console.log(data);
+        });
       })
       .catch(function(err) {
         console.error('Next error:', err);
