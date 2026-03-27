@@ -355,22 +355,8 @@
     .lookup-row:hover { background: var(--accent-glow); color: var(--accent); }
     .lookup-hint { font-size: 11px; color: var(--text-muted); padding: 4px 0 0; display: block; }
 
-    /* Search box inside picklist dropdown */
-    .lookup-search-box {
-        display: block;
-        width: 100%;
-        padding: 8px 12px;
-        font-family: 'Sora', sans-serif;
-        font-size: 12px;
-        color: var(--text-primary);
-        background: var(--surface);
-        border: none;
-        border-bottom: 1.5px solid var(--border);
-        outline: none;
-        border-radius: var(--radius) var(--radius) 0 0;
-    }
-    .lookup-search-box:focus { border-bottom-color: var(--accent); }
-    .lookup-list { max-height: 190px; overflow-y: auto; }
+    /* Picklist scroll list */
+    .lookup-list { max-height: 220px; overflow-y: auto; }
 </style>
 <script src="https://live.zwidgets.com/js-sdk/1.5/ZohoEmbededAppSDK.min.js"></script>
 <script>
@@ -663,35 +649,18 @@
         dropdown.className = "lookup-dropdown";
         dropdown.id        = "dropdown-" + inputId;
 
-        // Inline search / filter box
-        var searchBox = document.createElement("input");
-        searchBox.type        = "text";
-        searchBox.placeholder = "Filter…";
-        searchBox.className   = "lookup-search-box";
-        searchBox.onclick     = function (e) { e.stopPropagation(); };
-        dropdown.appendChild(searchBox);
-
         var listWrap = document.createElement("div");
         listWrap.className = "lookup-list";
-        dropdown.appendChild(listWrap);
 
-        function renderList(filterStr) {
-            listWrap.innerHTML = "";
-            var lower    = (filterStr || "").toLowerCase();
-            var filtered = lower
-                ? items.filter(function (it) { return it.name.toLowerCase().indexOf(lower) !== -1; })
-                : items;
-
-            if (filtered.length === 0) {
-                listWrap.innerHTML = '<div class="lookup-row" style="color:var(--text-muted);cursor:default">No results</div>';
-                return;
-            }
-            filtered.forEach(function (item) {
+        if (items.length === 0) {
+            listWrap.innerHTML = '<div class="lookup-row" style="color:var(--text-muted);cursor:default">No results</div>';
+        } else {
+            items.forEach(function (item) {
                 var row = document.createElement("div");
                 row.className   = "lookup-row";
                 row.textContent = item.name;
                 row.onmousedown = function (e) {
-                    e.preventDefault();  // prevent blur before click registers
+                    e.preventDefault();
                     onSelect(item);
                     closeAllDropdowns();
                 };
@@ -699,11 +668,8 @@
             });
         }
 
-        renderList("");
-        searchBox.oninput = function () { renderList(this.value); };
-
+        dropdown.appendChild(listWrap);
         wrap.appendChild(dropdown);
-        setTimeout(function () { searchBox.focus(); }, 50);
 
         // Close on outside mousedown
         function outsideClick(e) {
