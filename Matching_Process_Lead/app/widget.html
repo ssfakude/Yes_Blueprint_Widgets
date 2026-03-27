@@ -293,6 +293,8 @@
     .btn-primary:hover { background: #2e8ab5; }
     .btn-success   { background: #22c55e; color: white; }
     .btn-success:hover { background: #16a34a; }
+    .btn-cancel-style  { background: var(--surface-card); color: var(--text-secondary); border: 1.5px solid var(--border); }
+    .btn-cancel-style:hover { background: #e8edf3; border-color: #b0bfce; }
 
     /* ── Toast ── */
     .toast {
@@ -582,14 +584,15 @@
 
     function loadAllCities() {
         if (allCities !== null) return Promise.resolve(allCities);
-        return fetchAllPages("Cities", "Name", "").then(function (items) {
+        return fetchAllPages("Cities", "Name", null).then(function (items) {
             allCities = items;
             return items;
         });
     }
 
     function loadStreetsForCity(cityId) {
-        var where = cityId ? " where (City_Name.id = '" + cityId + "')" : "";
+        if (!cityId) return Promise.resolve([]);   // streets need a city filter
+        var where = " where (City_Name.id = '" + cityId + "')";
         return fetchAllPages("Streets", "Name", where);
     }
 
@@ -597,8 +600,9 @@
     function fetchAllPages(module, nameField, whereClause, accum, offset) {
         accum  = accum  || [];
         offset = offset || 0;
+        var where = (whereClause && whereClause.trim()) ? whereClause : "";
         var query = "select id, " + nameField + " from " + module +
-                    (whereClause || "") +
+                    where +
                     " limit 200 offset " + offset;
 
         return ZOHO.CRM.API.coql({ select_query: query }).then(function (resp) {
@@ -630,10 +634,13 @@
 
     // ─── Street LP picklist (filtered by selected city) ──────────────────────
     function openStreetPicklist() {
+        if (!selectedCity) {
+            showToast("Please select a City first", "error");
+            return;
+        }
         closeAllDropdowns();
         showLoadingDropdown("street-lp-input");
-        var cityId = selectedCity ? selectedCity.id : null;
-        loadStreetsForCity(cityId).then(function (streets) {
+        loadStreetsForCity(selectedCity.id).then(function (streets) {
             showPicklistDropdown("street-lp-input", streets, function (item) {
                 selectedStreet = item;
                 setLookupDisplay("street-lp-input", item.name);
@@ -772,40 +779,18 @@
         btn.disabled  = !!disabled;
     }
 
-    // ─── Action: Not Interested ──────────────────────────────────────────────
-    function handleNotInterested() {
-        if (isProcessing) return;
-        isProcessing = true;
-        var payload  = buildPayload();
-        payload.Lead_Status = "Not Interested";
-
-        setBtn("btn-not-interested", spinnerHtml("Not Interested"), true);
-
-        saveLeadRecord(payload)
-            .then(function () {
-                return ZOHO.CRM.BLUEPRINT.proceed();
-            })
-            .then(function () {
-                showToast("Saved & proceeded", "success");
-                setTimeout(function () { try { ZOHO.CRM.UI.Popup.close(); } catch (e) {} }, 1000);
-            })
-            .catch(function (err) {
-                showToast("Error: " + JSON.stringify(err), "error");
-                setBtn("btn-not-interested", "Not Interested");
-                isProcessing = false;
-            });
+    // ─── Action: Cancel — just close the popup ──────────────────────────────
+    function handleCancel() {
+        try { ZOHO.CRM.UI.Popup.close(); } catch (e) {}
     }
 
-    // ─── Action: Unservable ──────────────────────────────────────────────────
-    function handleUnservable() {
+    // ─── Action: Next — save all fields then proceed blueprint ───────────────
+    function handleNext() {
         if (isProcessing) return;
         isProcessing = true;
-        var payload  = buildPayload();
-        payload.Lead_Status = "Unservable";
+        setBtn("btn-next", spinnerHtml("Next"), true);
 
-        setBtn("btn-unservable", spinnerHtml("Unservable"), true);
-
-        saveLeadRecord(payload)
+        saveLeadRecord(buildPayload())
             .then(function () {
                 return ZOHO.CRM.BLUEPRINT.proceed();
             })
@@ -815,54 +800,7 @@
             })
             .catch(function (err) {
                 showToast("Error: " + JSON.stringify(err), "error");
-                setBtn("btn-unservable", "Unservable");
-                isProcessing = false;
-            });
-    }
-
-    // ─── Action: Convert ────────────────────────────────────────────────────
-    function handleConvert() {
-        if (isProcessing) return;
-        isProcessing = true;
-        var payload  = buildPayload();
-
-        setBtn("btn-convert", spinnerHtml("Convert"), true);
-
-        saveLeadRecord(payload)
-            .then(function () {
-                return ZOHO.CRM.BLUEPRINT.proceed();
-            })
-            .then(function () {
-                showToast("Saved & proceeded", "success");
-                setTimeout(function () { try { ZOHO.CRM.UI.Popup.close(); } catch (e) {} }, 1000);
-            })
-            .catch(function (err) {
-                showToast("Error: " + JSON.stringify(err), "error");
-                setBtn("btn-convert", "Convert");
-                isProcessing = false;
-            });
-    }
-
-    // ─── Action: Follow Up Later ─────────────────────────────────────────────
-    function handleFollowUpLater() {
-        if (isProcessing) return;
-        isProcessing = true;
-        var payload  = buildPayload();
-        payload.Lead_Status = "Follow Up Later";
-
-        setBtn("btn-follow-up", spinnerHtml("Follow Up Later"), true);
-
-        saveLeadRecord(payload)
-            .then(function () {
-                return ZOHO.CRM.BLUEPRINT.proceed();
-            })
-            .then(function () {
-                showToast("Saved & proceeded", "success");
-                setTimeout(function () { try { ZOHO.CRM.UI.Popup.close(); } catch (e) {} }, 1000);
-            })
-            .catch(function (err) {
-                showToast("Error: " + JSON.stringify(err), "error");
-                setBtn("btn-follow-up", "Follow Up Later");
+                setBtn("btn-next", "Next");
                 isProcessing = false;
             });
     }
@@ -955,10 +893,8 @@
 
 <!-- Bottom action bar -->
 <div class="action-bar">
-    <button id="btn-not-interested" class="action-btn btn-danger"  onclick="handleNotInterested()">Not Interested</button>
-    <button id="btn-unservable"     class="action-btn btn-danger"  onclick="handleUnservable()">Unservable</button>
-    <button id="btn-convert"        class="action-btn btn-primary" onclick="handleConvert()">Convert</button>
-    <button id="btn-follow-up"      class="action-btn btn-success" onclick="handleFollowUpLater()">Follow Up Later</button>
+    <button id="btn-cancel" class="action-btn btn-cancel-style" onclick="handleCancel()">Cancel</button>
+    <button id="btn-next"   class="action-btn btn-primary"      onclick="handleNext()">Next</button>
 </div>
 
 <div id="toast" class="toast"></div>
