@@ -425,7 +425,13 @@
       .then(function(data) {
         console.log(data);
 
-        // Step 3 — close and reload
+        // Step 3 — advance blueprint
+        return ZOHO.CRM.BLUEPRINT.proceed();
+      })
+      .then(function(blueprintResp) {
+        console.log('Blueprint proceed response:', blueprintResp);
+
+        // Step 4 — close and reload
         ZOHO.CRM.UI.Popup.closeReload().then(function(data) {
           console.log('closeReload data:', data);
         });
