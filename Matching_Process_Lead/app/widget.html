@@ -543,12 +543,21 @@
 
     function loadAllCities() {
         if (allCities !== null) return Promise.resolve(allCities);
+        return fetchCitiesPage([], 0);
+    }
+
+    function fetchCitiesPage(accum, offset) {
         return ZOHO.CRM.API.coql({
-            select_query: "select id, Name from Cities WHERE id is not null LIMIT 100"
+            select_query: "select id, Name from Cities WHERE id is not null LIMIT 200 OFFSET " + offset
         }).then(function (resp) {
-            allCities = (resp.data || []).map(function (r) {
-                return { id: String(r.id), name: r.Name };
+            var rows = resp.data || [];
+            rows.forEach(function (r) {
+                accum.push({ id: String(r.id), name: r.Name });
             });
+            if (rows.length === 200) {
+                return fetchCitiesPage(accum, offset + 200);
+            }
+            allCities = accum;
             return allCities;
         });
     }
