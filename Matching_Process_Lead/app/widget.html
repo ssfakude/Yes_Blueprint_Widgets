@@ -329,34 +329,7 @@
     .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
     @keyframes pulse { 0%, 80%, 100% { transform: scale(0.7); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
 
-    /* ── Lookup dropdown ── */
-    .lookup-dropdown {
-        position: absolute;
-        top: calc(100% + 4px);
-        left: 0;
-        right: 0;
-        background: var(--surface-card);
-        border: 1.5px solid var(--border-active);
-        border-radius: var(--radius);
-        box-shadow: var(--shadow-lg);
-        z-index: 500;
-        max-height: 220px;
-        overflow-y: auto;
-    }
-    .lookup-row {
-        padding: 10px 14px;
-        font-size: 13px;
-        color: var(--text-primary);
-        cursor: pointer;
-        border-bottom: 1px solid var(--border);
-        transition: background 0.15s;
-    }
-    .lookup-row:last-child { border-bottom: none; }
-    .lookup-row:hover { background: var(--accent-glow); color: var(--accent); }
-    .lookup-hint { font-size: 11px; color: var(--text-muted); padding: 4px 0 0; display: block; }
 
-    /* Picklist scroll list */
-    .lookup-list { max-height: 220px; overflow-y: auto; }
 </style>
 <script src="https://live.zwidgets.com/js-sdk/1.5/ZohoEmbededAppSDK.min.js"></script>
 <script>
@@ -413,11 +386,13 @@
             buildIdTypeSelect(meta.fields);
             buildLeavingCompanyGrid(meta.fields);
 
-            if (record) prefillForm(record);
-
-            // Preload cities in background so the picklist opens instantly
-            loadAllCities().catch(function (err) {
-                console.warn("City preload failed:", err);
+            // Load cities into the select, then prefill if record exists
+            loadAllCities().then(function (cities) {
+                populateCitySelect(cities);
+                if (record) prefillForm(record);
+            }).catch(function (err) {
+                console.warn("City load failed:", err);
+                if (record) prefillForm(record);
             });
         }).catch(function (err) {
             showToast("Error loading data: " + JSON.stringify(err), "error");
@@ -540,27 +515,27 @@
             document.getElementById("email-input").value = record.Email;
         }
 
-        // FIX 2 & 3: City_LP and Street_LP are lookup fields → pre-fill display name + store id
+        // City_LP and Street_LP are lookup fields — set the <select> elements
         if (record.City_LP && record.City_LP.id) {
-            selectedCity = { id: record.City_LP.id, name: record.City_LP.name };
-            setLookupDisplay("city-lp-input", record.City_LP.name);
-        }
-        if (record["Street LP"] && record["Street LP"].id) {
-            selectedStreet = { id: record["Street LP"].id, name: record["Street LP"].name };
-            setLookupDisplay("street-lp-input", record["Street LP"].name);
-        } else if (record.Street_LP && record.Street_LP.id) {
-            selectedStreet = { id: record.Street_LP.id, name: record.Street_LP.name };
-            setLookupDisplay("street-lp-input", record.Street_LP.name);
+            selectedCity = { id: String(record.City_LP.id), name: record.City_LP.name };
+            var citySel = document.getElementById("city-lp-select");
+            if (citySel) citySel.value = String(record.City_LP.id);
+
+            // Load streets for this city then set the street select
+            loadStreetsForCity(record.City_LP.name).then(function (streets) {
+                populateStreetSelect(streets);
+                var streetRecord = record["Street LP"] || record.Street_LP;
+                if (streetRecord && streetRecord.id) {
+                    selectedStreet = { id: String(streetRecord.id), name: streetRecord.name };
+                    var streetSel = document.getElementById("street-lp-select");
+                    if (streetSel) streetSel.value = String(streetRecord.id);
+                }
+            });
         }
 
         if (record.Number) {
             document.getElementById("number-input").value = record.Number;
         }
-    }
-
-    function setLookupDisplay(inputId, name) {
-        var el = document.getElementById(inputId);
-        if (el) el.value = name || "";
     }
 
     // ─── Lookup caches ───────────────────────────────────────────────────────
@@ -589,100 +564,74 @@
         });
     }
 
-    // ─── City LP picklist ────────────────────────────────────────────────────
-    function openCityPicklist() {
-        closeAllDropdowns();
-        showLoadingDropdown("city-lp-input");
-        loadAllCities().then(function (cities) {
-            showPicklistDropdown("city-lp-input", cities, function (item) {
-                selectedCity   = item;
-                selectedStreet = null;
-                document.getElementById("street-lp-input").value = "";
-                setLookupDisplay("city-lp-input", item.name);
-            });
-        }).catch(function (err) {
-            closeAllDropdowns();
-            showToast("Error loading cities: " + JSON.stringify(err), "error");
+    // ─── Populate City <select> ──────────────────────────────────────────────
+    function populateCitySelect(cities) {
+        var sel = document.getElementById("city-lp-select");
+        sel.innerHTML = '<option value="">— Select City —</option>';
+        cities.forEach(function (c) {
+            var o = document.createElement("option");
+            o.value       = c.id;
+            o.textContent = c.name;
+            o.setAttribute("data-name", c.name);
+            sel.appendChild(o);
         });
     }
 
-    // ─── Street LP picklist (filtered by selected city name) ────────────────
-    function openStreetPicklist() {
-        if (!selectedCity) {
-            showToast("Please select a City first", "error");
+    // ─── Populate Street <select> ────────────────────────────────────────────
+    function populateStreetSelect(streets) {
+        var sel = document.getElementById("street-lp-select");
+        sel.innerHTML = '<option value="">— Select Street —</option>';
+        if (streets.length === 0) {
+            sel.innerHTML = '<option value="">No streets found</option>';
+            sel.disabled = true;
             return;
         }
-        closeAllDropdowns();
-        showLoadingDropdown("street-lp-input");
+        streets.forEach(function (s) {
+            var o = document.createElement("option");
+            o.value       = s.id;
+            o.textContent = s.name;
+            o.setAttribute("data-name", s.name);
+            sel.appendChild(o);
+        });
+        sel.disabled = false;
+    }
+
+    // ─── City change handler ─────────────────────────────────────────────────
+    function onCitySelectChange(sel) {
+        var opt = sel.options[sel.selectedIndex];
+        if (!opt || !opt.value) {
+            selectedCity   = null;
+            selectedStreet = null;
+            var streetSel  = document.getElementById("street-lp-select");
+            streetSel.innerHTML = '<option value="">— Select Street —</option>';
+            streetSel.disabled  = true;
+            return;
+        }
+
+        selectedCity   = { id: opt.value, name: opt.getAttribute("data-name") };
+        selectedStreet = null;
+
+        // Reset + disable street while loading
+        var streetSel = document.getElementById("street-lp-select");
+        streetSel.innerHTML = '<option value="">Loading…</option>';
+        streetSel.disabled  = true;
+
         loadStreetsForCity(selectedCity.name).then(function (streets) {
-            showPicklistDropdown("street-lp-input", streets, function (item) {
-                selectedStreet = item;
-                setLookupDisplay("street-lp-input", item.name);
-            });
+            populateStreetSelect(streets);
         }).catch(function (err) {
-            closeAllDropdowns();
+            streetSel.innerHTML = '<option value="">Error loading streets</option>';
             showToast("Error loading streets: " + JSON.stringify(err), "error");
         });
     }
 
-    // Temporary loading indicator inside dropdown
-    function showLoadingDropdown(inputId) {
-        var input = document.getElementById(inputId);
-        var wrap  = input.closest(".input-icon-wrap") || input.parentNode;
-        var d = document.createElement("div");
-        d.className = "lookup-dropdown";
-        d.id        = "dropdown-" + inputId;
-        d.innerHTML = '<div class="lookup-row" style="color:var(--text-muted);cursor:default;display:flex;align-items:center;gap:8px">' +
-            '<span class="loading-dots" style="padding:0;display:inline-flex;gap:4px">' +
-            '<span></span><span></span><span></span></span>Loading…</div>';
-        wrap.appendChild(d);
-    }
-
-    // Render a full picklist dropdown with an inline filter search box
-    function showPicklistDropdown(inputId, items, onSelect) {
-        closeAllDropdowns();
-        var input = document.getElementById(inputId);
-        if (!input) return;
-        var wrap = input.closest(".input-icon-wrap") || input.parentNode;
-
-        var dropdown = document.createElement("div");
-        dropdown.className = "lookup-dropdown";
-        dropdown.id        = "dropdown-" + inputId;
-
-        var listWrap = document.createElement("div");
-        listWrap.className = "lookup-list";
-
-        if (items.length === 0) {
-            listWrap.innerHTML = '<div class="lookup-row" style="color:var(--text-muted);cursor:default">No results</div>';
-        } else {
-            items.forEach(function (item) {
-                var row = document.createElement("div");
-                row.className   = "lookup-row";
-                row.textContent = item.name;
-                row.onmousedown = function (e) {
-                    e.preventDefault();
-                    onSelect(item);
-                    closeAllDropdowns();
-                };
-                listWrap.appendChild(row);
-            });
+    // ─── Street change handler ───────────────────────────────────────────────
+    function onStreetSelectChange(sel) {
+        var opt = sel.options[sel.selectedIndex];
+        if (!opt || !opt.value) {
+            selectedStreet = null;
+            return;
         }
-
-        dropdown.appendChild(listWrap);
-        wrap.appendChild(dropdown);
-
-        // Close on outside mousedown
-        function outsideClick(e) {
-            if (!dropdown.contains(e.target) && e.target !== input) {
-                closeAllDropdowns();
-                document.removeEventListener("mousedown", outsideClick);
-            }
-        }
-        setTimeout(function () { document.addEventListener("mousedown", outsideClick); }, 0);
-    }
-
-    function closeAllDropdowns() {
-        document.querySelectorAll(".lookup-dropdown").forEach(function (d) { d.remove(); });
+        selectedStreet = { id: opt.value, name: opt.getAttribute("data-name") };
     }
 
     // ─── Build save payload ──────────────────────────────────────────────────
@@ -813,12 +762,10 @@
 <div class="form-row">
     <div class="form-label">City LP</div>
     <div class="form-control-wrap">
-        <div class="input-icon-wrap">
-            <input id="city-lp-input" type="text" class="form-input" placeholder="Click to select…" readonly
-                   onclick="openCityPicklist()" />
-            <button class="input-icon-btn" title="Select city" onclick="openCityPicklist()">
-                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
-            </button>
+        <div class="select-wrap">
+            <select id="city-lp-select" class="form-select" onchange="onCitySelectChange(this)">
+                <option value="">— Select City —</option>
+            </select>
         </div>
     </div>
 </div>
@@ -827,12 +774,10 @@
 <div class="form-row">
     <div class="form-label">Street LP</div>
     <div class="form-control-wrap">
-        <div class="input-icon-wrap">
-            <input id="street-lp-input" type="text" class="form-input" placeholder="Click to select…" readonly
-                   onclick="openStreetPicklist()" />
-            <button class="input-icon-btn" title="Select street" onclick="openStreetPicklist()">
-                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
-            </button>
+        <div class="select-wrap">
+            <select id="street-lp-select" class="form-select" onchange="onStreetSelectChange(this)" disabled>
+                <option value="">— Select Street —</option>
+            </select>
         </div>
     </div>
 </div>
