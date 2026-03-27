@@ -422,18 +422,15 @@
         console.log('Deal update response:', updateResp);
         btnNext.textContent = 'Moving…';
 
-        // Step 2 — execute MoveBlueprintState function
-        var func_name = "MoveBlueprintState";
-        var req_data = { "arguments": JSON.stringify({ "dealID": _entityId }) };
-        return ZOHO.CRM.FUNCTIONS.execute(func_name, req_data);
+        // Step 2 — advance blueprint
+        return ZOHO.CRM.BLUEPRINT.proceed();
       })
-      .then(function(data) {
-        console.log(data);
-
-        // Open the Deal record
-        ZOHO.CRM.UI.Record.open({ Entity: "Deals", RecordID: _entityId }).then(function(data) {
+      .then(function(blueprintResp) {
+        console.log('Blueprint proceed response:', blueprintResp);
+        ZOHO.CRM.UI.Popup.closeReload().then(function(data) {
           console.log(data);
         });
+        setTimeout(function() { ZOHO.CRM.UI.Popup.close(); }, 2000);
       })
       .catch(function(err) {
         console.error('Next error:', err);
