@@ -164,12 +164,19 @@
 
     /* ── Action buttons ── */
     .card-actions {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
       display: flex;
       justify-content: flex-end;
       align-items: center;
       gap: 8px;
-      padding: 14px 2px 4px 2px;
+      padding: 10px 16px;
+      background: #fff;
+      border-top: 1px solid #e0e0e0;
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
+      z-index: 100;
     }
+    body { padding-bottom: 56px; }
     .btn-cancel {
       padding: 7px 18px;
       font-family: 'Lato', Arial, sans-serif;
@@ -486,7 +493,9 @@
       })
       .then(function(blueprintResp) {
         console.log('Blueprint proceed response:', blueprintResp);
-        ZOHO.CRM.UI.Popup.close();
+        ZOHO.CRM.UI.Popup.closeReload().then(function(data) {
+          console.log(data);
+        });
       })
       .catch(function(err) {
         console.error('Next error:', err);
