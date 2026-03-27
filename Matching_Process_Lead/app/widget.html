@@ -352,6 +352,23 @@
     .lookup-row:last-child { border-bottom: none; }
     .lookup-row:hover { background: var(--accent-glow); color: var(--accent); }
     .lookup-hint { font-size: 11px; color: var(--text-muted); padding: 4px 0 0; display: block; }
+
+    /* Search box inside picklist dropdown */
+    .lookup-search-box {
+        display: block;
+        width: 100%;
+        padding: 8px 12px;
+        font-family: 'Sora', sans-serif;
+        font-size: 12px;
+        color: var(--text-primary);
+        background: var(--surface);
+        border: none;
+        border-bottom: 1.5px solid var(--border);
+        outline: none;
+        border-radius: var(--radius) var(--radius) 0 0;
+    }
+    .lookup-search-box:focus { border-bottom-color: var(--accent); }
+    .lookup-list { max-height: 190px; overflow-y: auto; }
 </style>
 <script src="https://live.zwidgets.com/js-sdk/1.5/ZohoEmbededAppSDK.min.js"></script>
 <script>
@@ -369,6 +386,7 @@
 
     // Logo filename map — keys must match the picklist actual_value exactly.
     // Only used to locate the image; never written to CRM.
+    // "None" and "HOTNet" are intentionally excluded from the grid.
     var LOGO_MAP = {
         "012":     "012.png",
         "019":     "019.png",
@@ -378,8 +396,11 @@
         "Idan+":   "Idan+.jpg",
         "Next":    "Next.png",
         "Netflix": "Netflix.png",
-        "HOT":     "HOT.png",
+        "HOT":     "HOT.png"
     };
+
+    // Values to hide from the Leaving Company grid
+    var COMPANY_EXCLUDE = { "None": true, "HOTNet": true };
 
     // ─── Boot ───────────────────────────────────────────────────────────────
     ZOHO.embeddedApp.on("PageLoad", function (data) {
@@ -405,6 +426,11 @@
             buildLeavingCompanyGrid(meta.fields);
 
             if (record) prefillForm(record);
+
+            // Preload cities in background so the picklist opens instantly
+            loadAllCities().catch(function (err) {
+                console.warn("City preload failed:", err);
+            });
         }).catch(function (err) {
             showToast("Error loading data: " + JSON.stringify(err), "error");
             console.error(err);
@@ -439,6 +465,9 @@
         field.pick_list_values.forEach(function (opt) {
             var val   = opt.actual_value;          // ← this is what gets saved to CRM
             var label = opt.display_value || val;
+
+            // Skip excluded companies
+            if (COMPANY_EXCLUDE[val]) return;
 
             var logoFile = findLogoFile(val);
 
@@ -546,107 +575,149 @@
         if (el) el.value = name || "";
     }
 
-    // ─── FIX 2: City LP lookup search ───────────────────────────────────────
-    function openCitySearch() {
-        var query = document.getElementById("city-lp-input").value.trim();
-        runLookupSearch("Cities", "Name", query, function (results) {
-            showDropdown("city-lp-input", results, function (item) {
-                selectedCity   = item;
-                selectedStreet = null;   // reset street when city changes
-                document.getElementById("street-lp-input").value = "";
-                setLookupDisplay("city-lp-input", item.name);
-            });
+    // ─── Preloaded lookup caches ─────────────────────────────────────────────
+    // All cities are fetched once on init. Streets are fetched per city.
+    // Dropdowns filter client-side — no round-trips on each keystroke.
+    var allCities = null;  // [{ id, name }]
+
+    function loadAllCities() {
+        if (allCities !== null) return Promise.resolve(allCities);
+        return fetchAllPages("Cities", "Name", "").then(function (items) {
+            allCities = items;
+            return items;
         });
     }
 
-    // ─── FIX 3: Street LP lookup search (filtered by selected city if available) ─
-    function openStreetSearch() {
-        var query = document.getElementById("street-lp-input").value.trim();
-        var cityId = selectedCity ? selectedCity.id : null;
-
-        var coqlQuery;
-        if (cityId) {
-            // Filter streets by the selected city
-            coqlQuery = "select id, Name from Streets where (City_Name.id = '" + cityId + "')" +
-                        (query ? " and (Name like '%" + query.replace(/'/g, "\\'") + "%')" : "") +
-                        " limit 20";
-        } else {
-            coqlQuery = "select id, Name from Streets" +
-                        (query ? " where (Name like '%" + query.replace(/'/g, "\\'") + "%')" : "") +
-                        " limit 20";
-        }
-
-        ZOHO.CRM.API.coql({ select_query: coqlQuery })
-            .then(function (resp) {
-                var items = (resp.data || []).map(function (r) {
-                    return { id: r.id, name: r.Name };
-                });
-                showDropdown("street-lp-input", items, function (item) {
-                    selectedStreet = item;
-                    setLookupDisplay("street-lp-input", item.name);
-                });
-            })
-            .catch(function (err) {
-                showToast("Street search error: " + JSON.stringify(err), "error");
-            });
+    function loadStreetsForCity(cityId) {
+        var where = cityId ? " where (City_Name.id = '" + cityId + "')" : "";
+        return fetchAllPages("Streets", "Name", where);
     }
 
-    // Generic lookup search via COQL
-    function runLookupSearch(module, nameField, query, callback) {
-        var coqlQuery = "select id, " + nameField + " from " + module +
-                        (query ? " where (" + nameField + " like '%" + query.replace(/'/g, "\\'") + "%')" : "") +
-                        " limit 20";
+    // Fetch all records across pages (COQL max 200 per call)
+    function fetchAllPages(module, nameField, whereClause, accum, offset) {
+        accum  = accum  || [];
+        offset = offset || 0;
+        var query = "select id, " + nameField + " from " + module +
+                    (whereClause || "") +
+                    " limit 200 offset " + offset;
 
-        ZOHO.CRM.API.coql({ select_query: coqlQuery })
-            .then(function (resp) {
-                var items = (resp.data || []).map(function (r) {
-                    return { id: r.id, name: r[nameField] };
-                });
-                callback(items);
-            })
-            .catch(function (err) {
-                showToast("Search error: " + JSON.stringify(err), "error");
-            });
+        return ZOHO.CRM.API.coql({ select_query: query }).then(function (resp) {
+            var rows = resp.data || [];
+            rows.forEach(function (r) { accum.push({ id: r.id, name: r[nameField] }); });
+            if (rows.length === 200) {
+                return fetchAllPages(module, nameField, whereClause, accum, offset + 200);
+            }
+            return accum;
+        });
     }
 
-    // ─── Dropdown UI for lookup results ─────────────────────────────────────
-    function showDropdown(inputId, items, onSelect) {
-        // Remove any existing dropdown
+    // ─── City LP picklist ────────────────────────────────────────────────────
+    function openCityPicklist() {
         closeAllDropdowns();
+        showLoadingDropdown("city-lp-input");
+        loadAllCities().then(function (cities) {
+            showPicklistDropdown("city-lp-input", cities, function (item) {
+                selectedCity   = item;
+                selectedStreet = null;
+                document.getElementById("street-lp-input").value = "";
+                setLookupDisplay("city-lp-input", item.name);
+            });
+        }).catch(function (err) {
+            closeAllDropdowns();
+            showToast("Error loading cities: " + JSON.stringify(err), "error");
+        });
+    }
 
+    // ─── Street LP picklist (filtered by selected city) ──────────────────────
+    function openStreetPicklist() {
+        closeAllDropdowns();
+        showLoadingDropdown("street-lp-input");
+        var cityId = selectedCity ? selectedCity.id : null;
+        loadStreetsForCity(cityId).then(function (streets) {
+            showPicklistDropdown("street-lp-input", streets, function (item) {
+                selectedStreet = item;
+                setLookupDisplay("street-lp-input", item.name);
+            });
+        }).catch(function (err) {
+            closeAllDropdowns();
+            showToast("Error loading streets: " + JSON.stringify(err), "error");
+        });
+    }
+
+    // Temporary loading indicator inside dropdown
+    function showLoadingDropdown(inputId) {
+        var input = document.getElementById(inputId);
+        var wrap  = input.closest(".input-icon-wrap") || input.parentNode;
+        var d = document.createElement("div");
+        d.className = "lookup-dropdown";
+        d.id        = "dropdown-" + inputId;
+        d.innerHTML = '<div class="lookup-row" style="color:var(--text-muted);cursor:default;display:flex;align-items:center;gap:8px">' +
+            '<span class="loading-dots" style="padding:0;display:inline-flex;gap:4px">' +
+            '<span></span><span></span><span></span></span>Loading…</div>';
+        wrap.appendChild(d);
+    }
+
+    // Render a full picklist dropdown with an inline filter search box
+    function showPicklistDropdown(inputId, items, onSelect) {
+        closeAllDropdowns();
         var input = document.getElementById(inputId);
         if (!input) return;
-
-        if (items.length === 0) {
-            showToast("No results found", "error");
-            return;
-        }
+        var wrap = input.closest(".input-icon-wrap") || input.parentNode;
 
         var dropdown = document.createElement("div");
         dropdown.className = "lookup-dropdown";
         dropdown.id        = "dropdown-" + inputId;
 
-        items.forEach(function (item) {
-            var row = document.createElement("div");
-            row.className   = "lookup-row";
-            row.textContent = item.name;
-            row.onclick = function (e) {
-                e.stopPropagation();
-                onSelect(item);
-                closeAllDropdowns();
-            };
-            dropdown.appendChild(row);
-        });
+        // Inline search / filter box
+        var searchBox = document.createElement("input");
+        searchBox.type        = "text";
+        searchBox.placeholder = "Filter…";
+        searchBox.className   = "lookup-search-box";
+        searchBox.onclick     = function (e) { e.stopPropagation(); };
+        dropdown.appendChild(searchBox);
 
-        // Position below the input
-        var wrap = input.closest(".input-icon-wrap") || input.parentNode;
-        wrap.style.position = "relative";
+        var listWrap = document.createElement("div");
+        listWrap.className = "lookup-list";
+        dropdown.appendChild(listWrap);
+
+        function renderList(filterStr) {
+            listWrap.innerHTML = "";
+            var lower    = (filterStr || "").toLowerCase();
+            var filtered = lower
+                ? items.filter(function (it) { return it.name.toLowerCase().indexOf(lower) !== -1; })
+                : items;
+
+            if (filtered.length === 0) {
+                listWrap.innerHTML = '<div class="lookup-row" style="color:var(--text-muted);cursor:default">No results</div>';
+                return;
+            }
+            filtered.forEach(function (item) {
+                var row = document.createElement("div");
+                row.className   = "lookup-row";
+                row.textContent = item.name;
+                row.onmousedown = function (e) {
+                    e.preventDefault();  // prevent blur before click registers
+                    onSelect(item);
+                    closeAllDropdowns();
+                };
+                listWrap.appendChild(row);
+            });
+        }
+
+        renderList("");
+        searchBox.oninput = function () { renderList(this.value); };
+
         wrap.appendChild(dropdown);
+        setTimeout(function () { searchBox.focus(); }, 50);
 
-        // Close on outside click
-        setTimeout(function () {
-            document.addEventListener("click", closeAllDropdowns, { once: true });
-        }, 0);
+        // Close on outside mousedown
+        function outsideClick(e) {
+            if (!dropdown.contains(e.target) && e.target !== input) {
+                closeAllDropdowns();
+                document.removeEventListener("mousedown", outsideClick);
+            }
+        }
+        setTimeout(function () { document.addEventListener("mousedown", outsideClick); }, 0);
     }
 
     function closeAllDropdowns() {
@@ -800,28 +871,7 @@
         return '<svg class="spin" viewBox="0 0 24 24" width="14" height="14" style="stroke:currentColor;stroke-width:2;fill:none;margin-right:6px;vertical-align:middle"><circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="10"/></svg>' + label + '…';
     }
 
-    // ─── Debounced type-to-search handlers ───────────────────────────────────
-    var citySearchTimer   = null;
-    var streetSearchTimer = null;
 
-    function onCityInput(input) {
-        // Clear the selected city when the user edits the field
-        selectedCity   = null;
-        selectedStreet = null;
-        document.getElementById("street-lp-input").value = "";
-        clearTimeout(citySearchTimer);
-        var q = input.value.trim();
-        if (q.length < 1) { closeAllDropdowns(); return; }
-        citySearchTimer = setTimeout(function () { openCitySearch(); }, 350);
-    }
-
-    function onStreetInput(input) {
-        selectedStreet = null;
-        clearTimeout(streetSearchTimer);
-        var q = input.value.trim();
-        if (q.length < 1) { closeAllDropdowns(); return; }
-        streetSearchTimer = setTimeout(function () { openStreetSearch(); }, 350);
-    }
 </script>
 </head>
 <body>
@@ -872,10 +922,9 @@
     <div class="form-label">City LP</div>
     <div class="form-control-wrap">
         <div class="input-icon-wrap">
-            <input id="city-lp-input" type="text" class="form-input" placeholder="Type to search…"
-                   oninput="onCityInput(this)"
-                   onkeydown="if(event.key==='Enter'){openCitySearch();}" />
-            <button class="input-icon-btn" title="Search city" onclick="openCitySearch()">
+            <input id="city-lp-input" type="text" class="form-input" placeholder="Click to select…" readonly
+                   onclick="openCityPicklist()" />
+            <button class="input-icon-btn" title="Select city" onclick="openCityPicklist()">
                 <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
             </button>
         </div>
@@ -887,10 +936,9 @@
     <div class="form-label">Street LP</div>
     <div class="form-control-wrap">
         <div class="input-icon-wrap">
-            <input id="street-lp-input" type="text" class="form-input" placeholder="Type to search…"
-                   oninput="onStreetInput(this)"
-                   onkeydown="if(event.key==='Enter'){openStreetSearch();}" />
-            <button class="input-icon-btn" title="Search street" onclick="openStreetSearch()">
+            <input id="street-lp-input" type="text" class="form-input" placeholder="Click to select…" readonly
+                   onclick="openStreetPicklist()" />
+            <button class="input-icon-btn" title="Select street" onclick="openStreetPicklist()">
                 <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
             </button>
         </div>
