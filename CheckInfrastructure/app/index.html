@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fiber Service Widget</title>
+  <script src="https://live.zwidgets.com/js-sdk/1.2/ZohoEmbededAppSDK.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Lato', Arial, sans-serif;
+      background: #f3f3f5;
+      padding: 16px;
+      font-size: 13px;
+      color: #3d3d3d;
+    }
+
+    /* ── Section header ── */
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .section-icon {
+      width: 28px; height: 28px;
+      background: #e8f5f0;
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .section-icon svg { width: 15px; height: 15px; }
+    .section-title {
+      font-size: 12px; font-weight: 700;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+    }
+    .section-line { flex: 1; height: 1px; background: #ddd; }
+
+    /* ── Card ── */
+    .zoho-card {
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+
+    /* ── Card header ── */
+    .card-header {
+      background: linear-gradient(135deg, #2a7d52 0%, #1e9c63 100%);
+      padding: 13px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .card-header-left { display: flex; align-items: center; gap: 10px; }
+    .pulse-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: #7ef5bb;
+      box-shadow: 0 0 0 3px rgba(126,245,187,0.25);
+      flex-shrink: 0;
+    }
+    .header-title { font-size: 14px; font-weight: 700; color: #fff; }
+    .header-sub { font-size: 11px; color: rgba(255,255,255,0.75); margin-top: 2px; }
+    .header-badge {
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-size: 11px; font-weight: 700;
+      color: #fff; letter-spacing: 0.04em;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .card-header.inactive {
+      background: linear-gradient(135deg, #a93226 0%, #c0392b 100%);
+    }
+    .pulse-dot.inactive {
+      background: #f1948a;
+      box-shadow: 0 0 0 3px rgba(241,148,138,0.25);
+    }
+
+    /* ── Fields grid ── */
+    .fields-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+    .field-cell {
+      padding: 12px 16px;
+      border-bottom: 1px solid #f2f2f2;
+      border-right: 1px solid #f2f2f2;
+      transition: background 0.12s;
+    }
+    .field-cell:hover { background: #fafbff; }
+    .field-cell:nth-child(even) { border-right: none; }
+    .field-cell:nth-last-child(-n+2) { border-bottom: none; }
+    .field-cell.full-width {
+      grid-column: 1 / -1;
+      border-right: none;
+    }
+
+    .field-label {
+      font-size: 10.5px; font-weight: 700;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 5px;
+    }
+    .field-value {
+      font-size: 13px; font-weight: 600;
+      color: #222;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .field-value.muted { font-weight: 400; color: #444; }
+
+    /* ── Badges ── */
+    .confirmed-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: #e8f5f0;
+      border: 1px solid #b3dfc9;
+      border-radius: 4px;
+      padding: 3px 8px;
+      font-size: 12px; font-weight: 700;
+      color: #1e7a48;
+    }
+    .check-circle {
+      width: 14px; height: 14px;
+      background: #2d8653;
+      border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .check-circle svg { width: 8px; height: 8px; }
+
+    .speed-tag {
+      background: #f0f4ff;
+      border: 1px solid #d0daff;
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-size: 13px; font-weight: 700;
+      color: #2b4ab5;
+    }
+    .speed-tag.copper {
+      background: #fff8f0;
+      border-color: #ffd8a8;
+      color: #8a4f00;
+    }
+
+    /* ── Footer ── */
+    .card-footer {
+      background: #fafafa;
+      border-top: 1px solid #eee;
+      padding: 8px 16px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .footer-dot { width: 6px; height: 6px; border-radius: 50%; background: #2d8653; }
+    .footer-text { font-size: 11px; color: #888; }
+
+    /* ── Action buttons ── */
+    .card-actions {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 2px 4px 2px;
+    }
+    .btn-cancel {
+      padding: 7px 18px;
+      font-family: 'Lato', Arial, sans-serif;
+      font-size: 12px; font-weight: 600;
+      color: #666;
+      background: #fff;
+      border: 1px solid #d0d0d0;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: background 0.12s, border-color 0.12s;
+    }
+    .btn-cancel:hover { background: #f5f5f5; border-color: #b0b0b0; }
+    .btn-cancel:active { background: #ebebeb; }
+    .btn-next {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 7px 18px;
+      font-family: 'Lato', Arial, sans-serif;
+      font-size: 12px; font-weight: 700;
+      color: #1a6b3c;
+      background: #d4f0e0;
+      border: 1px solid #a8ddbf;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: background 0.12s, border-color 0.12s;
+    }
+    .btn-next:hover { background: #bde8d0; border-color: #8ecfaa; }
+    .btn-next:active { background: #a5dfc0; }
+    .btn-next svg { width: 12px; height: 12px; }
+    .btn-next:disabled, .btn-cancel:disabled {
+      opacity: 0.5; cursor: not-allowed;
+    }
+
+    /* ── Loading state ── */
+    .state-loading, .state-error {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 32px 16px; gap: 10px;
+      color: #888; font-size: 13px;
+    }
+    .spinner {
+      width: 24px; height: 24px;
+      border: 2px solid #e0e0e0;
+      border-top-color: #2d8653;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .error-icon { font-size: 24px; }
+    .state-error { color: #c0392b; }
+
+    /* ── Hidden until loaded ── */
+    #widget-content { display: none; }
+  </style>
+</head>
+<body>
+
+  <!-- Loading -->
+  <div id="state-loading" class="state-loading">
+    <div class="spinner"></div>
+    <span>Checking infrastructure…</span>
+  </div>
+
+  <!-- Error -->
+  <div id="state-error" class="state-error" style="display:none;">
+    <div class="error-icon">⚠</div>
+    <span id="error-msg">Unable to load service data.</span>
+  </div>
+
+  <!-- Widget -->
+  <div id="widget-content">
+
+    <div class="section-header">
+      <div class="section-icon">
+        <svg viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2 10.5C3.5 8.5 5.5 7.5 7.5 7.5C9.5 7.5 11.5 8.5 13 10.5" stroke="#2d8653" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M4 13C5 11.5 6.2 10.8 7.5 10.8C8.8 10.8 10 11.5 11 13" stroke="#2d8653" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="7.5" cy="14" r="0.8" fill="#2d8653"/>
+          <path d="M0.5 7.5C2.5 5 5 3.8 7.5 3.8C10 3.8 12.5 5 14.5 7.5" stroke="#2d8653" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <span class="section-title">Fiber Service Details</span>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="zoho-card">
+      <div class="card-header" id="card-header">
+        <div class="card-header-left">
+          <div class="pulse-dot" id="pulse-dot"></div>
+          <div>
+            <div class="header-title" id="header-title">Fiber Service Available</div>
+            <div class="header-sub" id="address-line">Loading address...</div>
+          </div>
+        </div>
+        <div class="header-badge" id="header-badge">ACTIVE</div>
+      </div>
+
+      <div class="fields-grid">
+        <div class="field-cell">
+          <div class="field-label">Optical Wiring</div>
+          <div class="field-value" id="optical-wiring">—</div>
+        </div>
+
+        <div class="field-cell">
+          <div class="field-label">Connection Type</div>
+          <div class="field-value muted">Fiber Optic</div>
+        </div>
+
+        <div class="field-cell">
+          <div class="field-label">Max Fiber Speed</div>
+          <div class="field-value" id="fiber-speed">—</div>
+        </div>
+
+        <div class="field-cell">
+          <div class="field-label">Max Copper Speed</div>
+          <div class="field-value" id="copper-speed">—</div>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <div class="footer-dot"></div>
+        <span class="footer-text">Service verified for this address</span>
+      </div>
+    </div>
+
+    <div class="card-actions">
+      <button class="btn-cancel" id="btn-cancel" onclick="handleCancel()">Cancel</button>
+      <button class="btn-next" id="btn-next" onclick="handleNext()">
+        Next
+        <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2.5 6H9.5M6.5 3L9.5 6L6.5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    function showLoading() {
+      document.getElementById('state-loading').style.display = 'flex';
+      document.getElementById('state-error').style.display = 'none';
+      document.getElementById('widget-content').style.display = 'none';
+    }
+
+    function showError(msg) {
+      document.getElementById('state-loading').style.display = 'none';
+      document.getElementById('state-error').style.display = 'flex';
+      document.getElementById('widget-content').style.display = 'none';
+      document.getElementById('error-msg').textContent = msg || 'Unable to load service data.';
+    }
+
+    function showWidget() {
+      document.getElementById('state-loading').style.display = 'none';
+      document.getElementById('state-error').style.display = 'none';
+      document.getElementById('widget-content').style.display = 'block';
+    }
+
+    function renderOpticalWiring(value) {
+      if (value === 'Available') {
+        return `<span class="confirmed-badge">
+          <span class="check-circle">
+            <svg viewBox="0 0 8 8" fill="none">
+              <path d="M1.5 4L3.2 5.8L6.5 2.2" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          Available
+        </span>`;
+      }
+      return `<span style="color:#c0392b;font-weight:600;">Unavailable</span>`;
+    }
+
+    var _entityId = null;
+
+    ZOHO.embeddedApp.on("PageLoad", function(data) {
+      var entityId = data.EntityId;
+      _entityId = entityId;
+
+      // Fetch the Deal record to get address fields
+      ZOHO.CRM.API.getRecord({ Entity: "Deals", RecordID: entityId })
+        .then(function(recordData) {
+          var record = recordData.data && recordData.data[0];
+          if (!record) { showError('Deal record not found.'); return; }
+
+       
+  var address = record['Full_Address']   || '';
+          document.getElementById('address-line').textContent = address || 'No address on record';
+
+          // Execute Deluge function
+          var func_name = "CheckInfrastructure";
+          ZOHO.CRM.FUNCTIONS.execute(func_name, {})
+            .then(function(fnData) {
+
+              // Log full response so we can inspect the shape in DevTools
+              console.log("CheckInfrastructure raw response:", JSON.stringify(fnData, null, 2));
+
+              // Zoho can nest the output in several different ways depending on
+              // how the Deluge function returns its value. Try each path in order.
+              var raw =
+                (fnData && fnData.details && fnData.details.output)   ||  // most common
+                (fnData && fnData.details && fnData.details.userMessage) || // alternate key
+                (fnData && fnData.output)                              ||  // flat
+                (fnData && fnData.data)                                ||  // data key
+                fnData;                                                    // the object itself
+
+              console.log("Raw value before parse:", raw, "| type:", typeof raw);
+
+              var result;
+              try {
+                if (typeof raw === 'string') {
+                  // Deluge string maps sometimes come back as
+                  // {"Optical wiring":"true","Max fiber speed":"2GB",...}
+                  result = JSON.parse(raw);
+                } else if (raw && typeof raw === 'object') {
+                  result = raw;
+                } else {
+                  throw new Error("Unexpected type: " + typeof raw);
+                }
+              } catch(e) {
+                console.error("Parse error:", e, "| raw was:", raw);
+                showError('Could not parse service data. Check console for details.');
+                return;
+              }
+
+              console.log("Parsed result:", result);
+
+              if (!result || typeof result !== 'object') {
+                showError('Service data was empty or malformed.');
+                return;
+              }
+
+              // Determine active/inactive from Optical wiring
+              var opticalValue = result['Optical wiring'];
+              var isActive = (opticalValue === 'Available');
+
+              // Store result values on window for use in handleNext
+              window._infraResult = {
+                Fibers_Available:  opticalValue        || '',
+                Fiber_Max_Speed:   result['Max fiber speed']   || '',
+                Copper_Max_Speed:  result['Max copper speed']  || ''
+              };
+
+              // Toggle header appearance
+              var cardHeader = document.getElementById('card-header');
+              var pulseDot   = document.getElementById('pulse-dot');
+              var badge      = document.getElementById('header-badge');
+              var title      = document.getElementById('header-title');
+
+              if (isActive) {
+                cardHeader.classList.remove('inactive');
+                pulseDot.classList.remove('inactive');
+                badge.textContent = 'ACTIVE';
+                title.textContent = 'Fiber Service Available';
+              } else {
+                cardHeader.classList.add('inactive');
+                pulseDot.classList.add('inactive');
+                badge.textContent = 'INACTIVE';
+                title.textContent = 'Fiber Service Unavailable';
+              }
+
+              // Render optical wiring
+              document.getElementById('optical-wiring').innerHTML =
+                renderOpticalWiring(opticalValue);
+
+              // Render fiber speed
+              document.getElementById('fiber-speed').innerHTML =
+                `<span class="speed-tag">${result['Max fiber speed'] || '—'}</span>`;
+
+              // Render copper speed
+              document.getElementById('copper-speed').innerHTML =
+                `<span class="speed-tag copper">${result['Max copper speed'] || '—'}</span>`;
+
+              showWidget();
+            })
+            .catch(function(err) {
+              console.error('Function error:', err);
+              showError('CheckInfrastructure function failed: ' + (err && err.message ? err.message : JSON.stringify(err)));
+            });
+        })
+        .catch(function(err) {
+          console.error('Record fetch error:', err);
+          showError('Could not load deal record.');
+        });
+    });
+
+    function handleCancel() {
+      ZOHO.CRM.UI.Popup.close();
+    }
+
+    function handleNext() {
+      var btnNext   = document.getElementById('btn-next');
+      var btnCancel = document.getElementById('btn-cancel');
+
+      btnNext.disabled   = true;
+      btnCancel.disabled = true;
+      btnNext.textContent = 'Saving…';
+
+      var fields = window._infraResult || {};
+
+      // Update the Deal record with the 3 infra fields
+      ZOHO.CRM.API.updateRecord({
+        Entity: "Deals",
+        APIData: {
+          id:               _entityId,
+          Fibers_Available: fields.Fibers_Available,
+          Fiber_Max_Speed:  fields.Fiber_Max_Speed,
+          Copper_Max_Speed: fields.Copper_Max_Speed
+        },
+        Trigger: []
+      })
+      .then(function(updateResp) {
+        console.log('Deal update response:', updateResp);
+        btnNext.textContent = 'Moving…';
+
+        // Now advance the blueprint
+        return ZOHO.CRM.BLUEPRINT.proceed();
+      })
+      .then(function(blueprintResp) {
+        console.log('Blueprint proceed response:', blueprintResp);
+        ZOHO.CRM.UI.Popup.close();
+      })
+      .catch(function(err) {
+        console.error('Next error:', err);
+        btnNext.disabled   = false;
+        btnCancel.disabled = false;
+        btnNext.innerHTML  = 'Next <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 6H9.5M6.5 3L9.5 6L6.5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+        showError('Save failed: ' + (err && err.message ? err.message : JSON.stringify(err)));
+      });
+    }
+
+    ZOHO.embeddedApp.init();
+  </script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "slug": "fiber_service_widget",
+  "name": "Fiber Service Widget",
+  "type": "widget",
+  "location": "Deals",
+  "version": "1.0",
+  "vendor_name": "",
+  "vendor_url": "",
+  "vendor_email": "",
+  "size": {
+    "width": "1000px",
+    "height": "600px"
+  }
+}
+

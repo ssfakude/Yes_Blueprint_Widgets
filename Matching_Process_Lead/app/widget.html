@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --navy: #0f1f35;
+        --navy-mid: #162840;
+        --navy-light: #1e3a52;
+        --accent: #3b9eca;
+        --accent-bright: #4db8e8;
+        --accent-glow: rgba(59, 158, 202, 0.15);
+        --gold: #e8b84b;
+        --surface: #f0f4f8;
+        --surface-card: #ffffff;
+        --text-primary: #0f1f35;
+        --text-secondary: #4a6080;
+        --text-muted: #8ba3bc;
+        --border: #d4e0ec;
+        --border-active: #3b9eca;
+        --shadow-sm: 0 1px 3px rgba(15,31,53,0.06), 0 1px 2px rgba(15,31,53,0.04);
+        --shadow-md: 0 4px 16px rgba(15,31,53,0.08), 0 2px 6px rgba(15,31,53,0.05);
+        --shadow-lg: 0 12px 40px rgba(15,31,53,0.12), 0 4px 12px rgba(15,31,53,0.06);
+        --radius: 10px;
+        --radius-sm: 6px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+        font-family: 'Sora', sans-serif;
+        background: var(--surface);
+        color: var(--text-primary);
+        padding: 20px 24px 100px;
+        min-height: 100vh;
+    }
+
+    /* ── Title ── */
+    .page-title {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--navy);
+        text-align: right;
+        direction: rtl;
+        margin-bottom: 28px;
+        line-height: 1.5;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    /* ── Form rows ── */
+    .form-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 20px;
+        margin-bottom: 18px;
+    }
+
+    .form-label {
+        min-width: 120px;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-secondary);
+        padding-top: 11px;
+        text-align: right;
+        flex-shrink: 0;
+    }
+
+    .form-control-wrap {
+        flex: 1;
+    }
+
+    /* ── Select / Input shared styles ── */
+    .form-select,
+    .form-input {
+        width: 100%;
+        height: 42px;
+        padding: 0 14px;
+        font-family: 'Sora', sans-serif;
+        font-size: 13px;
+        color: var(--text-primary);
+        background: var(--surface-card);
+        border: 1.5px solid var(--border);
+        border-left: 3px solid var(--accent);
+        border-radius: var(--radius);
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        box-shadow: var(--shadow-sm);
+        appearance: none;
+        -webkit-appearance: none;
+    }
+
+    .form-select:focus,
+    .form-input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .form-input.field-error {
+        border-color: #ef4444;
+        box-shadow: 0 0 0 3px rgba(239,68,68,0.1);
+    }
+
+    /* Select wrapper for custom chevron */
+    .select-wrap {
+        position: relative;
+    }
+
+    .select-wrap::after {
+        content: '';
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 0;
+        height: 0;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 6px solid var(--text-muted);
+        pointer-events: none;
+    }
+
+    .select-dot {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 10px;
+        height: 10px;
+        background: var(--accent);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    .select-wrap .form-select {
+        padding-left: 34px;
+    }
+
+    /* Input with icon on the right */
+    .input-icon-wrap {
+        position: relative;
+    }
+
+    .input-icon-wrap .form-input {
+        padding-right: 46px;
+    }
+
+    .input-icon-btn {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 28px;
+        height: 28px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background 0.15s;
+    }
+
+    .input-icon-btn:hover { background: var(--border); }
+    .input-icon-btn svg {
+        width: 15px; height: 15px;
+        stroke: var(--text-secondary);
+        stroke-width: 1.8;
+        fill: none;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    /* ── Logo grid ── */
+    .logo-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .logo-tile {
+        width: 82px;
+        height: 52px;
+        border: 2px solid var(--border);
+        border-radius: 8px;
+        background: var(--surface-card);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        padding: 6px;
+        transition: all 0.2s ease;
+        box-shadow: var(--shadow-sm);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .logo-tile img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+
+    .logo-tile:hover {
+        border-color: var(--accent);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .logo-tile.selected {
+        border-color: var(--navy);
+        box-shadow: 0 0 0 3px var(--accent-glow), var(--shadow-sm);
+        background: #f0f8ff;
+    }
+
+    .logo-tile.selected::after {
+        content: '✓';
+        position: absolute;
+        top: 3px;
+        right: 4px;
+        width: 15px;
+        height: 15px;
+        background: var(--navy);
+        color: white;
+        font-size: 9px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 15px;
+        text-align: center;
+        font-weight: 700;
+    }
+
+    .logo-tile-label {
+        font-size: 9px;
+        color: var(--text-muted);
+        text-align: center;
+        margin-top: 4px;
+    }
+
+    .logo-tile-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        cursor: pointer;
+    }
+
+    /* ── Action bar (bottom sticky) ── */
+    .action-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        border-top: 1px solid var(--border);
+        padding: 12px 24px;
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        box-shadow: 0 -4px 20px rgba(15,31,53,0.08);
+        z-index: 100;
+    }
+
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 9px 20px;
+        border: none;
+        border-radius: 8px;
+        font-family: 'Sora', sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        letter-spacing: 0.01em;
+        min-width: 110px;
+        justify-content: center;
+    }
+
+    .action-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+    .action-btn:active { transform: translateY(0); }
+    .action-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
+
+    .btn-danger    { background: #ef4444; color: white; }
+    .btn-danger:hover  { background: #dc2626; }
+    .btn-warning   { background: #f97316; color: white; }
+    .btn-warning:hover { background: #ea6a0a; }
+    .btn-primary   { background: var(--accent); color: white; }
+    .btn-primary:hover { background: #2e8ab5; }
+    .btn-success   { background: #22c55e; color: white; }
+    .btn-success:hover { background: #16a34a; }
+
+    /* ── Toast ── */
+    .toast {
+        position: fixed;
+        bottom: 72px;
+        left: 50%;
+        transform: translateX(-50%) translateY(16px);
+        background: var(--navy);
+        color: white;
+        font-size: 13px;
+        font-weight: 500;
+        padding: 10px 20px;
+        border-radius: 50px;
+        box-shadow: var(--shadow-lg);
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        white-space: nowrap;
+        z-index: 200;
+    }
+    .toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast.toast-error   { background: #ef4444; }
+    .toast.toast-success { background: #16a34a; }
+
+    /* Loading spinner */
+    .spin { animation: spinIcon 0.8s linear infinite; }
+    @keyframes spinIcon { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+    .loading-dots { display: flex; gap: 6px; align-items: center; padding: 10px 0; }
+    .loading-dots span { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); animation: pulse 1.2s ease-in-out infinite; }
+    .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes pulse { 0%, 80%, 100% { transform: scale(0.7); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
+</style>
+<script src="https://live.zwidgets.com/js-sdk/1.5/ZohoEmbededAppSDK.min.js"></script>
+<script>
+    var currentLeadId = null;
+    var isProcessing  = false;
+    var selectedCompany = null; // stores the actual_value of selected leaving company
+
+    // Map of picklist actual_value → logo filename (no extension — we try png then jpg)
+    // The logo folder is at logos/ relative to widget.html
+    // Filenames must match exactly (case-sensitive on some servers)
+    var LOGO_MAP = {
+        "None":    { file: "None.jpg"    },
+        "012":     { file: "012.png"     },
+        "019":     { file: "019.png"     },
+        "Partner": { file: "Partner.png" },
+        "Cellcom": { file: "Cellcom.png" }, // סלקום
+        "FreeTV":  { file: "FreeTV.png"  },
+        "Idan+":   { file: "Idan+.jpg"   },
+        "Next":    { file: "Next.png"    },
+        "Netflix": { file: "Netflix.png" },
+        "HOT":     { file: "HOT.png"     },
+        "HOTNet":  { file: "HOTNet.png"  }
+    };
+
+    // ─── Boot ───────────────────────────────────────────────────────────────
+    ZOHO.embeddedApp.on("PageLoad", function (data) {
+        console.log("PageLoad:", data);
+
+        if (data && data.EntityId)      currentLeadId = data.EntityId;
+        else if (data && data.ID)       currentLeadId = data.ID;
+
+        initWidget();
+    });
+
+    ZOHO.embeddedApp.init();
+
+    function initWidget() {
+        // Load field metadata and existing record values in parallel
+        Promise.all([
+            ZOHO.CRM.META.getFields({ Entity: "Leads" }),
+            currentLeadId
+                ? ZOHO.CRM.API.getRecord({ Entity: "Leads", RecordID: currentLeadId })
+                : Promise.resolve(null)
+        ]).then(function (results) {
+            var meta   = results[0];
+            var record = results[1] && results[1].data && results[1].data[0];
+
+            // Build ID_Type picklist
+            buildIdTypeSelect(meta.fields);
+
+            // Build Leaving_Company logo grid
+            buildLeavingCompanyGrid(meta.fields);
+
+            // Pre-fill if existing record
+            if (record) {
+                prefillForm(record);
+            }
+        }).catch(function (err) {
+            showToast("Error loading data: " + JSON.stringify(err), "error");
+            console.error(err);
+        });
+    }
+
+    // ─── Build ID Type dropdown ─────────────────────────────────────────────
+    function buildIdTypeSelect(fields) {
+        var field = fields.find(function (f) { return f.api_name === "ID_Type"; });
+        var select = document.getElementById("id-type-select");
+        if (!field || !field.pick_list_values) return;
+
+        field.pick_list_values.forEach(function (opt) {
+            var o = document.createElement("option");
+            o.value       = opt.actual_value;
+            o.textContent = opt.display_value || opt.actual_value;
+            select.appendChild(o);
+        });
+    }
+
+    // ─── Build Leaving Company logo grid ───────────────────────────────────
+    function buildLeavingCompanyGrid(fields) {
+        var field = fields.find(function (f) { return f.api_name === "Leaving_Company"; });
+        var container = document.getElementById("leaving-company-grid");
+
+        if (!field || !field.pick_list_values) {
+            container.innerHTML = '<p style="font-size:12px;color:var(--text-muted)">No options found</p>';
+            return;
+        }
+
+        container.innerHTML = "";
+
+        field.pick_list_values.forEach(function (opt) {
+            var val   = opt.actual_value;
+            var label = opt.display_value || val;
+
+            // Try to find a logo for this option
+            var logoInfo = findLogoForValue(val);
+
+            var wrap = document.createElement("div");
+            wrap.className = "logo-tile-wrap";
+            wrap.setAttribute("data-value", val);
+            wrap.onclick = function () { selectCompany(val, this); };
+
+            var tile = document.createElement("div");
+            tile.className = "logo-tile";
+
+            if (logoInfo) {
+                var img = document.createElement("img");
+                img.src = "logos/" + logoInfo.file;
+                img.alt = label;
+                img.onerror = function () {
+                    // Fallback to text if image fails to load
+                    this.parentNode.innerHTML = '<span style="font-size:10px;font-weight:600;color:var(--text-secondary);text-align:center;padding:4px">' + label + '</span>';
+                };
+                tile.appendChild(img);
+            } else {
+                tile.innerHTML = '<span style="font-size:10px;font-weight:600;color:var(--text-secondary);text-align:center;padding:4px">' + label + '</span>';
+            }
+
+            var lbl = document.createElement("div");
+            lbl.className = "logo-tile-label";
+            lbl.textContent = label;
+
+            wrap.appendChild(tile);
+            wrap.appendChild(lbl);
+            container.appendChild(wrap);
+        });
+    }
+
+    // Try to match a picklist value to a logo file
+    function findLogoForValue(val) {
+        // Direct key match
+        if (LOGO_MAP[val]) return LOGO_MAP[val];
+
+        // Case-insensitive match
+        var lower = val.toLowerCase();
+        for (var key in LOGO_MAP) {
+            if (key.toLowerCase() === lower) return LOGO_MAP[key];
+        }
+
+        // Partial match (e.g. "012 Smile" matches "012")
+        for (var key in LOGO_MAP) {
+            if (val.indexOf(key) !== -1 || key.indexOf(val) !== -1) return LOGO_MAP[key];
+        }
+
+        return null;
+    }
+
+    // ─── Select company ─────────────────────────────────────────────────────
+    function selectCompany(val, wrapEl) {
+        // Deselect all
+        document.querySelectorAll(".logo-tile-wrap .logo-tile").forEach(function (t) {
+            t.classList.remove("selected");
+        });
+
+        // Toggle
+        if (selectedCompany === val) {
+            selectedCompany = null;
+            return;
+        }
+
+        selectedCompany = val;
+        wrapEl.querySelector(".logo-tile").classList.add("selected");
+    }
+
+    // ─── Pre-fill form from existing record ─────────────────────────────────
+    function prefillForm(record) {
+        if (record.ID_Type) {
+            document.getElementById("id-type-select").value = record.ID_Type;
+        }
+        if (record.ID_Number) {
+            document.getElementById("id-number-input").value = record.ID_Number;
+        }
+        if (record.Leaving_Company) {
+            // Find & select the tile
+            var wrap = document.querySelector('.logo-tile-wrap[data-value="' + record.Leaving_Company + '"]');
+            if (wrap) {
+                selectedCompany = record.Leaving_Company;
+                wrap.querySelector(".logo-tile").classList.add("selected");
+            }
+        }
+        if (record.Email) {
+            document.getElementById("email-input").value = record.Email;
+        }
+        if (record.City_LP) {
+            document.getElementById("city-lp-input").value = record.City_LP;
+        }
+        if (record["Street LP"] || record.Street_LP) {
+            document.getElementById("street-lp-input").value = record["Street LP"] || record.Street_LP;
+        }
+        if (record.Number) {
+            document.getElementById("number-input").value = record.Number;
+        }
+    }
+
+    // ─── Build save payload ──────────────────────────────────────────────────
+    function buildPayload() {
+        var payload = { id: currentLeadId };
+
+        payload.ID_Type         = document.getElementById("id-type-select").value   || null;
+        payload.ID_Number       = document.getElementById("id-number-input").value.trim()  || null;
+        payload.Leaving_Company = selectedCompany || null;
+        payload.Email           = document.getElementById("email-input").value.trim()      || null;
+        payload.City_LP         = document.getElementById("city-lp-input").value.trim()    || null;
+        payload["Street LP"]    = document.getElementById("street-lp-input").value.trim()  || null;
+        payload.Number          = document.getElementById("number-input").value.trim()      || null;
+
+        return payload;
+    }
+
+    // ─── Save lead record ────────────────────────────────────────────────────
+    function saveLeadRecord(payload) {
+        return ZOHO.CRM.API.updateRecord({
+            Entity : "Leads",
+            APIData: payload,
+            Trigger: []
+        });
+    }
+
+    // ─── Toast ───────────────────────────────────────────────────────────────
+    function showToast(msg, type) {
+        var toast = document.getElementById("toast");
+        toast.textContent = msg;
+        toast.className   = "toast toast-" + (type || "success") + " visible";
+        clearTimeout(toast._t);
+        toast._t = setTimeout(function () { toast.classList.remove("visible"); }, 3500);
+    }
+
+    // ─── Button state helpers ────────────────────────────────────────────────
+    function setBtn(id, html, disabled) {
+        var btn = document.getElementById(id);
+        if (!btn) return;
+        btn.innerHTML = html;
+        btn.disabled  = !!disabled;
+    }
+
+    // ─── Action: Not Interested ──────────────────────────────────────────────
+    function handleNotInterested() {
+        if (isProcessing) return;
+        isProcessing = true;
+        var payload  = buildPayload();
+        payload.Lead_Status = "Not Interested";
+
+        setBtn("btn-not-interested", spinnerHtml("Not Interested"), true);
+
+        saveLeadRecord(payload)
+            .then(function () {
+                return ZOHO.CRM.BLUEPRINT.proceed();
+            })
+            .then(function () {
+                showToast("Saved & proceeded", "success");
+                setTimeout(function () { try { ZOHO.CRM.UI.Popup.close(); } catch (e) {} }, 1000);
+            })
+            .catch(function (err) {
+                showToast("Error: " + JSON.stringify(err), "error");
+                setBtn("btn-not-interested", "Not Interested");
+                isProcessing = false;
+            });
+    }
+
+    // ─── Action: Unservable ──────────────────────────────────────────────────
+    function handleUnservable() {
+        if (isProcessing) return;
+        isProcessing = true;
+        var payload  = buildPayload();
+        payload.Lead_Status = "Unservable";
+
+        setBtn("btn-unservable", spinnerHtml("Unservable"), true);
+
+        saveLeadRecord(payload)
+            .then(function () {
+                return ZOHO.CRM.BLUEPRINT.proceed();
+            })
+            .then(function () {
+                showToast("Saved & proceeded", "success");
+                setTimeout(function () { try { ZOHO.CRM.UI.Popup.close(); } catch (e) {} }, 1000);
+            })
+            .catch(function (err) {
+                showToast("Error: " + JSON.stringify(err), "error");
+                setBtn("btn-unservable", "Unservable");
+                isProcessing = false;
+            });
+    }
+
+    // ─── Action: Convert ────────────────────────────────────────────────────
+    function handleConvert() {
+        if (isProcessing) return;
+        isProcessing = true;
+        var payload  = buildPayload();
+
+        setBtn("btn-convert", spinnerHtml("Convert"), true);
+
+        saveLeadRecord(payload)
+            .then(function () {
+                return ZOHO.CRM.BLUEPRINT.proceed();
+            })
+            .then(function () {
+                showToast("Saved & proceeded", "success");
+                setTimeout(function () { try { ZOHO.CRM.UI.Popup.close(); } catch (e) {} }, 1000);
+            })
+            .catch(function (err) {
+                showToast("Error: " + JSON.stringify(err), "error");
+                setBtn("btn-convert", "Convert");
+                isProcessing = false;
+            });
+    }
+
+    // ─── Action: Follow Up Later ─────────────────────────────────────────────
+    function handleFollowUpLater() {
+        if (isProcessing) return;
+        isProcessing = true;
+        var payload  = buildPayload();
+        payload.Lead_Status = "Follow Up Later";
+
+        setBtn("btn-follow-up", spinnerHtml("Follow Up Later"), true);
+
+        saveLeadRecord(payload)
+            .then(function () {
+                return ZOHO.CRM.BLUEPRINT.proceed();
+            })
+            .then(function () {
+                showToast("Saved & proceeded", "success");
+                setTimeout(function () { try { ZOHO.CRM.UI.Popup.close(); } catch (e) {} }, 1000);
+            })
+            .catch(function (err) {
+                showToast("Error: " + JSON.stringify(err), "error");
+                setBtn("btn-follow-up", "Follow Up Later");
+                isProcessing = false;
+            });
+    }
+
+    function spinnerHtml(label) {
+        return '<svg class="spin" viewBox="0 0 24 24" width="14" height="14" style="stroke:currentColor;stroke-width:2;fill:none;margin-right:6px;vertical-align:middle"><circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="10"/></svg>' + label + '…';
+    }
+</script>
+</head>
+<body>
+
+<p class="page-title">פרטו מאיזו חברה הלקוח עובר אלינו , אימייל (לא חובה) ומספר זיהוי</p>
+
+<!-- ID Type -->
+<div class="form-row">
+    <div class="form-label">ID Type</div>
+    <div class="form-control-wrap">
+        <div class="select-wrap">
+            <span class="select-dot"></span>
+            <select id="id-type-select" class="form-select">
+                <option value="">— Select —</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<!-- ID Number -->
+<div class="form-row">
+    <div class="form-label">ID Number</div>
+    <div class="form-control-wrap">
+        <input id="id-number-input" type="text" class="form-input" placeholder="" />
+    </div>
+</div>
+
+<!-- Leaving Company -->
+<div class="form-row">
+    <div class="form-label" style="padding-top:14px">Leaving Company</div>
+    <div class="form-control-wrap">
+        <div id="leaving-company-grid" class="logo-grid">
+            <div class="loading-dots"><span></span><span></span><span></span></div>
+        </div>
+    </div>
+</div>
+
+<!-- Email -->
+<div class="form-row" style="margin-top:10px">
+    <div class="form-label">Email</div>
+    <div class="form-control-wrap">
+        <input id="email-input" type="email" class="form-input" placeholder="" />
+    </div>
+</div>
+
+<!-- City LP -->
+<div class="form-row">
+    <div class="form-label">City LP</div>
+    <div class="form-control-wrap">
+        <div class="input-icon-wrap">
+            <input id="city-lp-input" type="text" class="form-input" placeholder="" />
+            <button class="input-icon-btn" title="Search city" onclick="void(0)">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><circle cx="17.5" cy="17.5" r="2.5"/><line x1="19.5" y1="19.5" x2="22" y2="22"/></svg>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Street LP -->
+<div class="form-row">
+    <div class="form-label">Street LP</div>
+    <div class="form-control-wrap">
+        <div class="input-icon-wrap">
+            <input id="street-lp-input" type="text" class="form-input" placeholder="" />
+            <button class="input-icon-btn" title="Search street" onclick="void(0)">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><circle cx="17.5" cy="17.5" r="2.5"/><line x1="19.5" y1="19.5" x2="22" y2="22"/></svg>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Number -->
+<div class="form-row">
+    <div class="form-label">Number</div>
+    <div class="form-control-wrap">
+        <input id="number-input" type="text" class="form-input" placeholder="" />
+    </div>
+</div>
+
+<!-- Bottom action bar -->
+<div class="action-bar">
+    <button id="btn-not-interested" class="action-btn btn-danger"  onclick="handleNotInterested()">Not Interested</button>
+    <button id="btn-unservable"     class="action-btn btn-danger"  onclick="handleUnservable()">Unservable</button>
+    <button id="btn-convert"        class="action-btn btn-primary" onclick="handleConvert()">Convert</button>
+    <button id="btn-follow-up"      class="action-btn btn-success" onclick="handleFollowUpLater()">Follow Up Later</button>
+</div>
+
+<div id="toast" class="toast"></div>
+</body>
+</html>
