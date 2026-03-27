@@ -436,7 +436,10 @@
       .then(function(blueprintResp) {
         console.log('Blueprint proceed response:', blueprintResp);
 
-        // Step 4 — close and reload
+        // Step 4 — open the Deal record, close and reload
+        ZOHO.CRM.UI.Record.open({ Entity: "Deals", RecordID: _entityId }).then(function(data) {
+          console.log(data);
+        });
         ZOHO.CRM.UI.Popup.closeReload().then(function(data) {
           console.log('closeReload data:', data);
         });
