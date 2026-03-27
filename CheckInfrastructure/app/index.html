@@ -430,20 +430,10 @@
       .then(function(data) {
         console.log(data);
 
-        // Step 3 — advance blueprint1
-        return ZOHO.CRM.BLUEPRINT.proceed();
-      })
-      .then(function(blueprintResp) {
-        console.log('Blueprint proceed response:', blueprintResp);
-
-        // Step 4 — open the Deal record, close and reload
+        // Open the Deal record
         ZOHO.CRM.UI.Record.open({ Entity: "Deals", RecordID: _entityId }).then(function(data) {
           console.log(data);
         });
-        ZOHO.CRM.UI.Popup.closeReload().then(function(data) {
-          console.log('closeReload data:', data);
-        });
-        setTimeout(function() { ZOHO.CRM.UI.Popup.close(); }, 2000);
       })
       .catch(function(err) {
         console.error('Next error:', err);
