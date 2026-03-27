@@ -363,6 +363,32 @@
           document.getElementById('copper-speed').innerHTML  = '<span class="speed-tag copper">250kbs</span>';
 
           showWidget();
+
+          // Auto-save and advance blueprint immediately on load
+          ZOHO.CRM.API.updateRecord({
+            Entity:   "Deals",
+            APIData: {
+              id:               _entityId,
+              Fibers_Available: window._infraResult.Fibers_Available,
+              Fiber_Max_Speed:  window._infraResult.Fiber_Max_Speed,
+              Copper_Max_Speed: window._infraResult.Copper_Max_Speed
+            },
+            Trigger: []
+          })
+          .then(function(updateResp) {
+            console.log('Auto update response:', updateResp);
+            return ZOHO.CRM.BLUEPRINT.proceed();
+          })
+          .then(function(blueprintResp) {
+            console.log('Auto blueprint proceed:', blueprintResp);
+            ZOHO.CRM.UI.Popup.closeReload().then(function(data) {
+              console.log('closeReload data:', data);
+            });
+            setTimeout(function() { ZOHO.CRM.UI.Popup.close(); }, 2000);
+          })
+          .catch(function(err) {
+            console.error('Auto proceed error:', err);
+          });
         })
         .catch(function(err) {
           console.error('Record fetch error:', err);
