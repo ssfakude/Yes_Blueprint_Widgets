@@ -760,27 +760,36 @@
 
         saveDealRecord()
             .then(function () {
-                // Execute ComputeDealAmount function
+                console.log("Deal saved — executing ComputeDealAmount...");
                 var func_name = "ComputeDealAmount";
                 var req_data  = {
                     "arguments": JSON.stringify({ "deal_id": currentDealId })
                 };
-                return ZOHO.CRM.FUNCTIONS.execute(func_name, req_data);
+                console.log("Function name:", func_name);
+                console.log("Function args:", req_data);
+                // Execute but don't let a failure block blueprint — catch separately
+                return ZOHO.CRM.FUNCTIONS.execute(func_name, req_data)
+                    .then(function (data) {
+                        console.log("ComputeDealAmount SUCCESS:", JSON.stringify(data));
+                    })
+                    .catch(function (fnErr) {
+                        console.error("ComputeDealAmount FAILED:", JSON.stringify(fnErr));
+                        // Log but continue to blueprint regardless
+                    });
             })
-            .then(function (data) {
-                console.log("ComputeDealAmount result:", data);
-                // Proceed blueprint to next state
+            .then(function () {
+                console.log("Proceeding blueprint...");
                 return ZOHO.CRM.BLUEPRINT.proceed();
             })
             .then(function (blueprintResponse) {
-                console.log("Blueprint proceeded:", blueprintResponse);
+                console.log("Blueprint proceeded:", JSON.stringify(blueprintResponse));
                 setButtonState("next", "done");
                 setTimeout(function () {
                     try { ZOHO.CRM.UI.Popup.close(); } catch (e) {}
                 }, 1200);
             })
             .catch(function (err) {
-                console.error("Failed:", err);
+                console.error("handleNext failed:", JSON.stringify(err));
                 setButtonState("next", "error");
                 showToast("Failed: " + JSON.stringify(err), "error");
                 isProcessing = false;
