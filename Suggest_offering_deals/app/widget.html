@@ -727,7 +727,7 @@
 
             var subformRows = selectedAddons.map(function (addon) {
                 return {
-                    Add_On: { id: addon.id }   // lookup field inside the subform row
+                    Product: { id: addon.id }   // lookup field inside the subform row
                 };
             });
 
@@ -760,7 +760,16 @@
 
         saveDealRecord()
             .then(function () {
-                // All fields + subform saved — proceed blueprint to next state
+                // Execute ComputeDealAmount function
+                var func_name = "ComputeDealAmount";
+                var req_data  = {
+                    "arguments": JSON.stringify({ "deal_id": currentDealId })
+                };
+                return ZOHO.CRM.FUNCTIONS.execute(func_name, req_data);
+            })
+            .then(function (data) {
+                console.log("ComputeDealAmount result:", data);
+                // Proceed blueprint to next state
                 return ZOHO.CRM.BLUEPRINT.proceed();
             })
             .then(function (blueprintResponse) {
