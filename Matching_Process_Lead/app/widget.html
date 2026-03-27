@@ -544,7 +544,7 @@
     function loadAllCities() {
         if (allCities !== null) return Promise.resolve(allCities);
         return ZOHO.CRM.API.coql({
-            select_query: "select id, Name from Cities WHERE id is not null LIMIT 2000"
+            select_query: "select id, Name from Cities WHERE id is not null LIMIT 100"
         }).then(function (resp) {
             allCities = (resp.data || []).map(function (r) {
                 return { id: String(r.id), name: r.Name };
