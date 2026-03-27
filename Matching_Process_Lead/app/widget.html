@@ -779,7 +779,7 @@
         // Lookup fields: pass id as a number (Zoho CRM requires numeric id for lookups)
         // IDs are kept as strings — they exceed JS MAX_SAFE_INTEGER so parseInt corrupts them
         payload.City_LP      = selectedCity   ? { id: selectedCity.id   } : null;
-        payload["Street LP"] = selectedStreet ? { id: selectedStreet.id } : null;
+        payload.Street_LP = selectedStreet ? { id: selectedStreet.id } : null;
 
         payload.Number = document.getElementById("number-input").value.trim() || null;
 
