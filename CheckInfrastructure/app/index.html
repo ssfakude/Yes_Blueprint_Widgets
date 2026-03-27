@@ -381,10 +381,6 @@
           })
           .then(function(blueprintResp) {
             console.log('Auto blueprint proceed:', blueprintResp);
-            ZOHO.CRM.UI.Popup.closeReload().then(function(data) {
-              console.log('closeReload data:', data);
-            });
-            setTimeout(function() { ZOHO.CRM.UI.Popup.close(); }, 2000);
           })
           .catch(function(err) {
             console.error('Auto proceed error:', err);
