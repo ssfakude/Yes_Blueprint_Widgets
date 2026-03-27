@@ -11,79 +11,68 @@
 
     body {
       font-family: 'Lato', Arial, sans-serif;
-      background: #f3f3f5;
-      padding: 16px;
+      background: #f0f0f0;
+      padding: 20px;
       font-size: 13px;
       color: #3d3d3d;
+      padding-bottom: 72px;
     }
 
     /* ── Section header ── */
     .section-header {
       display: flex;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 12px;
+      gap: 8px;
+      margin-bottom: 10px;
     }
-    .section-icon {
-      width: 28px; height: 28px;
-      background: #e8f5f0;
-      border-radius: 6px;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-    }
-    .section-icon svg { width: 15px; height: 15px; }
+    .section-icon svg { width: 16px; height: 16px; display: block; }
     .section-title {
-      font-size: 12px; font-weight: 700;
-      color: #555;
+      font-size: 11px; font-weight: 700;
+      color: #666;
       text-transform: uppercase;
-      letter-spacing: 0.07em;
+      letter-spacing: 0.08em;
     }
-    .section-line { flex: 1; height: 1px; background: #ddd; }
+    .section-line { flex: 1; height: 1px; background: #d0d0d0; }
 
     /* ── Card ── */
     .zoho-card {
       background: #fff;
-      border: 1px solid #e0e0e0;
-      border-radius: 6px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
       overflow: hidden;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
     }
 
     /* ── Card header ── */
     .card-header {
-      background: linear-gradient(135deg, #2a7d52 0%, #1e9c63 100%);
-      padding: 13px 16px;
+      background: #3a9e5f;
+      padding: 14px 18px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 10px;
     }
+    .card-header.inactive { background: #c0392b; }
+
     .card-header-left { display: flex; align-items: center; gap: 10px; }
     .pulse-dot {
-      width: 10px; height: 10px;
+      width: 11px; height: 11px;
       border-radius: 50%;
       background: #7ef5bb;
-      box-shadow: 0 0 0 3px rgba(126,245,187,0.25);
       flex-shrink: 0;
     }
-    .header-title { font-size: 14px; font-weight: 700; color: #fff; }
-    .header-sub { font-size: 11px; color: rgba(255,255,255,0.75); margin-top: 2px; }
+    .pulse-dot.inactive { background: #f1948a; }
+
+    .header-title { font-size: 14px; font-weight: 700; color: #fff; line-height: 1.3; }
+    .header-sub   { font-size: 11px; color: rgba(255,255,255,0.8); margin-top: 2px; }
+
     .header-badge {
-      background: rgba(255,255,255,0.18);
-      border: 1px solid rgba(255,255,255,0.3);
+      background: transparent;
+      border: 1.5px solid rgba(255,255,255,0.7);
       border-radius: 20px;
-      padding: 3px 10px;
+      padding: 3px 12px;
       font-size: 11px; font-weight: 700;
-      color: #fff; letter-spacing: 0.04em;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-    .card-header.inactive {
-      background: linear-gradient(135deg, #a93226 0%, #c0392b 100%);
-    }
-    .pulse-dot.inactive {
-      background: #f1948a;
-      box-shadow: 0 0 0 3px rgba(241,148,138,0.25);
+      color: #fff; letter-spacing: 0.06em;
+      white-space: nowrap; flex-shrink: 0;
     }
 
     /* ── Fields grid ── */
@@ -92,142 +81,138 @@
       grid-template-columns: 1fr 1fr;
     }
     .field-cell {
-      padding: 12px 16px;
-      border-bottom: 1px solid #f2f2f2;
-      border-right: 1px solid #f2f2f2;
-      transition: background 0.12s;
+      padding: 14px 18px;
+      border-bottom: 1px solid #efefef;
+      border-right: 1px solid #efefef;
     }
-    .field-cell:hover { background: #fafbff; }
-    .field-cell:nth-child(even) { border-right: none; }
-    .field-cell:nth-last-child(-n+2) { border-bottom: none; }
-    .field-cell.full-width {
-      grid-column: 1 / -1;
-      border-right: none;
-    }
+    .field-cell:nth-child(even)       { border-right: none; }
+    .field-cell:nth-last-child(-n+2)  { border-bottom: none; }
 
     .field-label {
-      font-size: 10.5px; font-weight: 700;
-      color: #999;
+      font-size: 10px; font-weight: 700;
+      color: #aaa;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 5px;
+      letter-spacing: 0.07em;
+      margin-bottom: 6px;
     }
     .field-value {
       font-size: 13px; font-weight: 600;
       color: #222;
       display: flex; align-items: center; gap: 6px;
     }
-    .field-value.muted { font-weight: 400; color: #444; }
+    .field-value.muted { font-weight: 400; color: #555; }
 
-    /* ── Badges ── */
+    /* ── Available badge ── */
     .confirmed-badge {
       display: inline-flex; align-items: center; gap: 5px;
-      background: #e8f5f0;
-      border: 1px solid #b3dfc9;
+      background: #e6f4ec;
+      border: 1px solid #a8d5b8;
       border-radius: 4px;
-      padding: 3px 8px;
+      padding: 3px 9px;
       font-size: 12px; font-weight: 700;
-      color: #1e7a48;
+      color: #2a7a48;
     }
     .check-circle {
-      width: 14px; height: 14px;
-      background: #2d8653;
+      width: 15px; height: 15px;
+      background: #3a9e5f;
       border-radius: 50%;
       display: inline-flex; align-items: center; justify-content: center;
       flex-shrink: 0;
     }
     .check-circle svg { width: 8px; height: 8px; }
 
+    /* ── Speed tags ── */
     .speed-tag {
-      background: #f0f4ff;
-      border: 1px solid #d0daff;
+      display: inline-block;
+      background: #eef2ff;
+      border: 1px solid #c7d2fe;
       border-radius: 4px;
-      padding: 2px 8px;
+      padding: 2px 9px;
       font-size: 13px; font-weight: 700;
-      color: #2b4ab5;
+      color: #3b4fce;
     }
     .speed-tag.copper {
-      background: #fff8f0;
-      border-color: #ffd8a8;
-      color: #8a4f00;
+      background: #fffbeb;
+      border-color: #fcd34d;
+      color: #92600a;
     }
 
-    /* ── Footer ── */
+    /* ── Card footer ── */
     .card-footer {
       background: #fafafa;
-      border-top: 1px solid #eee;
-      padding: 8px 16px;
-      display: flex; align-items: center; gap: 6px;
+      border-top: 1px solid #efefef;
+      padding: 8px 18px;
+      display: flex; align-items: center; gap: 7px;
     }
-    .footer-dot { width: 6px; height: 6px; border-radius: 50%; background: #2d8653; }
-    .footer-text { font-size: 11px; color: #888; }
+    .footer-dot  { width: 7px; height: 7px; border-radius: 50%; background: #3a9e5f; flex-shrink: 0; }
+    .footer-text { font-size: 11px; color: #999; }
 
-    /* ── Action buttons ── */
+    /* ── Fixed action bar ── */
     .card-actions {
       position: fixed;
       bottom: 0; left: 0; right: 0;
       display: flex;
-      justify-content: flex-end;
+      justify-content: center;
       align-items: center;
-      gap: 8px;
-      padding: 10px 16px;
+      gap: 12px;
+      padding: 14px 20px;
       background: #fff;
       border-top: 1px solid #e0e0e0;
-      box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
       z-index: 100;
     }
-    body { padding-bottom: 56px; }
-    .btn-cancel {
-      padding: 7px 18px;
-      font-family: 'Lato', Arial, sans-serif;
-      font-size: 12px; font-weight: 600;
-      color: #666;
-      background: #fff;
-      border: 1px solid #d0d0d0;
-      border-radius: 3px;
-      cursor: pointer;
-      transition: background 0.12s, border-color 0.12s;
-    }
-    .btn-cancel:hover { background: #f5f5f5; border-color: #b0b0b0; }
-    .btn-cancel:active { background: #ebebeb; }
-    .btn-next {
-      display: inline-flex; align-items: center; gap: 5px;
-      padding: 7px 18px;
-      font-family: 'Lato', Arial, sans-serif;
-      font-size: 12px; font-weight: 700;
-      color: #1a6b3c;
-      background: #d4f0e0;
-      border: 1px solid #a8ddbf;
-      border-radius: 3px;
-      cursor: pointer;
-      transition: background 0.12s, border-color 0.12s;
-    }
-    .btn-next:hover { background: #bde8d0; border-color: #8ecfaa; }
-    .btn-next:active { background: #a5dfc0; }
-    .btn-next svg { width: 12px; height: 12px; }
-    .btn-next:disabled, .btn-cancel:disabled {
-      opacity: 0.5; cursor: not-allowed;
-    }
 
-    /* ── Loading state ── */
+    .btn-cancel {
+      padding: 8px 28px;
+      font-family: 'Lato', Arial, sans-serif;
+      font-size: 13px; font-weight: 600;
+      color: #444;
+      background: #fff;
+      border: 1.5px solid #c8c8c8;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.12s, border-color 0.12s;
+      min-width: 90px;
+    }
+    .btn-cancel:hover  { background: #f5f5f5; border-color: #aaa; }
+    .btn-cancel:active { background: #ebebeb; }
+
+    .btn-next {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 28px;
+      font-family: 'Lato', Arial, sans-serif;
+      font-size: 13px; font-weight: 700;
+      color: #fff;
+      background: #3b8ad4;
+      border: 1.5px solid #3b8ad4;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.12s, border-color 0.12s;
+      min-width: 90px;
+    }
+    .btn-next:hover  { background: #2f74bb; border-color: #2f74bb; }
+    .btn-next:active { background: #2563a3; border-color: #2563a3; }
+    .btn-next svg    { width: 13px; height: 13px; }
+
+    .btn-next:disabled, .btn-cancel:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ── Loading / error states ── */
     .state-loading, .state-error {
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
-      padding: 32px 16px; gap: 10px;
+      padding: 40px 16px; gap: 10px;
       color: #888; font-size: 13px;
     }
     .spinner {
       width: 24px; height: 24px;
       border: 2px solid #e0e0e0;
-      border-top-color: #2d8653;
+      border-top-color: #3a9e5f;
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .error-icon { font-size: 24px; }
+    .error-icon  { font-size: 24px; }
     .state-error { color: #c0392b; }
 
-    /* ── Hidden until loaded ── */
     #widget-content { display: none; }
   </style>
 </head>
@@ -249,14 +234,12 @@
   <div id="widget-content">
 
     <div class="section-header">
-      <div class="section-icon">
-        <svg viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M2 10.5C3.5 8.5 5.5 7.5 7.5 7.5C9.5 7.5 11.5 8.5 13 10.5" stroke="#2d8653" stroke-width="1.5" stroke-linecap="round"/>
-          <path d="M4 13C5 11.5 6.2 10.8 7.5 10.8C8.8 10.8 10 11.5 11 13" stroke="#2d8653" stroke-width="1.5" stroke-linecap="round"/>
-          <circle cx="7.5" cy="14" r="0.8" fill="#2d8653"/>
-          <path d="M0.5 7.5C2.5 5 5 3.8 7.5 3.8C10 3.8 12.5 5 14.5 7.5" stroke="#2d8653" stroke-width="1.5" stroke-linecap="round"/>
-        </svg>
-      </div>
+      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;flex-shrink:0;">
+        <path d="M1.5 7C3.5 4.8 5.6 3.8 8 3.8C10.4 3.8 12.5 4.8 14.5 7" stroke="#888" stroke-width="1.4" stroke-linecap="round"/>
+        <path d="M3.5 9.5C5 7.8 6.4 7 8 7C9.6 7 11 7.8 12.5 9.5" stroke="#888" stroke-width="1.4" stroke-linecap="round"/>
+        <path d="M5.5 12C6.4 10.8 7.1 10.3 8 10.3C8.9 10.3 9.6 10.8 10.5 12" stroke="#888" stroke-width="1.4" stroke-linecap="round"/>
+        <circle cx="8" cy="13.5" r="0.8" fill="#888"/>
+      </svg>
       <span class="section-title">Fiber Service Details</span>
       <div class="section-line"></div>
     </div>
@@ -395,15 +378,15 @@
       var btnNext   = document.getElementById('btn-next');
       var btnCancel = document.getElementById('btn-cancel');
 
-      btnNext.disabled   = true;
-      btnCancel.disabled = true;
+      btnNext.disabled    = true;
+      btnCancel.disabled  = true;
       btnNext.textContent = 'Saving…';
 
       var fields = window._infraResult || {};
 
-      // Update the Deal record with the 3 infra fields
+      // Step 1 — update Deal fields
       ZOHO.CRM.API.updateRecord({
-        Entity: "Deals",
+        Entity:   "Deals",
         APIData: {
           id:               _entityId,
           Fibers_Available: fields.Fibers_Available,
@@ -416,18 +399,21 @@
         console.log('Deal update response:', updateResp);
         btnNext.textContent = 'Moving…';
 
-        // Now advance the blueprint
+        // Step 2 — advance the blueprint
         return ZOHO.CRM.BLUEPRINT.proceed();
       })
       .then(function(blueprintResp) {
         console.log('Blueprint proceed response:', blueprintResp);
-        try {
-          ZOHO.CRM.UI.Popup.closeReload().then(function(data) {
-            console.log(data);
-          });
-        } catch(e) {
+
+        // Step 3 — closeReload MUST be the last call; do not chain anything after it
+        ZOHO.CRM.UI.Popup.closeReload().then(function(data) {
+          console.log('closeReload data:', data);
+        });
+
+        // Safety fallback: if closeReload doesn't trigger navigation within 2s, force close
+        setTimeout(function() {
           ZOHO.CRM.UI.Popup.close();
-        }
+        }, 2000);
       })
       .catch(function(err) {
         console.error('Next error:', err);
