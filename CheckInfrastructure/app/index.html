@@ -377,10 +377,6 @@
           })
           .then(function(updateResp) {
             console.log('Auto update response:', updateResp);
-            return ZOHO.CRM.BLUEPRINT.proceed();
-          })
-          .then(function(blueprintResp) {
-            console.log('Auto blueprint proceed:', blueprintResp);
           })
           .catch(function(err) {
             console.error('Auto proceed error:', err);
@@ -421,21 +417,19 @@
         console.log('Deal update response:', updateResp);
         btnNext.textContent = 'Moving…';
 
-        // Step 2 — advance the blueprint
-        return ZOHO.CRM.BLUEPRINT.proceed();
+        // Step 2 — execute MoveBlueprintState function
+        var func_name = "MoveBlueprintState";
+        var req_data = { "arguments": JSON.stringify({ "dealID": _entityId }) };
+        return ZOHO.CRM.FUNCTIONS.execute(func_name, req_data);
       })
-      .then(function(blueprintResp) {
-        console.log('Blueprint proceed response:', blueprintResp);
+      .then(function(data) {
+        console.log(data);
 
-        // Step 3 — closeReload MUST be the last call; do not chain anything after it
+        // Step 3 — close and reload
         ZOHO.CRM.UI.Popup.closeReload().then(function(data) {
           console.log('closeReload data:', data);
         });
-
-        // Safety fallback: if closeReload doesn't trigger navigation within 2s, force close
-        setTimeout(function() {
-          ZOHO.CRM.UI.Popup.close();
-        }, 2000);
+        setTimeout(function() { ZOHO.CRM.UI.Popup.close(); }, 2000);
       })
       .catch(function(err) {
         console.error('Next error:', err);
