@@ -36,7 +36,6 @@
 
     .container { max-width: 1200px; margin: 0 auto; }
 
-    /* ── Header ── */
     .widget-header {
         display: flex;
         align-items: center;
@@ -59,7 +58,6 @@
     .widget-header h1 { font-size: 15px; font-weight: 600; color: var(--navy); letter-spacing: -0.01em; }
     .widget-header p  { font-size: 12px; color: var(--text-muted); margin-left: auto; font-weight: 400; }
 
-    /* ── Section label ── */
     .section-label {
         display: flex;
         align-items: center;
@@ -74,7 +72,6 @@
     .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
     .required-star { color: #ef4444; margin-left: 3px; font-size: 12px; }
 
-    /* ── Interest buttons ── */
     .button-group { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 32px; }
 
     .interest-btn {
@@ -100,7 +97,6 @@
     .interest-btn.active { background: var(--navy); border-color: var(--navy); color: #fff; box-shadow: 0 4px 14px rgba(15,31,53,0.2); }
     .interest-btn.active::before { opacity: 0; }
 
-    /* ── Products grid (main package — single select) ── */
     .products-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -155,7 +151,6 @@
     .price-row.secondary .price-value { font-size: 12.5px; color: var(--text-secondary); }
     .product-description { font-size: 12px; line-height: 1.6; color: var(--text-secondary); border-top: 1px solid var(--border); padding-top: 12px; margin-top: 2px; }
 
-    /* ── Add-ons section ── */
     #addons-section { margin-bottom: 32px; }
 
     .addon-grid {
@@ -201,7 +196,6 @@
     .addon-price { font-family: 'DM Mono', monospace; font-size: 12px; color: #7c3aed; font-weight: 500; margin-bottom: 4px; }
     .addon-desc { font-size: 11.5px; color: var(--text-secondary); line-height: 1.5; margin-top: 4px; }
 
-    /* ── Bottom section ── */
     .bottom-section { margin-top: 8px; padding-top: 24px; border-top: 1px solid var(--border); }
 
     .description-field {
@@ -224,7 +218,37 @@
     .description-field::placeholder { color: var(--text-muted); }
     .description-field:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
 
-    /* ── Action bar ── */
+    /* ── Total summary bar ── */
+    .total-bar {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 12px;
+        padding: 12px 16px;
+        background: var(--surface-card);
+        border: 1.5px solid var(--border);
+        border-radius: var(--radius);
+        margin-bottom: 16px;
+        box-shadow: var(--shadow-sm);
+    }
+    .total-bar .total-label {
+        font-size: 11px; font-weight: 600;
+        text-transform: uppercase; letter-spacing: 0.08em;
+        color: var(--text-muted);
+    }
+    .total-bar .total-value {
+        font-family: 'DM Mono', monospace;
+        font-size: 16px; font-weight: 500;
+        color: var(--navy);
+    }
+    .total-bar .total-currency {
+        font-size: 11px; color: var(--text-muted); font-weight: 400; margin-left: 3px;
+    }
+    .total-bar .total-breakdown {
+        font-size: 11px; color: var(--text-muted);
+        margin-right: auto;
+    }
+
     .action-bar { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; padding: 4px 0 8px; }
 
     .action-btn {
@@ -250,7 +274,6 @@
     .action-btn svg.spin { animation: spinIcon 0.8s linear infinite; stroke-linecap: round; }
     @keyframes spinIcon { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-    /* ── State boxes ── */
     .state-box {
         grid-column: 1 / -1;
         display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -278,7 +301,6 @@
     .error-box svg { width: 18px; height: 18px; stroke: #ef4444; stroke-width: 2; fill: none; flex-shrink: 0; margin-top: 1px; }
     .error-box p { font-size: 12.5px; color: #b91c1c; line-height: 1.5; }
 
-    /* ── Validation error states ── */
     .button-group.field-error .interest-btn { border-color: #ef4444; }
     .description-field.field-error { border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.12); }
     .products-grid.field-error .state-box,
@@ -296,7 +318,6 @@
         80% { transform: translateX(4px); }
     }
 
-    /* ── Selection bar ── */
     .selection-bar {
         position: fixed; bottom: 0; left: 0; right: 0;
         background: var(--navy); color: white;
@@ -311,7 +332,6 @@
     .selection-bar.visible { transform: translateY(0); }
     .count-badge { background: var(--accent); color: white; font-size: 11px; font-weight: 700; font-family: 'DM Mono', monospace; padding: 2px 8px; border-radius: 50px; margin-left: 8px; }
 
-    /* ── Toast ── */
     .toast {
         position: fixed; bottom: 72px; left: 50%;
         transform: translateX(-50%) translateY(16px);
@@ -327,7 +347,6 @@
     .toast.toast-error { background: #ef4444; }
     .toast.toast-success { background: #16a34a; }
 
-    /* ── Animations ── */
     .product-card, .addon-card { animation: cardIn 0.3s ease both; }
     @keyframes cardIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     .interest-btn { animation: btnIn 0.25s ease both; }
@@ -335,20 +354,15 @@
 </style>
 <script src="https://live.zwidgets.com/js-sdk/1.5/ZohoEmbededAppSDK.min.js"></script>
 <script>
-    // ─── State ───────────────────────────────────────────────────────────────
-    var currentDealId     = null;
-    var selectedProduct   = null;   // single main package
-    var selectedAddons    = [];     // multiple add-ons
-    var isProcessing      = false;
+    var currentDealId   = null;
+    var selectedProduct = null;
+    var selectedAddons  = [];
+    var isProcessing    = false;
 
-    // ─── Boot ────────────────────────────────────────────────────────────────
     ZOHO.embeddedApp.on("PageLoad", function (data) {
         console.log("PageLoad:", data);
-
         if (data && data.EntityId) currentDealId = data.EntityId;
         else if (data && data.ID)  currentDealId = data.ID;
-
-        // Load picklist options then prefill from the current Deal record
         loadInterestedInOptions().then(function () {
             return prefillFromDeal();
         });
@@ -356,7 +370,6 @@
 
     ZOHO.embeddedApp.init();
 
-    // ─── Load "Interested In" picklist from Deals metadata ───────────────────
     function loadInterestedInOptions() {
         return ZOHO.CRM.META.getFields({ Entity: "Deals" })
             .then(function (response) {
@@ -374,34 +387,25 @@
             });
     }
 
-    // ─── Prefill from the current Deal record ────────────────────────────────
     function prefillFromDeal() {
         if (!currentDealId) return Promise.resolve();
-
         return ZOHO.CRM.API.getRecord({ Entity: "Deals", RecordID: currentDealId })
             .then(function (response) {
                 var deal = response.data && response.data[0];
                 if (!deal) return;
-
                 console.log("Deal record:", deal);
-
-                // Prefill Interested In — find and activate the matching button
                 if (deal.Interested_In) {
                     var btn = document.querySelector('.interest-btn[data-value="' + deal.Interested_In + '"]');
                     if (btn) {
                         document.querySelectorAll(".interest-btn").forEach(function (b) { b.classList.remove("active"); });
                         btn.classList.add("active");
-                        // Load products for this category, then prefill selected product
                         return fetchProducts(deal.Interested_In, deal.Product_Offerd);
                     }
                 }
             })
-            .catch(function (err) {
-                console.warn("Could not prefill deal:", err);
-            });
+            .catch(function (err) { console.warn("Could not prefill deal:", err); });
     }
 
-    // ─── Render interest buttons ──────────────────────────────────────────────
     function displayInterestButtons(options) {
         var container = document.getElementById("interest-buttons");
         container.innerHTML = "";
@@ -420,17 +424,13 @@
         document.querySelectorAll(".interest-btn").forEach(function (b) { b.classList.remove("active"); });
         button.classList.add("active");
         document.getElementById("interest-buttons").classList.remove("field-error");
-
-        // Reset product + addons when category changes
         selectedProduct = null;
         selectedAddons  = [];
         hideAddonsSection();
         updateSelectionBar();
-
         fetchProducts(button.getAttribute("data-value"), null);
     }
 
-    // ─── Fetch & display main packages ───────────────────────────────────────
     function fetchProducts(category, preselectId) {
         var container = document.getElementById("products-grid");
         container.innerHTML = '<div class="state-box"><div class="loading-dots"><span></span><span></span><span></span></div><p>Loading packages…</p></div>';
@@ -488,7 +488,6 @@
             card.onclick = function () { toggleProductSelection(this, product); };
             container.appendChild(card);
 
-            // Preselect if this product was previously saved on the deal
             if (preselectId && (product.id === preselectId || String(product.id) === String(preselectId))) {
                 toggleProductSelection(card, product);
             }
@@ -496,33 +495,29 @@
     }
 
     function toggleProductSelection(card, product) {
-        // Deselect if already selected
         if (card.classList.contains("selected")) {
             selectedProduct = null;
             card.classList.remove("selected");
             hideAddonsSection();
             updateSelectionBar();
+            updateTotalBar();
             return;
         }
-
-        // Deselect any previously selected card
         document.querySelectorAll(".product-card.selected").forEach(function (c) { c.classList.remove("selected"); });
-
         selectedProduct = product;
         card.classList.add("selected");
         document.getElementById("products-grid").classList.remove("field-error");
         updateSelectionBar();
-
-        // Load add-ons linked to this product via Related_Ad_Ons
+        updateTotalBar();
         loadAddons(product);
     }
 
-    // ─── Add-ons ─────────────────────────────────────────────────────────────
     function hideAddonsSection() {
         var section = document.getElementById("addons-section");
         section.style.display = "none";
         document.getElementById("addon-grid").innerHTML = "";
         selectedAddons = [];
+        updateTotalBar();
     }
 
     function loadAddons(product) {
@@ -541,26 +536,15 @@
         })
         .then(function (response) {
             console.log("Related add-ons response:", JSON.stringify(response));
-
             var records = response.data;
-            if (!records || records.length === 0) {
-                section.style.display = "none";
-                return Promise.resolve(null);
-            }
+            if (!records || records.length === 0) { section.style.display = "none"; return Promise.resolve(null); }
 
-            // Each record has Related_Ad_Ons1: { id, name } — extract the product IDs
             var productIds = records
                 .map(function (r) { return r.Related_Ad_Ons1 && r.Related_Ad_Ons1.id; })
                 .filter(Boolean);
 
-            console.log("Addon product IDs:", productIds);
+            if (productIds.length === 0) { section.style.display = "none"; return Promise.resolve(null); }
 
-            if (productIds.length === 0) {
-                section.style.display = "none";
-                return Promise.resolve(null);
-            }
-
-            // Fetch full product details via COQL using the extracted IDs
             var idList = productIds.map(function (id) { return "'" + id + "'"; }).join(", ");
             return ZOHO.CRM.API.coql({
                 select_query: "select id, Product_Name, Unit_Price, Unit_Price_2nd_period, Description from Products where id in (" + idList + ")"
@@ -568,7 +552,6 @@
         })
         .then(function (response) {
             if (!response) return;
-            console.log("Addon product details:", JSON.stringify(response));
             if (response.data && response.data.length > 0) {
                 displayAddons(response.data);
             } else {
@@ -586,14 +569,11 @@
         grid.innerHTML = "";
 
         addons.forEach(function (addon, i) {
-            console.log("Addon record:", JSON.stringify(addon));
-
             var card = document.createElement("div");
             card.className = "addon-card";
             card.style.animationDelay = (i * 0.05) + "s";
             card.setAttribute("data-addon-id", addon.id);
 
-            // COQL returns Product_Name, Unit_Price, Description
             var name      = addon.Product_Name || "Add-on";
             var unitPrice = addon.Unit_Price || null;
             var price     = unitPrice ? formatPrice(unitPrice) + " ILS/mo" : "";
@@ -617,7 +597,6 @@
     function toggleAddonSelection(card, addon) {
         var id    = card.getAttribute("data-addon-id");
         var index = selectedAddons.findIndex(function (a) { return a.id === id; });
-
         if (index > -1) {
             selectedAddons.splice(index, 1);
             card.classList.remove("selected");
@@ -626,23 +605,49 @@
             card.classList.add("selected");
         }
         updateSelectionBar();
+        updateTotalBar();
     }
 
-    // ─── Selection bar ────────────────────────────────────────────────────────
+    // ─── Total calculation ────────────────────────────────────────────────────
+    function calculateTotal() {
+        var mainPrice   = selectedProduct ? (parseFloat(selectedProduct.Unit_Price) || 0) : 0;
+        var addonsTotal = selectedAddons.reduce(function (sum, addon) {
+            return sum + (parseFloat(addon.Unit_Price) || 0);
+        }, 0);
+        return mainPrice + addonsTotal;
+    }
+
+    function updateTotalBar() {
+        var bar = document.getElementById("total-bar");
+        if (!selectedProduct) {
+            bar.style.display = "none";
+            return;
+        }
+        bar.style.display = "flex";
+
+        var mainPrice   = parseFloat(selectedProduct.Unit_Price) || 0;
+        var addonsTotal = selectedAddons.reduce(function (sum, addon) {
+            return sum + (parseFloat(addon.Unit_Price) || 0);
+        }, 0);
+        var total = mainPrice + addonsTotal;
+
+        var breakdown = selectedProduct.Product_Name || "Package";
+        if (selectedAddons.length > 0) {
+            breakdown += " + " + selectedAddons.length + " add-on" + (selectedAddons.length > 1 ? "s" : "");
+        }
+
+        document.getElementById("total-breakdown").textContent = breakdown;
+        document.getElementById("total-value").textContent     = Number(total).toLocaleString("en-IL");
+    }
+
     function updateSelectionBar() {
         var bar   = document.getElementById("selection-bar");
         var count = document.getElementById("selection-count");
         var total = (selectedProduct ? 1 : 0) + selectedAddons.length;
-
-        if (total > 0) {
-            count.textContent = total;
-            bar.classList.add("visible");
-        } else {
-            bar.classList.remove("visible");
-        }
+        if (total > 0) { count.textContent = total; bar.classList.add("visible"); }
+        else { bar.classList.remove("visible"); }
     }
 
-    // ─── UI helpers ───────────────────────────────────────────────────────────
     function setButtonState(action, state) {
         var btn = document.querySelector('.action-btn[data-action="' + action + '"]');
         if (!btn) return;
@@ -669,10 +674,8 @@
         toast._t = setTimeout(function () { toast.classList.remove("visible"); }, 3500);
     }
 
-    // ─── Validation ───────────────────────────────────────────────────────────
     function validate() {
         var ok = true;
-
         var interestedBtn = document.querySelector(".interest-btn.active");
         if (!interestedBtn) {
             document.getElementById("interest-buttons").classList.add("field-error");
@@ -680,36 +683,40 @@
         } else {
             document.getElementById("interest-buttons").classList.remove("field-error");
         }
-
         if (!selectedProduct) {
             document.getElementById("products-grid").classList.add("field-error");
             if (ok) { showToast("Please select a main package", "error"); ok = false; }
         } else {
             document.getElementById("products-grid").classList.remove("field-error");
         }
-
         return ok;
     }
 
-    // ─── Build payload ────────────────────────────────────────────────────────
+    // ─── Build payload — includes Amount = main + addons Unit_Price sum ───────
     function buildDealPayload() {
         var interestedBtn = document.querySelector(".interest-btn.active");
-
         var payload = { id: currentDealId };
 
         if (interestedBtn) {
             payload.Interested_In = interestedBtn.getAttribute("data-value");
         }
 
-        // Main package
         payload.Product_Offerd = selectedProduct ? selectedProduct.id : null;
+
+        // Sum Unit_Price of main package + all selected add-ons → save to Amount
+        var mainPrice   = selectedProduct ? (parseFloat(selectedProduct.Unit_Price) || 0) : 0;
+        var addonsTotal = selectedAddons.reduce(function (sum, addon) {
+            return sum + (parseFloat(addon.Unit_Price) || 0);
+        }, 0);
+        payload.Amount = mainPrice + addonsTotal;
+
+        console.log("Amount total:", payload.Amount, "(main:", mainPrice, "+ addons:", addonsTotal, ")");
 
         return payload;
     }
 
     // ─── Save deal record + Add_Ons subform ───────────────────────────────────
     function saveDealRecord() {
-        // Step 1: update main Deal fields
         return ZOHO.CRM.API.updateRecord({
             Entity : "Deals",
             APIData: buildDealPayload(),
@@ -717,26 +724,15 @@
         })
         .then(function (response) {
             console.log("Deal saved:", response);
-
-            // Step 2: save selected add-ons to the Add_Ons subform
-            // Each subform row needs a Product lookup field pointing to the add-on
-            // Subforms are upserted by including them inside the record update as an array
-            if (selectedAddons.length === 0) {
-                return Promise.resolve(response);
-            }
+            if (selectedAddons.length === 0) { return Promise.resolve(response); }
 
             var subformRows = selectedAddons.map(function (addon) {
-                return {
-                    Add_On: { id: addon.id }   // lookup field inside the subform row
-                };
+                return { Add_On: { id: addon.id } };
             });
 
             return ZOHO.CRM.API.updateRecord({
                 Entity : "Deals",
-                APIData: {
-                    id      : currentDealId,
-                    Add_Ons : subformRows        // subform API name
-                },
+                APIData: { id: currentDealId, Add_Ons: subformRows },
                 Trigger: []
             });
         })
@@ -746,7 +742,6 @@
         });
     }
 
-    // ─── Handlers ─────────────────────────────────────────────────────────────
     function handleCancel() {
         ZOHO.CRM.UI.Popup.close();
     }
@@ -760,14 +755,17 @@
 
         saveDealRecord()
             .then(function () {
-                // All fields + subform saved — proceed blueprint to next state
                 return ZOHO.CRM.BLUEPRINT.proceed();
             })
             .then(function (blueprintResponse) {
                 console.log("Blueprint proceeded:", blueprintResponse);
                 setButtonState("next", "done");
                 setTimeout(function () {
-                    try { ZOHO.CRM.UI.Popup.close(); } catch (e) {}
+                    try {
+                        ZOHO.CRM.UI.Popup.closeReload().then(function(data){ console.log(data); });
+                    } catch (e) {
+                        ZOHO.CRM.UI.Popup.close();
+                    }
                 }, 1200);
             })
             .catch(function (err) {
@@ -791,13 +789,11 @@
         <p>Review and confirm the deal package</p>
     </div>
 
-    <!-- Interested In -->
     <div class="section-label">Interested In<span class="required-star">*</span></div>
     <div id="interest-buttons" class="button-group">
         <div class="loading-dots" style="padding: 8px 0;"><span></span><span></span><span></span></div>
     </div>
 
-    <!-- Main Package -->
     <div class="section-label">Main Package<span class="required-star">*</span></div>
     <div id="products-grid" class="products-grid">
         <div class="state-box">
@@ -806,14 +802,19 @@
         </div>
     </div>
 
-    <!-- Add-ons (shown dynamically after main package selected) -->
     <div id="addons-section" style="display:none;">
         <div class="section-label">Available Add-ons</div>
         <div id="addon-grid" class="addon-grid"></div>
     </div>
 
-    <!-- Description + Actions -->
     <div class="bottom-section">
+        <!-- Total summary bar -->
+        <div class="total-bar" id="total-bar" style="display:none;">
+            <span class="total-breakdown" id="total-breakdown"></span>
+            <span class="total-label">Total</span>
+            <span class="total-value" id="total-value">0<span class="total-currency">ILS</span></span>
+        </div>
+
         <div class="action-bar">
             <button class="action-btn btn-cancel" data-action="cancel" onclick="handleCancel()">
                 <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
