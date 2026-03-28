@@ -437,7 +437,7 @@
         hideAddonsSection();
 
         return ZOHO.CRM.API.coql({
-            select_query: "select id, Product_Name, Unit_Price, Unit_Price_2nd_period, Description from Products where ((Usage_Unit = 'Monthly Package') and (Product_Category = '" + category + "'))"
+            select_query: "select id, Product_Name, Unit_Price, Unit_Price_2nd_period, Description from Products where ((Usage_Unit = 'חבילה חודשית') and (Product_Category = '" + category + "'))"
         })
         .then(function (response) {
             if (response.data && response.data.length > 0) {

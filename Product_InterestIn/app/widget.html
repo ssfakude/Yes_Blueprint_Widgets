@@ -748,7 +748,7 @@
 
     // ─── Fetch products via COQL ──────────────────────────────────────────────
     function fetchProducts(category) {
-        var query = "select Product_Name, Unit_Price, Unit_Price_2nd_period, Description from Products where ((Usage_Unit = 'Monthly Package') and (Product_Category = '" + category + "'))";
+        var query = "select Product_Name, Unit_Price, Unit_Price_2nd_period, Description from Products where ((Usage_Unit = 'חבילה חודשית') and (Product_Category = '" + category + "'))";
 
         console.log("📡 [COQL] category value passed in:", category);
         console.log("📡 [COQL] category is null/undefined?", category == null);
