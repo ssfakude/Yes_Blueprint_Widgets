@@ -710,7 +710,9 @@
         }, 0);
         payload.Amount = mainPrice + addonsTotal;
 
-        console.log("Amount total:", payload.Amount, "(main:", mainPrice, "+ addons:", addonsTotal, ")");
+        console.log("mainPrice:", mainPrice);
+        console.log("addonsTotal:", addonsTotal);
+        console.log("Amount total:", payload.Amount);
 
         return payload;
     }
