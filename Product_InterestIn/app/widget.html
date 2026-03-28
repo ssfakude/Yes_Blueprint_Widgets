@@ -636,7 +636,9 @@
 
     // ─── Boot ─────────────────────────────────────────────────────────────────
     ZOHO.embeddedApp.on("PageLoad", function (data) {
-        console.log("PageLoad data:", data);
+        console.log("🚀 [PageLoad] Raw data received:", data);
+        console.log("🚀 [PageLoad] EntityId:", data && data.EntityId);
+        console.log("🚀 [PageLoad] Full data keys:", data ? Object.keys(data) : "no data");
 
         // Grab the lead ID from the page-load payload
         if (data && data.EntityId) {
@@ -645,6 +647,8 @@
             currentLeadId = data.ID;
         }
 
+        console.log("🪪 [PageLoad] currentLeadId set to:", currentLeadId);
+
         loadInterestedInOptions();
     });
 
@@ -652,10 +656,24 @@
 
     // ─── Load "Interested In" picklist ────────────────────────────────────────
     function loadInterestedInOptions() {
+        console.log("📡 [META] Fetching Leads fields from Zoho CRM...");
+
         ZOHO.CRM.META.getFields({ Entity: "Leads" })
             .then(function (response) {
+                console.log("📋 [META] Full getFields response:", response);
+                console.log("📋 [META] Total fields returned:", response.fields ? response.fields.length : 0);
+                console.log("📋 [META] All field api_names:", response.fields ? response.fields.map(function(f){ return f.api_name; }) : []);
+
                 var fields = response.fields;
                 var field  = fields.find(function (f) { return f.api_name === "Interested_In"; });
+
+                if (field) {
+                    console.log("✅ [META] Interested_In field found:", field);
+                    console.log("🎯 [META] Interested_In pick_list_values:", field.pick_list_values);
+                } else {
+                    console.warn("⚠️ [META] Interested_In field NOT found in response");
+                }
+
                 if (field && field.pick_list_values) {
                     displayInterestButtons(field.pick_list_values);
                 } else {
@@ -663,17 +681,22 @@
                 }
             })
             .catch(function (err) {
+                console.error("❌ [META] getFields failed:", err);
                 showButtonError("Error loading options: " + JSON.stringify(err));
             });
     }
 
     // ─── Render interest buttons ──────────────────────────────────────────────
     function showButtonError(msg) {
+        console.error("❌ [UI] showButtonError:", msg);
         document.getElementById("interest-buttons").innerHTML =
             '<div class="error-box"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><p>' + msg + "</p></div>";
     }
 
     function displayInterestButtons(options) {
+        console.log("🖼️ [UI] Rendering interest buttons. Options count:", options.length);
+        console.log("🖼️ [UI] Interest button options:", options);
+
         var container = document.getElementById("interest-buttons");
         container.innerHTML = "";
         options.forEach(function (option, i) {
@@ -688,28 +711,51 @@
     }
 
     function selectInterest(button) {
+        var value = button.getAttribute("data-value");
+        var label = button.textContent;
+
+        console.log("🖱️ [Click] Interest button clicked:", { value: value, label: label });
+
         document.querySelectorAll(".interest-btn").forEach(function (b) { b.classList.remove("active"); });
         button.classList.add("active");
         document.getElementById("interest-buttons").classList.remove("field-error");
-        fetchProducts(button.getAttribute("data-value"));
+
+        console.log("🔍 [Click] Fetching products for category:", value);
+        fetchProducts(value);
     }
 
     // ─── Fetch products via COQL ──────────────────────────────────────────────
     function fetchProducts(category) {
+        var query = "select Product_Name, Unit_Price, Unit_Price_2nd_period, Description from Products where ((Usage_Unit = 'Monthly Package') and (Product_Category = '" + category + "'))";
+        console.log("📡 [COQL] Running query:", query);
+
         var container = document.getElementById("products-grid");
         container.innerHTML = '<div class="state-box"><div class="loading-dots"><span></span><span></span><span></span></div><p>Loading products…</p></div>';
 
-        ZOHO.CRM.API.coql({
-            select_query: "select Product_Name, Unit_Price, Unit_Price_2nd_period, Description from Products where ((Usage_Unit = 'Monthly Package') and (Product_Category = '" + category + "'))"
-        })
+        ZOHO.CRM.API.coql({ select_query: query })
         .then(function (response) {
+            console.log("📦 [COQL] Raw response:", response);
+            console.log("📦 [COQL] Products count:", response.data ? response.data.length : 0);
+            console.log("📦 [COQL] Products data:", response.data);
+
             if (response.data && response.data.length > 0) {
+                response.data.forEach(function(product, i) {
+                    console.log("📦 [COQL] Product[" + i + "]:", {
+                        id:                    product.id,
+                        Product_Name:          product.Product_Name,
+                        Unit_Price:            product.Unit_Price,
+                        Unit_Price_2nd_period: product.Unit_Price_2nd_period,
+                        Description:           product.Description
+                    });
+                });
                 displayProducts(response.data);
             } else {
+                console.warn("⚠️ [COQL] No products found for category:", category);
                 container.innerHTML = '<div class="state-box"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke="currentColor"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg><p>No products found for this category</p></div>';
             }
         })
         .catch(function (err) {
+            console.error("❌ [COQL] Query failed:", err);
             container.innerHTML = '<div class="error-box"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><p>Error loading products: ' + JSON.stringify(err) + '</p></div>';
         });
     }
@@ -721,6 +767,8 @@
     }
 
     function displayProducts(products) {
+        console.log("🖼️ [UI] Rendering", products.length, "product card(s)");
+
         var container = document.getElementById("products-grid");
         container.innerHTML = "";
         products.forEach(function (product, i) {
@@ -754,12 +802,21 @@
     }
 
     function toggleProductSelection(card, product) {
-        var id = card.getAttribute("data-product-id");
+        var id        = card.getAttribute("data-product-id");
+        var isAlready = card.classList.contains("selected");
+
+        console.log("🖱️ [Click] Product card clicked:", {
+            id:           id,
+            Product_Name: product.Product_Name,
+            Unit_Price:   product.Unit_Price,
+            wasSelected:  isAlready
+        });
 
         // If already selected, deselect it
-        if (card.classList.contains("selected")) {
+        if (isAlready) {
             selectedProducts = [];
             card.classList.remove("selected");
+            console.log("❎ [Selection] Product deselected. selectedProducts:", selectedProducts);
             updateSelectionBar();
             return;
         }
@@ -773,6 +830,10 @@
         selectedProducts = [product];
         card.classList.add("selected");
         document.getElementById("products-grid").classList.remove("field-error");
+
+        console.log("✅ [Selection] Product selected:", product);
+        console.log("📌 [Selection] Current selectedProducts:", selectedProducts);
+
         updateSelectionBar();
     }
 
@@ -817,29 +878,26 @@
     }
 
     // ─── Build the lead update payload ───────────────────────────────────────
-    // Always includes ALL fields so nothing is silently dropped on any action.
     function buildLeadPayload(statusValue) {
-        var description  = document.getElementById("lead-description").value.trim();
+        var description   = document.getElementById("lead-description").value.trim();
         var interestedBtn = document.querySelector(".interest-btn.active");
         var interestedIn  = interestedBtn ? interestedBtn.getAttribute("data-value") : null;
 
         var payload = { id: currentLeadId };
 
-        // Status — only set when explicitly passed (not_interested / unservable)
         if (statusValue) {
             payload.Lead_Status = statusValue;
         }
 
-        // Always write these fields (even if empty — lets the user clear them)
         payload.Description   = description;
 
         if (interestedIn) {
             payload.Interested_In = interestedIn;
         }
 
-        // Always write the selected product (or clear it if none selected)
         payload.Product_Offerd = selectedProducts.length > 0 ? selectedProducts[0].id : null;
 
+        console.log("🏗️ [Payload] Built lead payload:", payload);
         return payload;
     }
 
@@ -871,6 +929,7 @@
         }
 
         if (errors.length > 0) {
+            console.warn("⚠️ [Validation] Failed. Missing fields:", errors);
             var msgs = {
                 interested:  "Please select an interest category",
                 product:     "Please select a package",
@@ -879,11 +938,14 @@
             showToast(msgs[errors[0]], "error");
             return false;
         }
+
+        console.log("✅ [Validation] Passed. All required fields present.");
         return true;
     }
 
     // ─── Core: update lead record ─────────────────────────────────────────────
     function updateLeadRecord(payload) {
+        console.log("📡 [CRM] Calling updateRecord with payload:", payload);
         return ZOHO.CRM.API.updateRecord({
             Entity : "Leads",
             APIData: payload,
@@ -894,6 +956,7 @@
     // ─── Action handlers ──────────────────────────────────────────────────────
 
     function handleCancel() {
+        console.log("🖱️ [Click] Cancel button clicked. Closing popup.");
         ZOHO.CRM.UI.Popup.close();
     }
 
@@ -904,26 +967,37 @@
      * 3. Proceed blueprint
      */
     function handleMatchingProcess() {
-        if (isProcessing) return;
+        console.log("🖱️ [Click] Next (Matching Process) button clicked.");
+        console.log("🔄 [State] isProcessing:", isProcessing);
+
+        if (isProcessing) {
+            console.warn("⚠️ [Click] Already processing — ignoring duplicate click.");
+            return;
+        }
         if (!validate()) return;
 
         isProcessing = true;
         setButtonState("matching_process", "loading");
 
-        updateLeadRecord(buildLeadPayload(null))
+        var payload = buildLeadPayload(null);
+
+        updateLeadRecord(payload)
             .then(function (response) {
-                console.log("Lead saved (Matching Process):", response);
+                console.log("✅ [CRM] updateRecord success:", response);
+                console.log("📡 [Blueprint] Calling ZOHO.CRM.BLUEPRINT.proceed()...");
                 return ZOHO.CRM.BLUEPRINT.proceed();
             })
             .then(function (blueprintResponse) {
-                console.log("Blueprint proceeded:", blueprintResponse);
+                console.log("✅ [Blueprint] proceed() success:", blueprintResponse);
                 setButtonState("matching_process", "done");
                 setTimeout(function () {
-                    try { ZOHO.CRM.UI.Popup.close(); } catch (e) {}
+                    try { ZOHO.CRM.UI.Popup.close(); } catch (e) {
+                        console.warn("⚠️ [Popup] close() failed:", e);
+                    }
                 }, 1200);
             })
             .catch(function (err) {
-                console.error("Matching process failed:", err);
+                console.error("❌ [Error] Matching process failed:", err);
                 setButtonState("matching_process", "error");
                 showToast("Failed: " + JSON.stringify(err), "error");
                 isProcessing = false;
