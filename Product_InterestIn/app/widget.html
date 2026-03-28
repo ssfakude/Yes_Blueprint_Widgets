@@ -695,7 +695,20 @@
 
     function displayInterestButtons(options) {
         console.log("🖼️ [UI] Rendering interest buttons. Options count:", options.length);
-        console.log("🖼️ [UI] Interest button options:", options);
+        console.log("🖼️ [UI] Interest button options (full):", options);
+
+        // ── Dump every option's actual_value vs display_value ──────────────
+        console.group("🗂️ [Picklist] Interested_In option breakdown:");
+        options.forEach(function(opt, i) {
+            console.log(
+                "  [" + i + "]",
+                "actual_value:", JSON.stringify(opt.actual_value),
+                "| display_value:", JSON.stringify(opt.display_value),
+                "| sequence:", opt.sequence_number
+            );
+        });
+        console.groupEnd();
+        // ──────────────────────────────────────────────────────────────────
 
         var container = document.getElementById("interest-buttons");
         container.innerHTML = "";
@@ -716,6 +729,15 @@
 
         console.log("🖱️ [Click] Interest button clicked:", { value: value, label: label });
 
+        // ── Deep diagnostics for Hebrew / encoding issues ──────────────────
+        console.log("🔬 [Encoding] value type:", typeof value);
+        console.log("🔬 [Encoding] value length:", value ? value.length : "null");
+        console.log("🔬 [Encoding] value charCodes:", value ? Array.from(value).map(function(c){ return c + "(" + c.charCodeAt(0) + ")"; }).join(" ") : "null");
+        console.log("🔬 [Encoding] data-value attribute raw:", button.getAttribute("data-value"));
+        console.log("🔬 [Encoding] button textContent raw:", button.textContent);
+        console.log("🔬 [Encoding] button innerHTML:", button.innerHTML);
+        // ──────────────────────────────────────────────────────────────────
+
         document.querySelectorAll(".interest-btn").forEach(function (b) { b.classList.remove("active"); });
         button.classList.add("active");
         document.getElementById("interest-buttons").classList.remove("field-error");
@@ -727,7 +749,13 @@
     // ─── Fetch products via COQL ──────────────────────────────────────────────
     function fetchProducts(category) {
         var query = "select Product_Name, Unit_Price, Unit_Price_2nd_period, Description from Products where ((Usage_Unit = 'Monthly Package') and (Product_Category = '" + category + "'))";
+
+        console.log("📡 [COQL] category value passed in:", category);
+        console.log("📡 [COQL] category is null/undefined?", category == null);
+        console.log("📡 [COQL] category trimmed:", category ? category.trim() : "N/A");
         console.log("📡 [COQL] Running query:", query);
+        console.log("📡 [COQL] Query char length:", query.length);
+        console.log("📡 [COQL] Query JSON-safe:", JSON.stringify(query));
 
         var container = document.getElementById("products-grid");
         container.innerHTML = '<div class="state-box"><div class="loading-dots"><span></span><span></span><span></span></div><p>Loading products…</p></div>';
