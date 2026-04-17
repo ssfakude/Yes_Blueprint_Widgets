@@ -11,12 +11,14 @@
         --accent: #3b9eca;
         --accent-bright: #4db8e8;
         --accent-glow: rgba(59, 158, 202, 0.15);
+        --gold: #e8b84b;
         --surface: #f0f4f8;
         --surface-card: #ffffff;
         --text-primary: #0f1f35;
         --text-secondary: #4a6080;
         --text-muted: #8ba3bc;
         --border: #d4e0ec;
+        --border-active: #3b9eca;
         --shadow-sm: 0 1px 3px rgba(15,31,53,0.06), 0 1px 2px rgba(15,31,53,0.04);
         --shadow-md: 0 4px 16px rgba(15,31,53,0.08), 0 2px 6px rgba(15,31,53,0.05);
         --shadow-lg: 0 12px 40px rgba(15,31,53,0.12), 0 4px 12px rgba(15,31,53,0.06);
@@ -30,642 +32,771 @@
         font-family: 'Sora', sans-serif;
         background: var(--surface);
         color: var(--text-primary);
-        padding: 24px;
+        padding: 20px 24px 100px;
         min-height: 100vh;
     }
 
-    .container { max-width: 1200px; margin: 0 auto; }
-
-    .widget-header {
-        display: flex;
-        align-items: center;
-        gap: 10px;
+    /* ── Title ── */
+    .page-title {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--navy);
+        text-align: right;
+        direction: rtl;
         margin-bottom: 28px;
-        padding-bottom: 20px;
+        line-height: 1.5;
+        padding-bottom: 16px;
         border-bottom: 1px solid var(--border);
     }
-    .widget-header .icon {
-        width: 34px; height: 34px;
-        background: var(--navy);
-        border-radius: 8px;
-        display: flex; align-items: center; justify-content: center;
-    }
-    .widget-header .icon svg {
-        width: 18px; height: 18px;
-        fill: none; stroke: var(--accent-bright);
-        stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
-    }
-    .widget-header h1 { font-size: 15px; font-weight: 600; color: var(--navy); letter-spacing: -0.01em; }
-    .widget-header p  { font-size: 12px; color: var(--text-muted); margin-left: auto; font-weight: 400; }
 
-    .section-label {
+    /* ── Form rows ── */
+    .form-row {
         display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 11px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        color: var(--text-muted);
-        margin-bottom: 12px;
+        align-items: flex-start;
+        gap: 20px;
+        margin-bottom: 18px;
     }
-    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-    .required-star { color: #ef4444; margin-left: 3px; font-size: 12px; }
 
-    .button-group { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 32px; }
-
-    .interest-btn {
-        padding: 8px 18px;
-        border: 1.5px solid var(--border);
-        border-radius: 50px;
-        background: var(--surface-card);
+    .form-label {
+        min-width: 120px;
+        font-size: 13px;
+        font-weight: 500;
         color: var(--text-secondary);
-        font-family: 'Sora', sans-serif;
-        font-size: 13px; font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        outline: none;
-        box-shadow: var(--shadow-sm);
-        position: relative; overflow: hidden;
-    }
-    .interest-btn::before {
-        content: ''; position: absolute; inset: 0;
-        background: var(--accent-glow); opacity: 0; transition: opacity 0.2s;
-    }
-    .interest-btn:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); box-shadow: var(--shadow-md); }
-    .interest-btn:hover::before { opacity: 1; }
-    .interest-btn.active { background: var(--navy); border-color: var(--navy); color: #fff; box-shadow: 0 4px 14px rgba(15,31,53,0.2); }
-    .interest-btn.active::before { opacity: 0; }
-
-    .products-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 16px;
-        margin-bottom: 32px;
+        padding-top: 11px;
+        text-align: right;
+        flex-shrink: 0;
     }
 
-    .product-card {
-        background: var(--surface-card);
-        border: 1.5px solid var(--border);
-        border-radius: var(--radius);
-        cursor: pointer;
-        transition: all 0.25s ease;
-        box-shadow: var(--shadow-sm);
-        overflow: hidden;
-        position: relative;
-    }
-    .product-card::before {
-        content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-        background: linear-gradient(90deg, var(--accent), var(--accent-bright));
-        opacity: 0; transition: opacity 0.25s;
-    }
-    .product-card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: var(--shadow-lg); }
-    .product-card:hover::before { opacity: 1; }
-    .product-card.selected { border-color: var(--navy); box-shadow: 0 0 0 3px var(--accent-glow), var(--shadow-md); }
-    .product-card.selected::before { background: linear-gradient(90deg, var(--navy), var(--accent)); opacity: 1; }
-
-    .card-inner { padding: 20px; }
-    .card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; }
-    .product-name { font-size: 14px; font-weight: 600; color: var(--text-primary); line-height: 1.35; flex: 1; padding-right: 12px; }
-
-    .selected-badge {
-        width: 22px; height: 22px; border-radius: 50%;
-        border: 2px solid var(--border);
-        display: flex; align-items: center; justify-content: center;
-        flex-shrink: 0; transition: all 0.2s;
-    }
-    .product-card.selected .selected-badge { background: var(--navy); border-color: var(--navy); }
-    .selected-badge svg { width: 11px; height: 11px; stroke: white; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; opacity: 0; transition: opacity 0.2s; fill: none; }
-    .product-card.selected .selected-badge svg { opacity: 1; }
-
-    .pricing-block {
-        background: var(--surface); border-radius: var(--radius-sm);
-        padding: 12px 14px; margin-bottom: 12px;
-        display: flex; flex-direction: column; gap: 6px;
-    }
-    .price-row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
-    .price-label { font-size: 10.5px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
-    .price-value { font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 500; color: var(--text-primary); }
-    .price-currency { font-size: 11px; color: var(--text-muted); font-weight: 400; margin-left: 2px; }
-    .price-divider { height: 1px; background: var(--border); margin: 2px 0; }
-    .price-row.secondary .price-value { font-size: 12.5px; color: var(--text-secondary); }
-    .product-description { font-size: 12px; line-height: 1.6; color: var(--text-secondary); border-top: 1px solid var(--border); padding-top: 12px; margin-top: 2px; }
-
-    #addons-section { margin-bottom: 32px; }
-
-    .addon-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-        gap: 12px;
+    .form-control-wrap {
+        flex: 1;
     }
 
-    .addon-card {
-        background: var(--surface-card);
-        border: 1.5px solid var(--border);
-        border-radius: var(--radius);
-        cursor: pointer;
-        transition: all 0.2s ease;
-        box-shadow: var(--shadow-sm);
-        overflow: hidden;
-        position: relative;
-    }
-    .addon-card::before {
-        content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-        background: linear-gradient(90deg, #a78bfa, #7c3aed);
-        opacity: 0; transition: opacity 0.2s;
-    }
-    .addon-card:hover { border-color: #a78bfa; transform: translateY(-2px); box-shadow: var(--shadow-md); }
-    .addon-card:hover::before { opacity: 1; }
-    .addon-card.selected { border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124,58,237,0.1), var(--shadow-md); }
-    .addon-card.selected::before { opacity: 1; }
-
-    .addon-inner { padding: 16px; display: flex; align-items: flex-start; gap: 12px; }
-
-    .addon-checkbox {
-        width: 20px; height: 20px; border-radius: 5px;
-        border: 2px solid var(--border);
-        display: flex; align-items: center; justify-content: center;
-        flex-shrink: 0; margin-top: 1px; transition: all 0.2s;
-    }
-    .addon-card.selected .addon-checkbox { background: #7c3aed; border-color: #7c3aed; }
-    .addon-checkbox svg { width: 11px; height: 11px; stroke: white; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; opacity: 0; transition: opacity 0.2s; fill: none; }
-    .addon-card.selected .addon-checkbox svg { opacity: 1; }
-
-    .addon-info { flex: 1; min-width: 0; }
-    .addon-name { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; line-height: 1.3; }
-    .addon-price { font-family: 'DM Mono', monospace; font-size: 12px; color: #7c3aed; font-weight: 500; margin-bottom: 4px; }
-    .addon-desc { font-size: 11.5px; color: var(--text-secondary); line-height: 1.5; margin-top: 4px; }
-
-    .bottom-section { margin-top: 8px; padding-top: 24px; border-top: 1px solid var(--border); }
-
-    .description-field {
+    /* ── Select / Input shared styles ── */
+    .form-select,
+    .form-input {
         width: 100%;
-        min-height: 90px;
-        padding: 12px 14px;
+        height: 42px;
+        padding: 0 14px;
         font-family: 'Sora', sans-serif;
         font-size: 13px;
         color: var(--text-primary);
         background: var(--surface-card);
         border: 1.5px solid var(--border);
+        border-left: 3px solid var(--accent);
         border-radius: var(--radius);
-        resize: vertical;
         outline: none;
         transition: border-color 0.2s, box-shadow 0.2s;
         box-shadow: var(--shadow-sm);
-        margin-bottom: 20px;
-        line-height: 1.6;
+        appearance: none;
+        -webkit-appearance: none;
     }
-    .description-field::placeholder { color: var(--text-muted); }
-    .description-field:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
 
-    /* ── Total summary bar ── */
-    .total-bar {
+    .form-select:focus,
+    .form-input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .form-input.field-error {
+        border-color: #ef4444;
+        box-shadow: 0 0 0 3px rgba(239,68,68,0.1);
+    }
+
+    /* Select wrapper for custom chevron */
+    .select-wrap {
+        position: relative;
+    }
+
+    .select-wrap::after {
+        content: '';
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 0;
+        height: 0;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 6px solid var(--text-muted);
+        pointer-events: none;
+    }
+
+    .select-dot {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 10px;
+        height: 10px;
+        background: var(--accent);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    .select-wrap .form-select {
+        padding-left: 34px;
+    }
+
+    /* Input with icon on the right */
+    .input-icon-wrap {
+        position: relative;
+    }
+
+    .input-icon-wrap .form-input {
+        padding-right: 46px;
+    }
+
+    .input-icon-btn {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 28px;
+        height: 28px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 6px;
         display: flex;
         align-items: center;
-        justify-content: flex-end;
-        gap: 12px;
-        padding: 12px 16px;
-        background: var(--surface-card);
-        border: 1.5px solid var(--border);
-        border-radius: var(--radius);
-        margin-bottom: 16px;
-        box-shadow: var(--shadow-sm);
-    }
-    .total-bar .total-label {
-        font-size: 11px; font-weight: 600;
-        text-transform: uppercase; letter-spacing: 0.08em;
-        color: var(--text-muted);
-    }
-    .total-bar .total-value {
-        font-family: 'DM Mono', monospace;
-        font-size: 16px; font-weight: 500;
-        color: var(--navy);
-    }
-    .total-bar .total-currency {
-        font-size: 11px; color: var(--text-muted); font-weight: 400; margin-left: 3px;
-    }
-    .total-bar .total-breakdown {
-        font-size: 11px; color: var(--text-muted);
-        margin-right: auto;
+        justify-content: center;
+        cursor: pointer;
+        transition: background 0.15s;
     }
 
-    .action-bar { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; padding: 4px 0 8px; }
+    .input-icon-btn:hover { background: var(--border); }
+    .input-icon-btn svg {
+        width: 15px; height: 15px;
+        stroke: var(--text-secondary);
+        stroke-width: 1.8;
+        fill: none;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    /* ── Logo grid ── */
+    .logo-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .logo-tile {
+        width: 82px;
+        height: 52px;
+        border: 2px solid var(--border);
+        border-radius: 8px;
+        background: var(--surface-card);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        padding: 6px;
+        transition: all 0.2s ease;
+        box-shadow: var(--shadow-sm);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .logo-tile img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+
+    .logo-tile:hover {
+        border-color: var(--accent);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .logo-tile.selected {
+        border-color: var(--navy);
+        box-shadow: 0 0 0 3px var(--accent-glow), var(--shadow-sm);
+        background: #f0f8ff;
+    }
+
+    .logo-tile.selected::after {
+        content: '✓';
+        position: absolute;
+        top: 3px;
+        right: 4px;
+        width: 15px;
+        height: 15px;
+        background: var(--navy);
+        color: white;
+        font-size: 9px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 15px;
+        text-align: center;
+        font-weight: 700;
+    }
+
+    .logo-tile-label {
+        font-size: 9px;
+        color: var(--text-muted);
+        text-align: center;
+        margin-top: 4px;
+    }
+
+    .logo-tile-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        cursor: pointer;
+    }
+
+    /* ── Action bar (bottom sticky) ── */
+    .action-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        border-top: 1px solid var(--border);
+        padding: 12px 24px;
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        box-shadow: 0 -4px 20px rgba(15,31,53,0.08);
+        z-index: 100;
+    }
 
     .action-btn {
-        display: inline-flex; align-items: center; gap: 7px;
-        padding: 10px 22px;
-        border: none; border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 9px 20px;
+        border: none;
+        border-radius: 8px;
         font-family: 'Sora', sans-serif;
-        font-size: 13px; font-weight: 600;
+        font-size: 13px;
+        font-weight: 600;
         cursor: pointer;
         transition: all 0.2s ease;
         letter-spacing: 0.01em;
+        min-width: 110px;
+        justify-content: center;
     }
-    .action-btn svg { width: 15px; height: 15px; stroke: currentColor; stroke-width: 2.2; fill: none; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
-    .action-btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+
+    .action-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
     .action-btn:active { transform: translateY(0); }
-    .action-btn:disabled { opacity: 0.65; cursor: not-allowed; transform: none !important; }
+    .action-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
 
-    .btn-cancel { background: var(--surface); color: var(--text-secondary); border: 1.5px solid var(--border); box-shadow: var(--shadow-sm); }
-    .btn-cancel:hover { background: #e8edf3; border-color: #b0bfce; box-shadow: var(--shadow-md); }
-    .btn-success { background: #22c55e; color: white; box-shadow: 0 2px 8px rgba(34,197,94,0.25); }
-    .btn-success:hover { background: #16a34a; box-shadow: 0 6px 16px rgba(34,197,94,0.3); }
+    .btn-danger    { background: #ef4444; color: white; }
+    .btn-danger:hover  { background: #dc2626; }
+    .btn-warning   { background: #f97316; color: white; }
+    .btn-warning:hover { background: #ea6a0a; }
+    .btn-primary   { background: var(--accent); color: white; }
+    .btn-primary:hover { background: #2e8ab5; }
+    .btn-success   { background: #22c55e; color: white; }
+    .btn-success:hover { background: #16a34a; }
+    .btn-cancel-style  { background: var(--surface-card); color: var(--text-secondary); border: 1.5px solid var(--border); }
+    .btn-cancel-style:hover { background: #e8edf3; border-color: #b0bfce; }
 
-    .action-btn svg.spin { animation: spinIcon 0.8s linear infinite; stroke-linecap: round; }
+    /* ── Toast ── */
+    .toast {
+        position: fixed;
+        bottom: 72px;
+        left: 50%;
+        transform: translateX(-50%) translateY(16px);
+        background: var(--navy);
+        color: white;
+        font-size: 13px;
+        font-weight: 500;
+        padding: 10px 20px;
+        border-radius: 50px;
+        box-shadow: var(--shadow-lg);
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        white-space: nowrap;
+        z-index: 200;
+    }
+    .toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast.toast-error   { background: #ef4444; }
+    .toast.toast-success { background: #16a34a; }
+
+    /* Loading spinner */
+    .spin { animation: spinIcon 0.8s linear infinite; }
     @keyframes spinIcon { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-    .state-box {
-        grid-column: 1 / -1;
-        display: flex; flex-direction: column; align-items: center; justify-content: center;
-        padding: 48px 24px;
-        background: var(--surface-card);
-        border: 1.5px dashed var(--border);
-        border-radius: var(--radius);
-        gap: 10px;
-    }
-    .state-box svg { width: 32px; height: 32px; stroke: var(--text-muted); stroke-width: 1.5; fill: none; opacity: 0.6; }
-    .state-box p { font-size: 13px; color: var(--text-muted); }
-
-    .loading-dots { display: flex; gap: 6px; align-items: center; }
+    .loading-dots { display: flex; gap: 6px; align-items: center; padding: 10px 0; }
     .loading-dots span { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); animation: pulse 1.2s ease-in-out infinite; }
     .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
     .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
     @keyframes pulse { 0%, 80%, 100% { transform: scale(0.7); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
 
-    .error-box {
-        grid-column: 1 / -1;
-        background: #fff5f5; border: 1.5px solid #fecaca;
-        border-radius: var(--radius); padding: 16px 18px;
-        display: flex; align-items: flex-start; gap: 10px;
-    }
-    .error-box svg { width: 18px; height: 18px; stroke: #ef4444; stroke-width: 2; fill: none; flex-shrink: 0; margin-top: 1px; }
-    .error-box p { font-size: 12.5px; color: #b91c1c; line-height: 1.5; }
 
-    .button-group.field-error .interest-btn { border-color: #ef4444; }
-    .description-field.field-error { border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.12); }
-    .products-grid.field-error .state-box,
-    .products-grid.field-error .product-card { border-color: #ef4444; box-shadow: 0 0 0 2px rgba(239,68,68,0.1); }
+    /* ── Combo-box (type-to-filter dropdown) ── */
+    .combo-wrap { position: relative; }
 
-    .button-group.field-error,
-    .description-field.field-error,
-    .products-grid.field-error { animation: shakeX 0.4s ease; }
-
-    @keyframes shakeX {
-        0%, 100% { transform: translateX(0); }
-        20% { transform: translateX(-5px); }
-        40% { transform: translateX(5px); }
-        60% { transform: translateX(-4px); }
-        80% { transform: translateX(4px); }
-    }
-
-    .selection-bar {
-        position: fixed; bottom: 0; left: 0; right: 0;
-        background: var(--navy); color: white;
-        padding: 12px 24px;
-        display: flex; align-items: center; justify-content: space-between;
-        font-size: 13px; font-weight: 500;
-        transform: translateY(100%);
-        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        z-index: 100;
-        box-shadow: 0 -4px 20px rgba(15,31,53,0.2);
-    }
-    .selection-bar.visible { transform: translateY(0); }
-    .count-badge { background: var(--accent); color: white; font-size: 11px; font-weight: 700; font-family: 'DM Mono', monospace; padding: 2px 8px; border-radius: 50px; margin-left: 8px; }
-
-    .toast {
-        position: fixed; bottom: 72px; left: 50%;
-        transform: translateX(-50%) translateY(16px);
-        background: var(--navy); color: white;
-        font-size: 13px; font-weight: 500;
-        padding: 10px 20px; border-radius: 50px;
+    .combo-list {
+        position: absolute;
+        top: calc(100% + 3px);
+        left: 0; right: 0;
+        background: var(--surface-card);
+        border: 1.5px solid var(--border-active);
+        border-radius: var(--radius);
         box-shadow: var(--shadow-lg);
-        opacity: 0; pointer-events: none;
-        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        white-space: nowrap; z-index: 200;
+        z-index: 500;
+        max-height: 220px;
+        overflow-y: auto;
     }
-    .toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
-    .toast.toast-error { background: #ef4444; }
-    .toast.toast-success { background: #16a34a; }
 
-    .product-card, .addon-card { animation: cardIn 0.3s ease both; }
-    @keyframes cardIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    .interest-btn { animation: btnIn 0.25s ease both; }
-    @keyframes btnIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    .combo-row {
+        padding: 9px 14px;
+        font-size: 13px;
+        color: var(--text-primary);
+        cursor: pointer;
+        border-bottom: 1px solid var(--border);
+        transition: background 0.12s;
+    }
+    .combo-row:last-child { border-bottom: none; }
+    .combo-row:hover,
+    .combo-row.combo-highlighted { background: var(--accent-glow); color: var(--accent); }
+    .combo-empty { color: var(--text-muted); cursor: default; }
+    .combo-empty:hover { background: none; color: var(--text-muted); }
 </style>
 <script src="https://live.zwidgets.com/js-sdk/1.5/ZohoEmbededAppSDK.min.js"></script>
 <script>
-    var currentDealId   = null;
-    var selectedProduct = null;
-    var selectedAddons  = [];
+    var currentLeadId   = null;
     var isProcessing    = false;
 
+    // FIX 1: selectedCompany holds the CRM picklist actual_value (e.g. "012", "Partner")
+    // The logo filename is derived separately — it never pollutes this value.
+    var selectedCompany = null;
+
+    // City / Street lookup state
+    // Each stores { id, name } of the selected lookup record, or null
+    var selectedCity   = null;
+    var selectedStreet = null;
+
+    // Logo filename map — keys must match the picklist actual_value exactly.
+    // Only used to locate the image; never written to CRM.
+    // "None" and "HOTNet" are intentionally excluded from the grid.
+    var LOGO_MAP = {
+        "012":     "012.png",
+        "019":     "019.png",
+        "Partner": "Partner.png",
+        "Cellcom": "Cellcom.png",
+        "FreeTV":  "FreeTV.png",
+        "Idan+":   "Idan+.jpg",
+        "Next":    "Next.png",
+        "Netflix": "Netflix.png",
+        "HOT":     "HOT.png"
+    };
+
+    // Values to hide from the Leaving Company grid
+    var COMPANY_EXCLUDE = { "None": true, "HOTNet": true };
+
+    // ─── Boot ───────────────────────────────────────────────────────────────
     ZOHO.embeddedApp.on("PageLoad", function (data) {
         console.log("PageLoad:", data);
-        if (data && data.EntityId) currentDealId = data.EntityId;
-        else if (data && data.ID)  currentDealId = data.ID;
-        loadInterestedInOptions().then(function () {
-            return prefillFromDeal();
-        });
+        if (data && data.EntityId) currentLeadId = data.EntityId;
+        else if (data && data.ID)  currentLeadId = data.ID;
+        initWidget();
     });
 
     ZOHO.embeddedApp.init();
 
-    function loadInterestedInOptions() {
-        return ZOHO.CRM.META.getFields({ Entity: "Deals" })
-            .then(function (response) {
-                var field = response.fields.find(function (f) { return f.api_name === "Interested_In"; });
-                if (field && field.pick_list_values) {
-                    displayInterestButtons(field.pick_list_values);
-                } else {
-                    document.getElementById("interest-buttons").innerHTML =
-                        '<div class="error-box"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><p>Interested_In field not found</p></div>';
-                }
-            })
-            .catch(function (err) {
-                document.getElementById("interest-buttons").innerHTML =
-                    '<div class="error-box"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><p>Error loading fields: ' + JSON.stringify(err) + '</p></div>';
+    // Close combos when clicking outside
+    document.addEventListener("mousedown", function (e) {
+        ["city", "street"].forEach(function (which) {
+            var wrap = document.getElementById(which + "-combo-wrap");
+            if (wrap && !wrap.contains(e.target)) closeCombo(which);
+        });
+    });
+
+    function initWidget() {
+        Promise.all([
+            ZOHO.CRM.META.getFields({ Entity: "Leads" }),
+            currentLeadId
+                ? ZOHO.CRM.API.getRecord({ Entity: "Leads", RecordID: currentLeadId })
+                : Promise.resolve(null)
+        ]).then(function (results) {
+            var meta   = results[0];
+            var record = results[1] && results[1].data && results[1].data[0];
+
+            buildIdTypeSelect(meta.fields);
+            buildLeavingCompanyGrid(meta.fields);
+
+            // Load cities into the select, then prefill if record exists
+            loadAllCities().then(function (cities) {
+                populateCitySelect(cities);
+                if (record) prefillForm(record);
+            }).catch(function (err) {
+                console.warn("City load failed:", err);
+                if (record) prefillForm(record);
             });
-    }
-
-    function prefillFromDeal() {
-        if (!currentDealId) return Promise.resolve();
-        return ZOHO.CRM.API.getRecord({ Entity: "Deals", RecordID: currentDealId })
-            .then(function (response) {
-                var deal = response.data && response.data[0];
-                if (!deal) return;
-                console.log("Deal record:", deal);
-                if (deal.Interested_In) {
-                    var btn = document.querySelector('.interest-btn[data-value="' + deal.Interested_In + '"]');
-                    if (btn) {
-                        document.querySelectorAll(".interest-btn").forEach(function (b) { b.classList.remove("active"); });
-                        btn.classList.add("active");
-                        return fetchProducts(deal.Interested_In, deal.Product_Offerd);
-                    }
-                }
-            })
-            .catch(function (err) { console.warn("Could not prefill deal:", err); });
-    }
-
-    function displayInterestButtons(options) {
-        var container = document.getElementById("interest-buttons");
-        container.innerHTML = "";
-        options.forEach(function (option, i) {
-            var btn = document.createElement("button");
-            btn.className = "interest-btn";
-            btn.style.animationDelay = (i * 0.04) + "s";
-            btn.textContent = option.display_value || option.actual_value;
-            btn.setAttribute("data-value", option.actual_value);
-            btn.onclick = function () { selectInterest(this); };
-            container.appendChild(btn);
+        }).catch(function (err) {
+            showToast("Error loading data: " + JSON.stringify(err), "error");
+            console.error(err);
         });
     }
 
-    function selectInterest(button) {
-        document.querySelectorAll(".interest-btn").forEach(function (b) { b.classList.remove("active"); });
-        button.classList.add("active");
-        document.getElementById("interest-buttons").classList.remove("field-error");
-        selectedProduct = null;
-        selectedAddons  = [];
-        hideAddonsSection();
-        updateSelectionBar();
-        fetchProducts(button.getAttribute("data-value"), null);
+    // ─── Build ID Type dropdown ─────────────────────────────────────────────
+    function buildIdTypeSelect(fields) {
+        var field  = fields.find(function (f) { return f.api_name === "ID_Type"; });
+        var select = document.getElementById("id-type-select");
+        if (!field || !field.pick_list_values) return;
+        field.pick_list_values.forEach(function (opt) {
+            var o = document.createElement("option");
+            o.value = opt.actual_value;
+            o.textContent = opt.display_value || opt.actual_value;
+            select.appendChild(o);
+        });
     }
 
-    function fetchProducts(category, preselectId) {
-        var container = document.getElementById("products-grid");
-        container.innerHTML = '<div class="state-box"><div class="loading-dots"><span></span><span></span><span></span></div><p>Loading packages…</p></div>';
-        hideAddonsSection();
+    // ─── Build Leaving Company logo grid ───────────────────────────────────
+    function buildLeavingCompanyGrid(fields) {
+        var field     = fields.find(function (f) { return f.api_name === "Leaving_Company"; });
+        var container = document.getElementById("leaving-company-grid");
 
+        if (!field || !field.pick_list_values) {
+            container.innerHTML = '<p style="font-size:12px;color:var(--text-muted)">No options found</p>';
+            return;
+        }
+
+        container.innerHTML = "";
+
+        field.pick_list_values.forEach(function (opt) {
+            var val   = opt.actual_value;          // ← this is what gets saved to CRM
+            var label = opt.display_value || val;
+
+            // Skip excluded companies
+            if (COMPANY_EXCLUDE[val]) return;
+
+            var logoFile = findLogoFile(val);
+
+            var wrap = document.createElement("div");
+            wrap.className = "logo-tile-wrap";
+            wrap.setAttribute("data-value", val);  // data-value = CRM picklist actual_value
+            wrap.onclick = function () { selectCompany(val, this); };
+
+            var tile = document.createElement("div");
+            tile.className = "logo-tile";
+
+            if (logoFile) {
+                var img = document.createElement("img");
+                img.src = "logos/" + logoFile;
+                img.alt = label;
+                img.onerror = function () {
+                    this.parentNode.innerHTML =
+                        '<span style="font-size:10px;font-weight:600;color:var(--text-secondary);text-align:center;padding:4px">' + label + '</span>';
+                };
+                tile.appendChild(img);
+            } else {
+                tile.innerHTML =
+                    '<span style="font-size:10px;font-weight:600;color:var(--text-secondary);text-align:center;padding:4px">' + label + '</span>';
+            }
+
+            var lbl = document.createElement("div");
+            lbl.className   = "logo-tile-label";
+            lbl.textContent = label;
+
+            wrap.appendChild(tile);
+            wrap.appendChild(lbl);
+            container.appendChild(wrap);
+        });
+    }
+
+    // Returns just the filename string from LOGO_MAP, or null.
+    function findLogoFile(val) {
+        if (LOGO_MAP[val]) return LOGO_MAP[val];
+        var lower = val.toLowerCase();
+        for (var key in LOGO_MAP) {
+            if (key.toLowerCase() === lower) return LOGO_MAP[key];
+        }
+        for (var key in LOGO_MAP) {
+            if (val.indexOf(key) !== -1 || key.indexOf(val) !== -1) return LOGO_MAP[key];
+        }
+        return null;
+    }
+
+    // ─── FIX 1: selectCompany — always stores the picklist actual_value ────
+    function selectCompany(val, wrapEl) {
+        document.querySelectorAll(".logo-tile-wrap .logo-tile").forEach(function (t) {
+            t.classList.remove("selected");
+        });
+
+        if (selectedCompany === val) {
+            // Clicking the same tile again → deselect
+            selectedCompany = null;
+            return;
+        }
+
+        selectedCompany = val;   // ← plain picklist actual_value, e.g. "Partner"
+        wrapEl.querySelector(".logo-tile").classList.add("selected");
+        console.log("Leaving_Company selected:", selectedCompany);
+    }
+
+    // ─── Pre-fill form from existing record ─────────────────────────────────
+    function prefillForm(record) {
+        if (record.ID_Type) {
+            document.getElementById("id-type-select").value = record.ID_Type;
+        }
+        if (record.ID_Number) {
+            document.getElementById("id-number-input").value = record.ID_Number;
+        }
+        if (record.Leaving_Company) {
+            var wrap = document.querySelector('.logo-tile-wrap[data-value="' + record.Leaving_Company + '"]');
+            if (wrap) {
+                selectedCompany = record.Leaving_Company;
+                wrap.querySelector(".logo-tile").classList.add("selected");
+            }
+        }
+        if (record.Email) {
+            document.getElementById("email-input").value = record.Email;
+        }
+
+        // City_LP and Street_LP are lookup fields — set the combo inputs
+        if (record.City_LP && record.City_LP.id) {
+            selectedCity = { id: String(record.City_LP.id), name: record.City_LP.name };
+            var cityInp = document.getElementById("city-lp-input");
+            if (cityInp) cityInp.value = record.City_LP.name;
+
+            // Load streets for this city then prefill street
+            var streetRecord = record["Street LP"] || record.Street_LP;
+            loadStreetsForCity(record.City_LP.name).then(function (streets) {
+                populateStreetSelect(streets);
+                if (streetRecord && streetRecord.id) {
+                    selectedStreet = { id: String(streetRecord.id), name: streetRecord.name };
+                    var streetInp = document.getElementById("street-lp-input");
+                    if (streetInp) streetInp.value = streetRecord.name;
+                }
+            });
+        }
+
+        if (record.Number) {
+            document.getElementById("number-input").value = record.Number;
+        }
+    }
+
+    // ─── Lookup caches ───────────────────────────────────────────────────────
+    var allCities = null;  // [{ id, name }] — loaded once
+
+    function loadAllCities() {
+        if (allCities !== null) return Promise.resolve(allCities);
+        return fetchCitiesPage([], 0);
+    }
+
+    function fetchCitiesPage(accum, offset) {
         return ZOHO.CRM.API.coql({
-            select_query: "select id, Product_Name, Unit_Price, Unit_Price_2nd_period, Description from Products where ((Usage_Unit = 'חבילה חודשית') and (Product_Category = '" + category + "'))"
-        })
-        .then(function (response) {
-            if (response.data && response.data.length > 0) {
-                displayProducts(response.data, preselectId);
-            } else {
-                container.innerHTML = '<div class="state-box"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg><p>No packages found for this category</p></div>';
-            }
-        })
-        .catch(function (err) {
-            container.innerHTML = '<div class="error-box"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><p>Error loading packages: ' + JSON.stringify(err) + '</p></div>';
-        });
-    }
-
-    function formatPrice(val) {
-        if (!val && val !== 0) return "—";
-        return Number(val).toLocaleString("en-IL");
-    }
-
-    function displayProducts(products, preselectId) {
-        var container = document.getElementById("products-grid");
-        container.innerHTML = "";
-
-        products.forEach(function (product, i) {
-            var card = document.createElement("div");
-            card.className = "product-card";
-            card.style.animationDelay = (i * 0.06) + "s";
-            card.setAttribute("data-product-id", product.id);
-
-            var name   = product.Product_Name || "Unnamed Product";
-            var price1 = formatPrice(product.Unit_Price);
-            var price2 = formatPrice(product.Unit_Price_2nd_period);
-            var desc   = product.Description || "";
-
-            card.innerHTML =
-                '<div class="card-inner">' +
-                  '<div class="card-header">' +
-                    '<div class="product-name">' + name + '</div>' +
-                    '<div class="selected-badge"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>' +
-                  '</div>' +
-                  '<div class="pricing-block">' +
-                    '<div class="price-row"><span class="price-label">First 12 months</span><span class="price-value">' + price1 + '<span class="price-currency">ILS</span></span></div>' +
-                    '<div class="price-divider"></div>' +
-                    '<div class="price-row secondary"><span class="price-label">Thereafter</span><span class="price-value">' + price2 + '<span class="price-currency">ILS</span></span></div>' +
-                  '</div>' +
-                  (desc ? '<div class="product-description">' + desc + '</div>' : '') +
-                '</div>';
-
-            card.onclick = function () { toggleProductSelection(this, product); };
-            container.appendChild(card);
-
-            if (preselectId && (product.id === preselectId || String(product.id) === String(preselectId))) {
-                toggleProductSelection(card, product);
-            }
-        });
-    }
-
-    function toggleProductSelection(card, product) {
-        if (card.classList.contains("selected")) {
-            selectedProduct = null;
-            card.classList.remove("selected");
-            hideAddonsSection();
-            updateSelectionBar();
-            updateTotalBar();
-            return;
-        }
-        document.querySelectorAll(".product-card.selected").forEach(function (c) { c.classList.remove("selected"); });
-        selectedProduct = product;
-        card.classList.add("selected");
-        document.getElementById("products-grid").classList.remove("field-error");
-        updateSelectionBar();
-        updateTotalBar();
-        loadAddons(product);
-    }
-
-    function hideAddonsSection() {
-        var section = document.getElementById("addons-section");
-        section.style.display = "none";
-        document.getElementById("addon-grid").innerHTML = "";
-        selectedAddons = [];
-        updateTotalBar();
-    }
-
-    function loadAddons(product) {
-        var section = document.getElementById("addons-section");
-        var grid    = document.getElementById("addon-grid");
-
-        section.style.display = "block";
-        grid.innerHTML = '<div class="loading-dots" style="padding:12px 0"><span></span><span></span><span></span></div>';
-
-        ZOHO.CRM.API.getRelatedRecords({
-            Entity     : "Products",
-            RecordID   : product.id,
-            RelatedList: "Related_Ad_Ons3",
-            page       : 1,
-            per_page   : 200
-        })
-        .then(function (response) {
-            console.log("Related add-ons response:", JSON.stringify(response));
-            var records = response.data;
-            if (!records || records.length === 0) { section.style.display = "none"; return Promise.resolve(null); }
-
-            var productIds = records
-                .map(function (r) { return r.Related_Ad_Ons1 && r.Related_Ad_Ons1.id; })
-                .filter(Boolean);
-
-            if (productIds.length === 0) { section.style.display = "none"; return Promise.resolve(null); }
-
-            var idList = productIds.map(function (id) { return "'" + id + "'"; }).join(", ");
-            return ZOHO.CRM.API.coql({
-                select_query: "select id, Product_Name, Unit_Price, Unit_Price_2nd_period, Description from Products where id in (" + idList + ")"
+            select_query: "select id, Name from Cities WHERE id is not null LIMIT 200 OFFSET " + offset
+        }).then(function (resp) {
+            var rows = resp.data || [];
+            rows.forEach(function (r) {
+                accum.push({ id: String(r.id), name: r.Name });
             });
-        })
-        .then(function (response) {
-            if (!response) return;
-            if (response.data && response.data.length > 0) {
-                displayAddons(response.data);
-            } else {
-                section.style.display = "none";
+            if (rows.length === 200) {
+                return fetchCitiesPage(accum, offset + 200);
             }
-        })
-        .catch(function (err) {
-            console.error("Error loading add-ons:", JSON.stringify(err));
-            section.style.display = "none";
+            allCities = accum;
+            console.log("=== ALL CITIES LOADED (" + allCities.length + ") ===");
+            allCities.forEach(function (c) {
+                console.log("City | id:", c.id, "| name:", c.name);
+            });
+            return allCities;
         });
     }
 
-    function displayAddons(addons) {
-        var grid = document.getElementById("addon-grid");
-        grid.innerHTML = "";
-
-        addons.forEach(function (addon, i) {
-            var card = document.createElement("div");
-            card.className = "addon-card";
-            card.style.animationDelay = (i * 0.05) + "s";
-            card.setAttribute("data-addon-id", addon.id);
-
-            var name      = addon.Product_Name || "Add-on";
-            var unitPrice = addon.Unit_Price || null;
-            var price     = unitPrice ? formatPrice(unitPrice) + " ILS/mo" : "";
-            var desc      = addon.Description || "";
-
-            card.innerHTML =
-                '<div class="addon-inner">' +
-                  '<div class="addon-checkbox"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>' +
-                  '<div class="addon-info">' +
-                    '<div class="addon-name">' + name + '</div>' +
-                    (price ? '<div class="addon-price">' + price + '</div>' : '') +
-                    (desc  ? '<div class="addon-desc">'  + desc  + '</div>' : '') +
-                  '</div>' +
-                '</div>';
-
-            card.onclick = function () { toggleAddonSelection(this, addon); };
-            grid.appendChild(card);
+    function loadStreetsForCity(cityName) {
+        if (!cityName) return Promise.resolve([]);
+        return ZOHO.CRM.API.coql({
+            select_query: "select id, Name from Streets WHERE City = '" + cityName.replace(/'/g, "\'") + "'"
+        }).then(function (resp) {
+            var streets = (resp.data || []).map(function (r) {
+                return { id: String(r.id), name: r.Name };
+            });
+            console.log("=== STREETS LOADED FOR CITY: " + cityName + " (" + streets.length + ") ===");
+            streets.forEach(function (s) {
+                console.log("Street | id:", s.id, "| name:", s.name);
+            });
+            return streets;
         });
     }
 
-    function toggleAddonSelection(card, addon) {
-        var id    = card.getAttribute("data-addon-id");
-        var index = selectedAddons.findIndex(function (a) { return a.id === id; });
-        if (index > -1) {
-            selectedAddons.splice(index, 1);
-            card.classList.remove("selected");
-        } else {
-            selectedAddons.push(addon);
-            card.classList.add("selected");
+    // ─── Combo-box state ────────────────────────────────────────────────────
+    var comboData   = { city: [], street: [] };   // full item arrays
+    var comboActive = { city: -1, street: -1 };   // keyboard-focused index
+
+    // ─── Populate city combo after cities load ───────────────────────────────
+    function populateCitySelect(cities) {
+        comboData.city = cities;
+    }
+
+    // ─── Populate street combo ───────────────────────────────────────────────
+    function populateStreetSelect(streets) {
+        comboData.street = streets;
+        var inp = document.getElementById("street-lp-input");
+        inp.disabled    = streets.length === 0;
+        inp.placeholder = streets.length === 0 ? "No streets found" : "Type or select a street…";
+        inp.value       = "";
+        selectedStreet  = null;
+        closeCombo("street");
+    }
+
+    // ─── Open combo list ─────────────────────────────────────────────────────
+    function openCombo(which) {
+        if (which === "street" && comboData.street.length === 0) return;
+        renderComboList(which, document.getElementById(which + "-lp-input").value);
+        document.getElementById(which + "-combo-list").style.display = "block";
+    }
+
+    // ─── Close combo list ────────────────────────────────────────────────────
+    function closeCombo(which) {
+        document.getElementById(which + "-combo-list").style.display = "none";
+        comboActive[which] = -1;
+    }
+
+    // ─── Filter as user types ────────────────────────────────────────────────
+    function filterCombo(which) {
+        var val = document.getElementById(which + "-lp-input").value;
+        // If user clears the input, clear the selection
+        if (!val) {
+            if (which === "city") { selectedCity = null; resetStreetCombo(); }
+            else                  { selectedStreet = null; }
         }
-        updateSelectionBar();
-        updateTotalBar();
+        renderComboList(which, val);
+        document.getElementById(which + "-combo-list").style.display = "block";
+        comboActive[which] = -1;
     }
 
-    // ─── Total calculation ────────────────────────────────────────────────────
-    function calculateTotal() {
-        var mainPrice   = selectedProduct ? (parseFloat(selectedProduct.Unit_Price) || 0) : 0;
-        var addonsTotal = selectedAddons.reduce(function (sum, addon) {
-            return sum + (parseFloat(addon.Unit_Price) || 0);
-        }, 0);
-        return mainPrice + addonsTotal;
-    }
+    // ─── Render filtered rows ────────────────────────────────────────────────
+    function renderComboList(which, filterStr) {
+        var list  = document.getElementById(which + "-combo-list");
+        var lower = (filterStr || "").toLowerCase();
+        var items = comboData[which];
+        var filtered = lower
+            ? items.filter(function (it) { return it.name.toLowerCase().indexOf(lower) !== -1; })
+            : items;
 
-    function updateTotalBar() {
-        var bar = document.getElementById("total-bar");
-        if (!selectedProduct) {
-            bar.style.display = "none";
+        list.innerHTML = "";
+        if (filtered.length === 0) {
+            list.innerHTML = '<div class="combo-row combo-empty">No results</div>';
             return;
         }
-        bar.style.display = "flex";
+        filtered.forEach(function (item, idx) {
+            var row = document.createElement("div");
+            row.className   = "combo-row";
+            row.textContent = item.name;
+            row.setAttribute("data-idx", idx);
+            row.onmousedown = function (e) {
+                e.preventDefault();
+                selectComboItem(which, item);
+            };
+            list.appendChild(row);
+        });
+    }
 
-        var mainPrice   = parseFloat(selectedProduct.Unit_Price) || 0;
-        var addonsTotal = selectedAddons.reduce(function (sum, addon) {
-            return sum + (parseFloat(addon.Unit_Price) || 0);
-        }, 0);
-        var total = mainPrice + addonsTotal;
+    // ─── Select an item ──────────────────────────────────────────────────────
+    function selectComboItem(which, item) {
+        document.getElementById(which + "-lp-input").value = item.name;
+        closeCombo(which);
 
-        var breakdown = selectedProduct.Product_Name || "Package";
-        if (selectedAddons.length > 0) {
-            breakdown += " + " + selectedAddons.length + " add-on" + (selectedAddons.length > 1 ? "s" : "");
+        if (which === "city") {
+            selectedCity   = item;
+            selectedStreet = null;
+            console.log("=== CITY SELECTED ===");
+            console.log("City id:", selectedCity.id, "| name:", selectedCity.name);
+            resetStreetCombo();
+            // Load streets for this city
+            var streetInp = document.getElementById("street-lp-input");
+            streetInp.disabled    = true;
+            streetInp.placeholder = "Loading streets…";
+            comboData.street      = [];
+            loadStreetsForCity(item.name).then(function (streets) {
+                populateStreetSelect(streets);
+            }).catch(function (err) {
+                showToast("Error loading streets: " + JSON.stringify(err), "error");
+            });
+        } else {
+            selectedStreet = item;
+            console.log("=== STREET SELECTED ===");
+            console.log("Street id:", selectedStreet.id, "| name:", selectedStreet.name);
         }
-
-        document.getElementById("total-breakdown").textContent = breakdown;
-        document.getElementById("total-value").textContent     = Number(total).toLocaleString("en-IL");
     }
 
-    function updateSelectionBar() {
-        var bar   = document.getElementById("selection-bar");
-        var count = document.getElementById("selection-count");
-        var total = (selectedProduct ? 1 : 0) + selectedAddons.length;
-        if (total > 0) { count.textContent = total; bar.classList.add("visible"); }
-        else { bar.classList.remove("visible"); }
+    function resetStreetCombo() {
+        comboData.street = [];
+        var inp = document.getElementById("street-lp-input");
+        inp.value       = "";
+        inp.disabled    = true;
+        inp.placeholder = "Select a city first…";
+        closeCombo("street");
+        selectedStreet  = null;
     }
 
-    function setButtonState(action, state) {
-        var btn = document.querySelector('.action-btn[data-action="' + action + '"]');
-        if (!btn) return;
-        var configs = {
-            next: {
-                idle:    { icon: '<svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>', label: "Next" },
-                loading: { icon: '<svg viewBox="0 0 24 24" class="spin"><circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="10"/></svg>', label: "Saving…" },
-                done:    { icon: '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>', label: "Proceeding…" },
-                error:   { icon: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>', label: "Failed – retry" }
+    // ─── Keyboard navigation ─────────────────────────────────────────────────
+    function comboKeydown(e, which) {
+        var list = document.getElementById(which + "-combo-list");
+        if (list.style.display === "none") {
+            if (e.key === "ArrowDown" || e.key === "Enter") openCombo(which);
+            return;
+        }
+        var rows = list.querySelectorAll(".combo-row:not(.combo-empty)");
+        if (e.key === "ArrowDown") {
+            e.preventDefault();
+            comboActive[which] = Math.min(comboActive[which] + 1, rows.length - 1);
+            highlightComboRow(rows, comboActive[which]);
+        } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            comboActive[which] = Math.max(comboActive[which] - 1, 0);
+            highlightComboRow(rows, comboActive[which]);
+        } else if (e.key === "Enter") {
+            e.preventDefault();
+            if (comboActive[which] >= 0 && rows[comboActive[which]]) {
+                rows[comboActive[which]].onmousedown(e);
             }
-        };
-        var cfg = configs[action] && configs[action][state];
-        if (!cfg) return;
-        btn.innerHTML = cfg.icon + " " + cfg.label;
-        btn.disabled  = (state === "loading");
-        btn.classList.toggle("btn-loading", state === "loading");
+        } else if (e.key === "Escape") {
+            closeCombo(which);
+        }
     }
 
+    function highlightComboRow(rows, idx) {
+        rows.forEach(function (r) { r.classList.remove("combo-highlighted"); });
+        if (rows[idx]) {
+            rows[idx].classList.add("combo-highlighted");
+            rows[idx].scrollIntoView({ block: "nearest" });
+        }
+    }
+
+    // ─── Build save payload ──────────────────────────────────────────────────
+    function buildPayload() {
+        var payload = { id: currentLeadId };
+
+        payload.ID_Type         = document.getElementById("id-type-select").value || null;
+        payload.ID_Number       = document.getElementById("id-number-input").value.trim() || null;
+
+        // FIX 1: Save the picklist actual_value string directly
+        payload.Leaving_Company = selectedCompany || null;
+
+        payload.Email  = document.getElementById("email-input").value.trim() || null;
+
+        // Lookup fields: pass id as a number (Zoho CRM requires numeric id for lookups)
+        // IDs are kept as strings — they exceed JS MAX_SAFE_INTEGER so parseInt corrupts them
+        payload.City_LP      = selectedCity   ? { id: selectedCity.id   } : null;
+        payload.Street_LP = selectedStreet ? { id: selectedStreet.id } : null;
+
+        payload.Number = document.getElementById("number-input").value.trim() || null;
+
+        console.log("Saving payload:", JSON.stringify(payload));
+        return payload;
+    }
+
+    // ─── Save lead record ────────────────────────────────────────────────────
+    function saveLeadRecord(payload) {
+        return ZOHO.CRM.API.updateRecord({
+            Entity : "Leads",
+            APIData: payload,
+            Trigger: []
+        });
+    }
+
+    // ─── Toast ───────────────────────────────────────────────────────────────
     function showToast(msg, type) {
         var toast = document.getElementById("toast");
         toast.textContent = msg;
@@ -674,167 +805,135 @@
         toast._t = setTimeout(function () { toast.classList.remove("visible"); }, 3500);
     }
 
-    function validate() {
-        var ok = true;
-        var interestedBtn = document.querySelector(".interest-btn.active");
-        if (!interestedBtn) {
-            document.getElementById("interest-buttons").classList.add("field-error");
-            if (ok) { showToast("Please select an interest category", "error"); ok = false; }
-        } else {
-            document.getElementById("interest-buttons").classList.remove("field-error");
-        }
-        if (!selectedProduct) {
-            document.getElementById("products-grid").classList.add("field-error");
-            if (ok) { showToast("Please select a main package", "error"); ok = false; }
-        } else {
-            document.getElementById("products-grid").classList.remove("field-error");
-        }
-        return ok;
+    // ─── Button state helpers ────────────────────────────────────────────────
+    function setBtn(id, html, disabled) {
+        var btn = document.getElementById(id);
+        if (!btn) return;
+        btn.innerHTML = html;
+        btn.disabled  = !!disabled;
     }
 
-    // ─── Build payload — includes Amount = main + addons Unit_Price sum ───────
-    function buildDealPayload() {
-        var interestedBtn = document.querySelector(".interest-btn.active");
-        var payload = { id: currentDealId };
-
-        if (interestedBtn) {
-            payload.Interested_In = interestedBtn.getAttribute("data-value");
-        }
-
-        payload.Product_Offerd = selectedProduct ? selectedProduct.id : null;
-
-        // Sum Unit_Price of main package + all selected add-ons → save to Amount
-        var mainPrice   = selectedProduct ? (parseFloat(selectedProduct.Unit_Price) || 0) : 0;
-        var addonsTotal = selectedAddons.reduce(function (sum, addon) {
-            return sum + (parseFloat(addon.Unit_Price) || 0);
-        }, 0);
-        payload.Amount = mainPrice + addonsTotal;
-
-        console.log("mainPrice:", mainPrice);
-        console.log("addonsTotal:", addonsTotal);
-        console.log("Amount total:", payload.Amount);
-
-        return payload;
-    }
-
-    // ─── Save deal record + Add_Ons subform ───────────────────────────────────
-    function saveDealRecord() {
-        return ZOHO.CRM.API.updateRecord({
-            Entity : "Deals",
-            APIData: buildDealPayload(),
-            Trigger: []
-        })
-        .then(function (response) {
-            console.log("Deal saved:", response);
-            if (selectedAddons.length === 0) { return Promise.resolve(response); }
-
-            var subformRows = selectedAddons.map(function (addon) {
-                return { Add_On: { id: addon.id } };
-            });
-
-            return ZOHO.CRM.API.updateRecord({
-                Entity : "Deals",
-                APIData: { id: currentDealId, Add_Ons: subformRows },
-                Trigger: []
-            });
-        })
-        .then(function (response) {
-            console.log("Add_Ons subform saved:", response);
-            return response;
-        });
-    }
-
+    // ─── Action: Cancel — just close the popup ──────────────────────────────
     function handleCancel() {
-        ZOHO.CRM.UI.Popup.close();
+        try { ZOHO.CRM.UI.Popup.close(); } catch (e) {}
     }
 
+    // ─── Action: Next — save all fields then proceed blueprint ───────────────
     function handleNext() {
         if (isProcessing) return;
-        if (!validate()) return;
-
         isProcessing = true;
-        setButtonState("next", "loading");
+        setBtn("btn-next", spinnerHtml("Next"), true);
 
-        saveDealRecord()
+        saveLeadRecord(buildPayload())
             .then(function () {
                 return ZOHO.CRM.BLUEPRINT.proceed();
             })
-            .then(function (blueprintResponse) {
-                console.log("Blueprint proceeded:", blueprintResponse);
-                setButtonState("next", "done");
-                setTimeout(function () {
-                    try {
-                        ZOHO.CRM.UI.Popup.closeReload().then(function(data){ console.log(data); });
-                    } catch (e) {
-                        ZOHO.CRM.UI.Popup.close();
-                    }
-                }, 1200);
+            .then(function () {
+                showToast("Saved & proceeded", "success");
+                setTimeout(function () { try { ZOHO.CRM.UI.Popup.close(); } catch (e) {} }, 1000);
             })
             .catch(function (err) {
-                console.error("Failed:", err);
-                setButtonState("next", "error");
-                showToast("Failed: " + JSON.stringify(err), "error");
+                showToast("Error: " + JSON.stringify(err), "error");
+                setBtn("btn-next", "Next");
                 isProcessing = false;
-                setTimeout(function () { setButtonState("next", "idle"); }, 2500);
             });
     }
+
+    function spinnerHtml(label) {
+        return '<svg class="spin" viewBox="0 0 24 24" width="14" height="14" style="stroke:currentColor;stroke-width:2;fill:none;margin-right:6px;vertical-align:middle"><circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="10"/></svg>' + label + '…';
+    }
+
+
 </script>
 </head>
 <body>
-<div class="container">
 
-    <div class="widget-header">
-        <div class="icon">
-            <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-        </div>
-        <h1>Deal Package Selector</h1>
-        <p>Review and confirm the deal package</p>
-    </div>
+<p class="page-title">פרטו מאיזו חברה הלקוח עובר אלינו , אימייל (לא חובה) ומספר זיהוי</p>
 
-    <div class="section-label">Interested In<span class="required-star">*</span></div>
-    <div id="interest-buttons" class="button-group">
-        <div class="loading-dots" style="padding: 8px 0;"><span></span><span></span><span></span></div>
-    </div>
-
-    <div class="section-label">Main Package<span class="required-star">*</span></div>
-    <div id="products-grid" class="products-grid">
-        <div class="state-box">
-            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            <p>Select a category above to view packages</p>
+<!-- ID Type -->
+<div class="form-row">
+    <div class="form-label">ID Type</div>
+    <div class="form-control-wrap">
+        <div class="select-wrap">
+            <span class="select-dot"></span>
+            <select id="id-type-select" class="form-select">
+                <option value="">— Select —</option>
+            </select>
         </div>
     </div>
-
-    <div id="addons-section" style="display:none;">
-        <div class="section-label">Available Add-ons</div>
-        <div id="addon-grid" class="addon-grid"></div>
-    </div>
-
-    <div class="bottom-section">
-        <!-- Total summary bar -->
-        <div class="total-bar" id="total-bar" style="display:none;">
-            <span class="total-breakdown" id="total-breakdown"></span>
-            <span class="total-label">Total</span>
-            <span class="total-value" id="total-value">0<span class="total-currency">ILS</span></span>
-        </div>
-
-        <div class="action-bar">
-            <button class="action-btn btn-cancel" data-action="cancel" onclick="handleCancel()">
-                <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                Cancel
-            </button>
-            <button class="action-btn btn-success" data-action="next" onclick="handleNext()">
-                <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-                Next
-            </button>
-        </div>
-    </div>
-
 </div>
 
-<div class="selection-bar" id="selection-bar">
-    <span>Items selected <span class="count-badge" id="selection-count">0</span></span>
-    <span style="color: rgba(255,255,255,0.5); font-size: 12px; font-weight: 400;">1 package + add-ons</span>
+<!-- ID Number -->
+<div class="form-row">
+    <div class="form-label">ID Number</div>
+    <div class="form-control-wrap">
+        <input id="id-number-input" type="text" class="form-input" placeholder="" />
+    </div>
 </div>
+
+<!-- Leaving Company -->
+<div class="form-row">
+    <div class="form-label" style="padding-top:14px">Leaving Company</div>
+    <div class="form-control-wrap">
+        <div id="leaving-company-grid" class="logo-grid">
+            <div class="loading-dots"><span></span><span></span><span></span></div>
+        </div>
+    </div>
+</div>
+
+<!-- Email -->
+<div class="form-row" style="margin-top:10px">
+    <div class="form-label">Email</div>
+    <div class="form-control-wrap">
+        <input id="email-input" type="email" class="form-input" placeholder="" />
+    </div>
+</div>
+
+<!-- City LP -->
+<div class="form-row">
+    <div class="form-label">City LP</div>
+    <div class="form-control-wrap">
+        <div class="combo-wrap" id="city-combo-wrap">
+            <input id="city-lp-input" type="text" class="form-input combo-input"
+                   placeholder="Type or select a city…" autocomplete="off"
+                   oninput="filterCombo('city')"
+                   onfocus="openCombo('city')"
+                   onkeydown="comboKeydown(event,'city')" />
+            <div id="city-combo-list" class="combo-list" style="display:none"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Street LP -->
+<div class="form-row">
+    <div class="form-label">Street LP</div>
+    <div class="form-control-wrap">
+        <div class="combo-wrap" id="street-combo-wrap">
+            <input id="street-lp-input" type="text" class="form-input combo-input"
+                   placeholder="Select a city first…" autocomplete="off"
+                   oninput="filterCombo('street')"
+                   onfocus="openCombo('street')"
+                   onkeydown="comboKeydown(event,'street')"
+                   disabled />
+            <div id="street-combo-list" class="combo-list" style="display:none"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Number -->
+<div class="form-row">
+    <div class="form-label">Number</div>
+    <div class="form-control-wrap">
+        <input id="number-input" type="text" class="form-input" placeholder="" />
+    </div>
+</div>
+
+<!-- Bottom action bar -->
+<div class="action-bar">
+    <button id="btn-cancel" class="action-btn btn-cancel-style" onclick="handleCancel()">Cancel</button>
+    <button id="btn-next"   class="action-btn btn-primary"      onclick="handleNext()">Next</button>
+</div>
+
 <div id="toast" class="toast"></div>
 </body>
 </html>
