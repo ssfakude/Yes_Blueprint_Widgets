@@ -6,8 +6,6 @@
 <style>
     :root {
         --navy: #0f1f35;
-        --navy-mid: #162840;
-        --navy-light: #1e3a52;
         --accent: #3b9eca;
         --accent-bright: #4db8e8;
         --accent-glow: rgba(59, 158, 202, 0.15);
@@ -18,7 +16,6 @@
         --text-secondary: #4a6080;
         --text-muted: #8ba3bc;
         --border: #d4e0ec;
-        --border-active: #3b9eca;
         --shadow-sm: 0 1px 3px rgba(15,31,53,0.06), 0 1px 2px rgba(15,31,53,0.04);
         --shadow-md: 0 4px 16px rgba(15,31,53,0.08), 0 2px 6px rgba(15,31,53,0.05);
         --shadow-lg: 0 12px 40px rgba(15,31,53,0.12), 0 4px 12px rgba(15,31,53,0.06);
@@ -26,11 +23,7 @@
         --radius-sm: 6px;
     }
 
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
         font-family: 'Sora', sans-serif;
@@ -40,676 +33,304 @@
         min-height: 100vh;
     }
 
-    .container {
-        max-width: 1200px;
-        margin: 0 auto;
-    }
+    /* ── RTL overrides ── */
+    body.rtl { direction: rtl; }
+    body.rtl .widget-header p              { margin-left: 0; margin-right: auto; }
+    body.rtl .section-label::after         { display: none; }
+    body.rtl .section-label::before        { content: ''; flex: 1; height: 1px; background: var(--border); order: -1; }
+    body.rtl .required-star                { margin-left: 0; margin-right: 3px; }
+    body.rtl .card-header                  { flex-direction: row-reverse; }
+    body.rtl .product-name                 { padding-right: 0; padding-left: 12px; }
+    body.rtl .price-row                    { flex-direction: row-reverse; }
+    body.rtl .action-btn                   { flex-direction: row-reverse; }
+    body.rtl .description-field            { text-align: right; }
 
-    /* Header strip */
+    .container { max-width: 1200px; margin: 0 auto; }
+
     .widget-header {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 28px;
-        padding-bottom: 20px;
+        display: flex; align-items: center; gap: 10px;
+        margin-bottom: 28px; padding-bottom: 20px;
         border-bottom: 1px solid var(--border);
     }
-
     .widget-header .icon {
-        width: 34px;
-        height: 34px;
-        background: var(--navy);
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        width: 34px; height: 34px; background: var(--navy);
+        border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
     }
+    .widget-header .icon svg { width: 18px; height: 18px; fill: none; stroke: var(--accent-bright); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .widget-header h1 { font-size: 15px; font-weight: 600; color: var(--navy); letter-spacing: -0.01em; }
+    .widget-header p  { font-size: 12px; color: var(--text-muted); margin-left: auto; font-weight: 400; }
 
-    .widget-header .icon svg {
-        width: 18px;
-        height: 18px;
-        fill: none;
-        stroke: var(--accent-bright);
-        stroke-width: 1.8;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-    }
-
-    .widget-header h1 {
-        font-size: 15px;
-        font-weight: 600;
-        color: var(--navy);
-        letter-spacing: -0.01em;
-    }
-
-    .widget-header p {
-        font-size: 12px;
-        color: var(--text-muted);
-        margin-left: auto;
-        font-weight: 400;
-    }
-
-    /* Section label */
     .section-label {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 11px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        color: var(--text-muted);
-        margin-bottom: 12px;
+        display: flex; align-items: center; gap: 8px;
+        font-size: 11px; font-weight: 600; text-transform: uppercase;
+        letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 12px;
     }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .required-star { color: #ef4444; margin-left: 3px; font-size: 12px; }
 
-    .section-label::after {
-        content: '';
-        flex: 1;
-        height: 1px;
-        background: var(--border);
-    }
-
-    /* Interest buttons */
-    .button-group {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin-bottom: 32px;
-    }
+    .button-group { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 32px; }
 
     .interest-btn {
-        padding: 8px 18px;
-        border: 1.5px solid var(--border);
-        border-radius: 50px;
-        background: var(--surface-card);
-        color: var(--text-secondary);
-        font-family: 'Sora', sans-serif;
-        font-size: 13px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        outline: none;
-        box-shadow: var(--shadow-sm);
-        position: relative;
-        overflow: hidden;
+        padding: 8px 18px; border: 1.5px solid var(--border); border-radius: 50px;
+        background: var(--surface-card); color: var(--text-secondary);
+        font-family: 'Sora', sans-serif; font-size: 13px; font-weight: 500;
+        cursor: pointer; transition: all 0.2s ease; outline: none;
+        box-shadow: var(--shadow-sm); position: relative; overflow: hidden;
     }
+    .interest-btn::before { content: ''; position: absolute; inset: 0; background: var(--accent-glow); opacity: 0; transition: opacity 0.2s; }
+    .interest-btn:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+    .interest-btn:hover::before { opacity: 1; }
+    .interest-btn.active { background: var(--navy); border-color: var(--navy); color: #fff; box-shadow: 0 4px 14px rgba(15,31,53,0.2); }
+    .interest-btn.active::before { opacity: 0; }
 
-    .interest-btn::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: var(--accent-glow);
-        opacity: 0;
-        transition: opacity 0.2s;
-    }
+    .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
 
-    .interest-btn:hover {
-        border-color: var(--accent);
-        color: var(--accent);
-        transform: translateY(-1px);
-        box-shadow: var(--shadow-md);
-    }
-
-    .interest-btn:hover::before {
-        opacity: 1;
-    }
-
-    .interest-btn.active {
-        background: var(--navy);
-        border-color: var(--navy);
-        color: #fff;
-        box-shadow: 0 4px 14px rgba(15,31,53,0.2);
-    }
-
-    .interest-btn.active::before {
-        opacity: 0;
-    }
-
-    /* Products grid */
-    .products-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 16px;
-    }
-
-    /* Product card */
     .product-card {
-        background: var(--surface-card);
-        border: 1.5px solid var(--border);
-        border-radius: var(--radius);
-        padding: 0;
-        cursor: pointer;
-        transition: all 0.25s ease;
-        box-shadow: var(--shadow-sm);
-        overflow: hidden;
-        position: relative;
-    }
-
-    .product-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 3px;
-        background: linear-gradient(90deg, var(--accent), var(--accent-bright));
-        opacity: 0;
-        transition: opacity 0.25s;
-    }
-
-    .product-card:hover {
-        border-color: var(--accent);
-        transform: translateY(-3px);
-        box-shadow: var(--shadow-lg);
-    }
-
-    .product-card:hover::before {
-        opacity: 1;
-    }
-
-    .product-card.selected {
-        border-color: var(--navy);
-        box-shadow: 0 0 0 3px var(--accent-glow), var(--shadow-md);
-    }
-
-    .product-card.selected::before {
-        background: linear-gradient(90deg, var(--navy), var(--accent));
-        opacity: 1;
-    }
-
-    .card-inner {
-        padding: 20px;
-    }
-
-    .card-header {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        margin-bottom: 14px;
-    }
-
-    .product-name {
-        font-size: 14px;
-        font-weight: 600;
-        color: var(--text-primary);
-        line-height: 1.35;
-        flex: 1;
-        padding-right: 12px;
-    }
-
-    .selected-badge {
-        width: 22px;
-        height: 22px;
-        border-radius: 50%;
-        border: 2px solid var(--border);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-        transition: all 0.2s;
-    }
-
-    .product-card.selected .selected-badge {
-        background: var(--navy);
-        border-color: var(--navy);
-    }
-
-    .selected-badge svg {
-        width: 11px;
-        height: 11px;
-        stroke: white;
-        stroke-width: 2.5;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-        opacity: 0;
-        transition: opacity 0.2s;
-    }
-
-    .product-card.selected .selected-badge svg {
-        opacity: 1;
-    }
-
-    /* Pricing block */
-    .pricing-block {
-        background: var(--surface);
-        border-radius: var(--radius-sm);
-        padding: 12px 14px;
-        margin-bottom: 12px;
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-    }
-
-    .price-row {
-        display: flex;
-        align-items: baseline;
-        justify-content: space-between;
-        gap: 8px;
-    }
-
-    .price-label {
-        font-size: 10.5px;
-        font-weight: 500;
-        color: var(--text-muted);
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        white-space: nowrap;
-    }
-
-    .price-value {
-        font-family: 'DM Mono', monospace;
-        font-size: 14px;
-        font-weight: 500;
-        color: var(--text-primary);
-    }
-
-    .price-currency {
-        font-size: 11px;
-        color: var(--text-muted);
-        font-weight: 400;
-        margin-left: 2px;
-    }
-
-    .price-divider {
-        height: 1px;
-        background: var(--border);
-        margin: 2px 0;
-    }
-
-    .price-row.secondary .price-value {
-        font-size: 12.5px;
-        color: var(--text-secondary);
-    }
-
-    /* Description */
-    .product-description {
-        font-size: 12px;
-        line-height: 1.6;
-        color: var(--text-secondary);
-        border-top: 1px solid var(--border);
-        padding-top: 12px;
-        margin-top: 2px;
-    }
-
-    /* States */
-    .state-box {
-        grid-column: 1 / -1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 48px 24px;
-        background: var(--surface-card);
-        border: 1.5px dashed var(--border);
-        border-radius: var(--radius);
-        gap: 10px;
-    }
-
-    .state-box svg {
-        width: 32px;
-        height: 32px;
-        stroke: var(--text-muted);
-        stroke-width: 1.5;
-        fill: none;
-        opacity: 0.6;
-    }
-
-    .state-box p {
-        font-size: 13px;
-        color: var(--text-muted);
-        font-weight: 400;
-    }
-
-    .loading-dots {
-        display: flex;
-        gap: 6px;
-        align-items: center;
-    }
-
-    .loading-dots span {
-        width: 7px;
-        height: 7px;
-        border-radius: 50%;
-        background: var(--accent);
-        animation: pulse 1.2s ease-in-out infinite;
-    }
-
-    .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
-    .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
-
-    @keyframes pulse {
-        0%, 80%, 100% { transform: scale(0.7); opacity: 0.4; }
-        40% { transform: scale(1); opacity: 1; }
-    }
-
-    .error-box {
-        grid-column: 1 / -1;
-        background: #fff5f5;
-        border: 1.5px solid #fecaca;
-        border-radius: var(--radius);
-        padding: 16px 18px;
-        display: flex;
-        align-items: flex-start;
-        gap: 10px;
-    }
-
-    .error-box svg {
-        width: 18px;
-        height: 18px;
-        stroke: #ef4444;
-        stroke-width: 2;
-        fill: none;
-        flex-shrink: 0;
-        margin-top: 1px;
-    }
-
-    .error-box p {
-        font-size: 12.5px;
-        color: #b91c1c;
-        line-height: 1.5;
-    }
-
-    /* Selection count bar */
-    .selection-bar {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: var(--navy);
-        color: white;
-        padding: 12px 24px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        font-size: 13px;
-        font-weight: 500;
-        transform: translateY(100%);
-        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        z-index: 100;
-        box-shadow: 0 -4px 20px rgba(15,31,53,0.2);
-    }
-
-    .selection-bar.visible {
-        transform: translateY(0);
-    }
-
-    .selection-bar .count-badge {
-        background: var(--accent);
-        color: white;
-        font-size: 11px;
-        font-weight: 700;
-        font-family: 'DM Mono', monospace;
-        padding: 2px 8px;
-        border-radius: 50px;
-        margin-left: 8px;
-    }
-
-    /* Description field */
-    .description-field {
-        width: 100%;
-        min-height: 90px;
-        padding: 12px 14px;
-        font-family: 'Sora', sans-serif;
-        font-size: 13px;
-        color: var(--text-primary);
-        background: var(--surface-card);
-        border: 1.5px solid var(--border);
-        border-radius: var(--radius);
-        resize: vertical;
-        outline: none;
-        transition: border-color 0.2s, box-shadow 0.2s;
-        box-shadow: var(--shadow-sm);
-        margin-bottom: 20px;
-        line-height: 1.6;
-    }
-    .description-field::placeholder { color: var(--text-muted); }
-    .description-field:focus {
-        border-color: var(--accent);
-        box-shadow: 0 0 0 3px var(--accent-glow);
-    }
-
-    .bottom-section {
-        margin-top: 28px;
-        padding-top: 24px;
-        border-top: 1px solid var(--border);
-    }
-
-    .action-bar {
-        display: flex;
-        gap: 10px;
-        justify-content: center;
-        flex-wrap: wrap;
-        padding: 4px 0 8px;
-    }
-
-    .action-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-        padding: 10px 22px;
-        border: none;
-        border-radius: 8px;
-        font-family: 'Sora', sans-serif;
-        font-size: 13px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        letter-spacing: 0.01em;
-    }
-    .action-btn svg {
-        width: 15px; height: 15px;
-        stroke: currentColor; stroke-width: 2.2;
-        fill: none; stroke-linecap: round; stroke-linejoin: round;
-        flex-shrink: 0;
-    }
-    .action-btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
-    .action-btn:active { transform: translateY(0); }
-
-    .btn-cancel { background: var(--surface); color: var(--text-secondary); border: 1.5px solid var(--border); box-shadow: var(--shadow-sm); }
-    .btn-cancel:hover { background: #e8edf3; border-color: #b0bfce; box-shadow: var(--shadow-md); }
-
-    .btn-danger  { background: #ef4444; color: white; box-shadow: 0 2px 8px rgba(239,68,68,0.25); }
-    .btn-danger:hover  { background: #dc2626; box-shadow: 0 6px 16px rgba(239,68,68,0.3); }
-    .btn-success { background: #22c55e; color: white; box-shadow: 0 2px 8px rgba(34,197,94,0.25); }
-    .btn-success:hover { background: #16a34a; box-shadow: 0 6px 16px rgba(34,197,94,0.3); }
-    .btn-warning { background: #ef4444; color: white; box-shadow: 0 2px 8px rgba(239,68,68,0.25); }
-    .btn-warning:hover { background: #dc2626; box-shadow: 0 6px 16px rgba(239,68,68,0.3); }
-
-    .action-btn svg.spin {
-        animation: spinIcon 0.8s linear infinite;
-        stroke-linecap: round;
-    }
-
-    @keyframes spinIcon {
-        from { transform: rotate(0deg); }
-        to   { transform: rotate(360deg); }
-    }
-
-    .action-btn:disabled {
-        opacity: 0.65;
-        cursor: not-allowed;
-        transform: none !important;
-    }
-
-    .btn-loading {
-        pointer-events: none;
-    }
-
-    /* Toast notification */
-    .toast {
-        position: fixed;
-        bottom: 72px;
-        left: 50%;
-        transform: translateX(-50%) translateY(16px);
-        background: var(--navy);
-        color: white;
-        font-size: 13px;
-        font-weight: 500;
-        padding: 10px 20px;
-        border-radius: 50px;
-        box-shadow: var(--shadow-lg);
-        opacity: 0;
-        pointer-events: none;
-        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        white-space: nowrap;
-        z-index: 200;
-    }
-
-    .toast.visible {
-        opacity: 1;
-        transform: translateX(-50%) translateY(0);
-    }
-
-    .toast.toast-error {
-        background: #ef4444;
-    }
-
-    .toast.toast-success {
-        background: #16a34a;
-    }
-
-    /* Required field error states */
-    .field-error .interest-btn:not(.active),
-    .button-group.field-error {
-        animation: shakeX 0.4s ease;
-    }
-
-    .description-field.field-error {
-        border-color: #ef4444;
-        box-shadow: 0 0 0 3px rgba(239,68,68,0.12);
-        animation: shakeX 0.4s ease;
-    }
-
-    .products-grid.field-error {
-        animation: shakeX 0.4s ease;
-    }
-
-    .products-grid.field-error .state-box,
-    .products-grid.field-error .product-card {
-        border-color: #ef4444;
-        box-shadow: 0 0 0 2px rgba(239,68,68,0.1);
-    }
-
-    .button-group.field-error .interest-btn {
-        border-color: #ef4444;
-    }
-
-    .required-star {
-        color: #ef4444;
-        margin-left: 3px;
-        font-size: 12px;
-    }
-
-    @keyframes shakeX {
-        0%, 100% { transform: translateX(0); }
-        20%       { transform: translateX(-5px); }
-        40%       { transform: translateX(5px); }
-        60%       { transform: translateX(-4px); }
-        80%       { transform: translateX(4px); }
-    }
-
-    /* Card appear animation */
-    .product-card {
+        background: var(--surface-card); border: 1.5px solid var(--border);
+        border-radius: var(--radius); cursor: pointer; transition: all 0.25s ease;
+        box-shadow: var(--shadow-sm); overflow: hidden; position: relative;
         animation: cardIn 0.3s ease both;
     }
+    .product-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--accent-bright)); opacity: 0; transition: opacity 0.25s; }
+    .product-card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+    .product-card:hover::before { opacity: 1; }
+    .product-card.selected { border-color: var(--navy); box-shadow: 0 0 0 3px var(--accent-glow), var(--shadow-md); }
+    .product-card.selected::before { background: linear-gradient(90deg, var(--navy), var(--accent)); opacity: 1; }
 
-    @keyframes cardIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to   { opacity: 1; transform: translateY(0); }
-    }
+    .card-inner { padding: 20px; }
+    .card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; }
+    .product-name { font-size: 14px; font-weight: 600; color: var(--text-primary); line-height: 1.35; flex: 1; padding-right: 12px; }
 
-    .button-group .interest-btn {
-        animation: btnIn 0.25s ease both;
-    }
+    .selected-badge { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; }
+    .product-card.selected .selected-badge { background: var(--navy); border-color: var(--navy); }
+    .selected-badge svg { width: 11px; height: 11px; stroke: white; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; opacity: 0; transition: opacity 0.2s; fill: none; }
+    .product-card.selected .selected-badge svg { opacity: 1; }
 
-    @keyframes btnIn {
-        from { opacity: 0; transform: scale(0.95); }
-        to   { opacity: 1; transform: scale(1); }
+    .pricing-block { background: var(--surface); border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 6px; }
+    .price-row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+    .price-label { font-size: 10.5px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
+    .price-value { font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 500; color: var(--text-primary); }
+    .price-currency { font-size: 11px; color: var(--text-muted); font-weight: 400; margin-left: 2px; }
+    .price-divider { height: 1px; background: var(--border); margin: 2px 0; }
+    .price-row.secondary .price-value { font-size: 12.5px; color: var(--text-secondary); }
+    .product-description { font-size: 12px; line-height: 1.6; color: var(--text-secondary); border-top: 1px solid var(--border); padding-top: 12px; margin-top: 2px; }
+
+    .state-box {
+        grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center;
+        justify-content: center; padding: 48px 24px; background: var(--surface-card);
+        border: 1.5px dashed var(--border); border-radius: var(--radius); gap: 10px;
     }
+    .state-box svg { width: 32px; height: 32px; stroke: var(--text-muted); stroke-width: 1.5; fill: none; opacity: 0.6; }
+    .state-box p   { font-size: 13px; color: var(--text-muted); }
+
+    .loading-dots { display: flex; gap: 6px; align-items: center; }
+    .loading-dots span { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); animation: pulse 1.2s ease-in-out infinite; }
+    .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes pulse { 0%,80%,100% { transform:scale(0.7); opacity:0.4; } 40% { transform:scale(1); opacity:1; } }
+
+    .error-box { grid-column: 1/-1; background: #fff5f5; border: 1.5px solid #fecaca; border-radius: var(--radius); padding: 16px 18px; display: flex; align-items: flex-start; gap: 10px; }
+    .error-box svg { width: 18px; height: 18px; stroke: #ef4444; stroke-width: 2; fill: none; flex-shrink: 0; margin-top: 1px; }
+    .error-box p   { font-size: 12.5px; color: #b91c1c; line-height: 1.5; }
+
+    .bottom-section { margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--border); }
+
+    .description-field {
+        width: 100%; min-height: 90px; padding: 12px 14px;
+        font-family: 'Sora', sans-serif; font-size: 13px; color: var(--text-primary);
+        background: var(--surface-card); border: 1.5px solid var(--border);
+        border-radius: var(--radius); resize: vertical; outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        box-shadow: var(--shadow-sm); margin-bottom: 20px; line-height: 1.6;
+    }
+    .description-field::placeholder { color: var(--text-muted); }
+    .description-field:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+
+    .action-bar { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; padding: 4px 0 8px; }
+
+    .action-btn {
+        display: inline-flex; align-items: center; gap: 7px; padding: 10px 22px;
+        border: none; border-radius: 8px; font-family: 'Sora', sans-serif;
+        font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; letter-spacing: 0.01em;
+    }
+    .action-btn svg { width: 15px; height: 15px; stroke: currentColor; stroke-width: 2.2; fill: none; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+    .action-btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .action-btn:active { transform: translateY(0); }
+    .action-btn:disabled { opacity: 0.65; cursor: not-allowed; transform: none !important; }
+    .btn-cancel  { background: var(--surface); color: var(--text-secondary); border: 1.5px solid var(--border); box-shadow: var(--shadow-sm); }
+    .btn-cancel:hover { background: #e8edf3; border-color: #b0bfce; }
+    .btn-success { background: #22c55e; color: white; box-shadow: 0 2px 8px rgba(34,197,94,0.25); }
+    .btn-success:hover { background: #16a34a; box-shadow: 0 6px 16px rgba(34,197,94,0.3); }
+    .action-btn svg.spin { animation: spinIcon 0.8s linear infinite; }
+    @keyframes spinIcon { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
+
+    /* Field error states */
+    .button-group.field-error .interest-btn { border-color: #ef4444; }
+    .button-group.field-error, .products-grid.field-error, .description-field.field-error { animation: shakeX 0.4s ease; }
+    .products-grid.field-error .state-box, .products-grid.field-error .product-card { border-color: #ef4444; box-shadow: 0 0 0 2px rgba(239,68,68,0.1); }
+    .description-field.field-error { border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.12); }
+    @keyframes shakeX { 0%,100% { transform:translateX(0); } 20% { transform:translateX(-5px); } 40% { transform:translateX(5px); } 60% { transform:translateX(-4px); } 80% { transform:translateX(4px); } }
+
+    .toast {
+        position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(16px);
+        background: var(--navy); color: white; font-size: 13px; font-weight: 500;
+        padding: 10px 20px; border-radius: 50px; box-shadow: var(--shadow-lg);
+        opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+        white-space: nowrap; z-index: 200;
+    }
+    .toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast.toast-error   { background: #ef4444; }
+    .toast.toast-success { background: #16a34a; }
+
+    @keyframes cardIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+    .interest-btn { animation: btnIn 0.25s ease both; }
+    @keyframes btnIn { from { opacity:0; transform:scale(0.95); } to { opacity:1; transform:scale(1); } }
 </style>
 <script src="https://live.zwidgets.com/js-sdk/1.5/ZohoEmbededAppSDK.min.js"></script>
 <script>
-    // ─── State ───────────────────────────────────────────────────────────────
+    // ─── i18n ─────────────────────────────────────────────────────────────────
+    var TRANSLATIONS = {
+        en_US: {
+            widgetTitle      : "Package Selector",
+            widgetSubtitle   : "Select a category, then choose a package",
+            interestedIn     : "Interested In",
+            mainPackage      : "Main Package",
+            description      : "Description",
+            cancel           : "Cancel",
+            next             : "Next",
+            saving           : "Saving\u2026",
+            proceeding       : "Proceeding\u2026",
+            failedRetry      : "Failed \u2013 retry",
+            selectCategory   : "Select a category above to view packages",
+            loadingPackages  : "Loading packages\u2026",
+            noPackages       : "No packages found for this category",
+            descPlaceholder  : "Add notes or context about this lead\u2026",
+            errSelectInterest: "Please select an interest category",
+            errSelectPackage : "Please select a package",
+            errDescription   : "Please enter a description",
+            errFieldNotFound : "Interested_In field not found",
+            errLoadFields    : "Error loading fields: ",
+            errLoadPackages  : "Error loading packages: ",
+            first12          : "First 12 months",
+            thereafter       : "Thereafter"
+        },
+        iw_IL: {
+            widgetTitle      : "\u05d1\u05d5\u05d7\u05e8 \u05d7\u05d1\u05d9\u05dc\u05d4",
+            widgetSubtitle   : "\u05d1\u05d7\u05e8 \u05e7\u05d8\u05d2\u05d5\u05e8\u05d9\u05d4 \u05d5\u05dc\u05d0\u05d7\u05e8 \u05de\u05db\u05df \u05d7\u05d1\u05d9\u05dc\u05d4",
+            interestedIn     : "\u05de\u05ea\u05e2\u05e0\u05d9\u05d9\u05df \u05d1",
+            mainPackage      : "\u05d7\u05d1\u05d9\u05dc\u05d4 \u05e8\u05d0\u05e9\u05d9\u05ea",
+            description      : "\u05ea\u05d9\u05d0\u05d5\u05e8",
+            cancel           : "\u05d1\u05d9\u05d8\u05d5\u05dc",
+            next             : "\u05d4\u05de\u05e9\u05da",
+            saving           : "\u05e9\u05d5\u05de\u05e8\u2026",
+            proceeding       : "\u05de\u05de\u05e9\u05d9\u05da\u2026",
+            failedRetry      : "\u05e0\u05db\u05e9\u05dc \u2013 \u05e0\u05e1\u05d4 \u05e9\u05e0\u05d9\u05ea",
+            selectCategory   : "\u05d1\u05d7\u05e8 \u05e7\u05d8\u05d2\u05d5\u05e8\u05d9\u05d4 \u05de\u05dc\u05de\u05e2\u05dc\u05d4 \u05dc\u05e6\u05e4\u05d9\u05d9\u05ea \u05d7\u05d1\u05d9\u05dc\u05d5\u05ea",
+            loadingPackages  : "\u05d8\u05d5\u05e2\u05df \u05d7\u05d1\u05d9\u05dc\u05d5\u05ea\u2026",
+            noPackages       : "\u05dc\u05d0 \u05e0\u05de\u05e6\u05d0\u05d5 \u05d7\u05d1\u05d9\u05dc\u05d5\u05ea \u05e2\u05d1\u05d5\u05e8 \u05e7\u05d8\u05d2\u05d5\u05e8\u05d9\u05d4 \u05d6\u05d5",
+            descPlaceholder  : "\u05d4\u05d5\u05e1\u05e3 \u05d4\u05e2\u05e8\u05d5\u05ea \u05d0\u05d5 \u05d4\u05e7\u05e9\u05e8 \u05dc\u05dc\u05d9\u05d3\u2026",
+            errSelectInterest: "\u05e0\u05d0 \u05d1\u05d7\u05e8 \u05e7\u05d8\u05d2\u05d5\u05e8\u05d9\u05d9\u05ea \u05e2\u05e0\u05d9\u05d9\u05df",
+            errSelectPackage : "\u05e0\u05d0 \u05d1\u05d7\u05e8 \u05d7\u05d1\u05d9\u05dc\u05d4",
+            errDescription   : "\u05e0\u05d0 \u05d4\u05d6\u05df \u05ea\u05d9\u05d0\u05d5\u05e8",
+            errFieldNotFound : "\u05e9\u05d3\u05d4 Interested_In \u05dc\u05d0 \u05e0\u05de\u05e6\u05d0",
+            errLoadFields    : "\u05e9\u05d2\u05d9\u05d0\u05d4 \u05d1\u05d8\u05e2\u05d9\u05e0\u05ea \u05e9\u05d3\u05d5\u05ea: ",
+            errLoadPackages  : "\u05e9\u05d2\u05d9\u05d0\u05d4 \u05d1\u05d8\u05e2\u05d9\u05e0\u05ea \u05d7\u05d1\u05d9\u05dc\u05d5\u05ea: ",
+            first12          : "12 \u05d7\u05d5\u05d3\u05e9\u05d9\u05dd \u05e8\u05d0\u05e9\u05d5\u05e0\u05d9\u05dd",
+            thereafter       : "\u05dc\u05d0\u05d7\u05e8 \u05de\u05db\u05df"
+        }
+    };
+
+    var currentLocale = "en_US";
+    function t(key) { return (TRANSLATIONS[currentLocale] || TRANSLATIONS.en_US)[key] || key; }
+
+    // ─── actual_value → Hebrew Product_Category map ───────────────────────────
+    var CATEGORY_HE_MAP = {
+        "yes"          : "yes",
+        "+sting"       : "+sting",
+        "TV + Internet": "\u05d8\u05dc\u05d5\u05d9\u05d6\u05d9\u05d4 + \u05d0\u05d9\u05e0\u05d8\u05e8\u05e0\u05d8",
+        "Internet yes" : "\u05d0\u05d9\u05e0\u05d8\u05e8\u05e0\u05d8 \u05d9\u05e1",
+        "Cellular"     : "\u05e1\u05dc\u05d5\u05dc\u05e8\u05d9",
+        "Internet"     : "\u05d0\u05d9\u05e0\u05d8\u05e8\u05e0\u05d8"
+    };
+
+    // ─── State ────────────────────────────────────────────────────────────────
     var selectedProducts = [];
     var currentLeadId    = null;
     var isProcessing     = false;
 
     // ─── Boot ─────────────────────────────────────────────────────────────────
     ZOHO.embeddedApp.on("PageLoad", function (data) {
-        console.log("🚀 [PageLoad] Raw data received:", data);
-        console.log("🚀 [PageLoad] EntityId:", data && data.EntityId);
-        console.log("🚀 [PageLoad] Full data keys:", data ? Object.keys(data) : "no data");
-
-        // Grab the lead ID from the page-load payload
-        if (data && data.EntityId) {
-            currentLeadId = data.EntityId;
-        } else if (data && data.ID) {
-            currentLeadId = data.ID;
-        }
-
-        console.log("🪪 [PageLoad] currentLeadId set to:", currentLeadId);
-
-        loadInterestedInOptions();
+        console.log("PageLoad:", data);
+        if (data && data.EntityId) currentLeadId = data.EntityId;
+        else if (data && data.ID)  currentLeadId = data.ID;
+        detectLocaleAndInit();
     });
 
     ZOHO.embeddedApp.init();
 
-    // ─── Load "Interested In" picklist ────────────────────────────────────────
-    function loadInterestedInOptions() {
-        console.log("📡 [META] Fetching Leads fields from Zoho CRM...");
-
-        ZOHO.CRM.META.getFields({ Entity: "Leads" })
-            .then(function (response) {
-                console.log("📋 [META] Full getFields response:", response);
-                console.log("📋 [META] Total fields returned:", response.fields ? response.fields.length : 0);
-                console.log("📋 [META] All field api_names:", response.fields ? response.fields.map(function(f){ return f.api_name; }) : []);
-
-                var fields = response.fields;
-                var field  = fields.find(function (f) { return f.api_name === "Interested_In"; });
-
-                if (field) {
-                    console.log("✅ [META] Interested_In field found:", field);
-                    console.log("🎯 [META] Interested_In pick_list_values:", field.pick_list_values);
-                } else {
-                    console.warn("⚠️ [META] Interested_In field NOT found in response");
-                }
-
-                if (field && field.pick_list_values) {
-                    displayInterestButtons(field.pick_list_values);
-                } else {
-                    showButtonError("Interested_In field not found or has no options");
-                }
+    function detectLocaleAndInit() {
+        ZOHO.CRM.CONFIG.getCurrentUser()
+            .then(function (resp) {
+                var user = resp && resp.users && resp.users[0];
+                var lang = (user && (user.language || user.Language || user.locale || "")) + "";
+                console.log("CRM user locale:", lang);
+                currentLocale = (lang.indexOf("iw") === 0 || lang.indexOf("he") === 0) ? "iw_IL" : "en_US";
             })
             .catch(function (err) {
-                console.error("❌ [META] getFields failed:", err);
-                showButtonError("Error loading options: " + JSON.stringify(err));
+                console.warn("Locale detection failed, defaulting to en_US:", err);
+                currentLocale = "en_US";
+            })
+            .then(function () {
+                applyLocale();
+                loadInterestedInOptions();
             });
     }
 
-    // ─── Render interest buttons ──────────────────────────────────────────────
-    function showButtonError(msg) {
-        console.error("❌ [UI] showButtonError:", msg);
-        document.getElementById("interest-buttons").innerHTML =
-            '<div class="error-box"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><p>' + msg + "</p></div>";
+    function applyLocale() {
+        var isHebrew = currentLocale === "iw_IL";
+        document.body.classList.toggle("rtl", isHebrew);
+        document.documentElement.setAttribute("lang", isHebrew ? "he" : "en");
+
+        setText("widget-title",    t("widgetTitle"));
+        setText("widget-subtitle", t("widgetSubtitle"));
+        setText("label-interested", t("interestedIn"));
+        setText("label-main-pkg",   t("mainPackage"));
+        setText("label-description",t("description"));
+
+        var descField = document.getElementById("lead-description");
+        if (descField) descField.placeholder = t("descPlaceholder");
+
+        var cancelSpan = document.querySelector("#btn-cancel .btn-label");
+        var nextSpan   = document.querySelector("#btn-next .btn-label");
+        if (cancelSpan) cancelSpan.textContent = t("cancel");
+        if (nextSpan)   nextSpan.textContent   = t("next");
+
+        var ph = document.querySelector("#products-grid .state-box p");
+        if (ph) ph.textContent = t("selectCategory");
+    }
+
+    function setText(id, val) {
+        var el = document.getElementById(id);
+        if (el) el.textContent = val;
+    }
+
+    // ─── Load Interested In picklist ──────────────────────────────────────────
+    function loadInterestedInOptions() {
+        ZOHO.CRM.META.getFields({ Entity: "Leads" })
+            .then(function (response) {
+                var field = response.fields.find(function (f) { return f.api_name === "Interested_In"; });
+                if (field && field.pick_list_values) {
+                    displayInterestButtons(field.pick_list_values);
+                } else {
+                    document.getElementById("interest-buttons").innerHTML = errorBox(t("errFieldNotFound"));
+                }
+            })
+            .catch(function (err) {
+                document.getElementById("interest-buttons").innerHTML = errorBox(t("errLoadFields") + JSON.stringify(err));
+            });
     }
 
     function displayInterestButtons(options) {
-        console.log("🖼️ [UI] Rendering interest buttons. Options count:", options.length);
-        console.log("🖼️ [UI] Interest button options (full):", options);
-
-        // ── Dump every option's actual_value vs display_value ──────────────
-        console.group("🗂️ [Picklist] Interested_In option breakdown:");
-        options.forEach(function(opt, i) {
-            console.log(
-                "  [" + i + "]",
-                "actual_value:", JSON.stringify(opt.actual_value),
-                "| display_value:", JSON.stringify(opt.display_value),
-                "| sequence:", opt.sequence_number
-            );
-        });
-        console.groupEnd();
-        // ──────────────────────────────────────────────────────────────────
-
         var container = document.getElementById("interest-buttons");
         container.innerHTML = "";
         options.forEach(function (option, i) {
@@ -717,87 +338,55 @@
             btn.className = "interest-btn";
             btn.style.animationDelay = (i * 0.04) + "s";
             btn.textContent = option.display_value || option.actual_value;
-            btn.setAttribute("data-value", option.actual_value);
+            btn.setAttribute("data-value",   option.actual_value);
+            btn.setAttribute("data-display", option.display_value || option.actual_value);
             btn.onclick = function () { selectInterest(this); };
             container.appendChild(btn);
         });
     }
 
     function selectInterest(button) {
-        var value = button.getAttribute("data-value");
-        var label = button.textContent;
-
-        console.log("🖱️ [Click] Interest button clicked:", { value: value, label: label });
-
-        // ── Deep diagnostics for Hebrew / encoding issues ──────────────────
-        console.log("🔬 [Encoding] value type:", typeof value);
-        console.log("🔬 [Encoding] value length:", value ? value.length : "null");
-        console.log("🔬 [Encoding] value charCodes:", value ? Array.from(value).map(function(c){ return c + "(" + c.charCodeAt(0) + ")"; }).join(" ") : "null");
-        console.log("🔬 [Encoding] data-value attribute raw:", button.getAttribute("data-value"));
-        console.log("🔬 [Encoding] button textContent raw:", button.textContent);
-        console.log("🔬 [Encoding] button innerHTML:", button.innerHTML);
-        // ──────────────────────────────────────────────────────────────────
-
         document.querySelectorAll(".interest-btn").forEach(function (b) { b.classList.remove("active"); });
         button.classList.add("active");
         document.getElementById("interest-buttons").classList.remove("field-error");
-
-        console.log("🔍 [Click] Fetching products for category:", value);
-        fetchProducts(value);
+        selectedProducts = [];
+        fetchProducts(button.getAttribute("data-value"), button.getAttribute("data-display"));
     }
 
-    // ─── Fetch products via COQL ──────────────────────────────────────────────
-    function fetchProducts(category) {
-        //var query = "select Product_Name, Unit_Price, Unit_Price_2nd_period, Description from Products where ((Usage_Unit = 'חבילה חודשית') and (Product_Category = '" + category + "'))";
-         var query = "select Product_Name, Unit_Price, Unit_Price_2nd_period, Description from Products where ((Usage_Unit ='Monthly Package') and (Product_Category = '" + category + "'))";
-
-        console.log("📡 [COQL] category value passed in:", category);
-        console.log("📡 [COQL] category is null/undefined?", category == null);
-        console.log("📡 [COQL] category trimmed:", category ? category.trim() : "N/A");
-        console.log("📡 [COQL] Running query:", query);
-        console.log("📡 [COQL] Query char length:", query.length);
-        console.log("📡 [COQL] Query JSON-safe:", JSON.stringify(query));
-
+    // ─── Fetch products ───────────────────────────────────────────────────────
+    function fetchProducts(category, categoryDisplay) {
         var container = document.getElementById("products-grid");
-        container.innerHTML = '<div class="state-box"><div class="loading-dots"><span></span><span></span><span></span></div><p>Loading products…</p></div>';
+        container.innerHTML = '<div class="state-box"><div class="loading-dots"><span></span><span></span><span></span></div><p>' + t("loadingPackages") + '</p></div>';
+
+        var hebrewCat    = CATEGORY_HE_MAP[category];
+        var catCondition = "(Product_Category = '" + category + "')";
+        if (hebrewCat && hebrewCat !== category) {
+            catCondition = "(Product_Category = '" + category + "' or Product_Category = '" + hebrewCat + "')";
+        }
+
+        var query = "select id, Product_Name, Unit_Price, Unit_Price_2nd_period, Description from Products where (Usage_Unit = 'Monthly Package' or Usage_Unit = '\u05d7\u05d1\u05d9\u05dc\u05d4 \u05d7\u05d5\u05d3\u05e9\u05d9\u05ea') and " + catCondition;
+        console.log("COQL query:", query);
 
         ZOHO.CRM.API.coql({ select_query: query })
-        .then(function (response) {
-            console.log("📦 [COQL] Raw response:", response);
-            console.log("📦 [COQL] Products count:", response.data ? response.data.length : 0);
-            console.log("📦 [COQL] Products data:", response.data);
-
-            if (response.data && response.data.length > 0) {
-                response.data.forEach(function(product, i) {
-                    console.log("📦 [COQL] Product[" + i + "]:", {
-                        id:                    product.id,
-                        Product_Name:          product.Product_Name,
-                        Unit_Price:            product.Unit_Price,
-                        Unit_Price_2nd_period: product.Unit_Price_2nd_period,
-                        Description:           product.Description
-                    });
-                });
-                displayProducts(response.data);
-            } else {
-                console.warn("⚠️ [COQL] No products found for category:", category);
-                container.innerHTML = '<div class="state-box"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke="currentColor"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg><p>No products found for this category</p></div>';
-            }
-        })
-        .catch(function (err) {
-            console.error("❌ [COQL] Query failed:", err);
-            container.innerHTML = '<div class="error-box"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><p>Error loading products: ' + JSON.stringify(err) + '</p></div>';
-        });
+            .then(function (response) {
+                if (response.data && response.data.length > 0) {
+                    displayProducts(response.data);
+                } else {
+                    container.innerHTML = '<div class="state-box"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg><p>' + t("noPackages") + '</p></div>';
+                }
+            })
+            .catch(function (err) {
+                container.innerHTML = errorBox(t("errLoadPackages") + JSON.stringify(err));
+            });
     }
 
-    // ─── Render product cards ─────────────────────────────────────────────────
+    // ─── Render products ──────────────────────────────────────────────────────
     function formatPrice(val) {
-        if (!val && val !== 0) return "—";
+        if (!val && val !== 0) return "\u2014";
         return Number(val).toLocaleString("en-IL");
     }
 
     function displayProducts(products) {
-        console.log("🖼️ [UI] Rendering", products.length, "product card(s)");
-
         var container = document.getElementById("products-grid");
         container.innerHTML = "";
         products.forEach(function (product, i) {
@@ -806,10 +395,10 @@
             card.style.animationDelay = (i * 0.06) + "s";
             card.setAttribute("data-product-id", product.id);
 
-            var name    = product.Product_Name || "Unnamed Product";
-            var price1  = formatPrice(product.Unit_Price);
-            var price2  = formatPrice(product.Unit_Price_2nd_period);
-            var desc    = product.Description || "";
+            var name   = product.Product_Name || "";
+            var price1 = formatPrice(product.Unit_Price);
+            var price2 = formatPrice(product.Unit_Price_2nd_period);
+            var desc   = product.Description || "";
 
             card.innerHTML =
                 '<div class="card-inner">' +
@@ -818,9 +407,9 @@
                     '<div class="selected-badge"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>' +
                   '</div>' +
                   '<div class="pricing-block">' +
-                    '<div class="price-row"><span class="price-label">First 12 months</span><span class="price-value">' + price1 + '<span class="price-currency">ILS</span></span></div>' +
+                    '<div class="price-row"><span class="price-label">' + t("first12") + '</span><span class="price-value">' + price1 + '<span class="price-currency">ILS</span></span></div>' +
                     '<div class="price-divider"></div>' +
-                    '<div class="price-row secondary"><span class="price-label">Thereafter</span><span class="price-value">' + price2 + '<span class="price-currency">ILS</span></span></div>' +
+                    '<div class="price-row secondary"><span class="price-label">' + t("thereafter") + '</span><span class="price-value">' + price2 + '<span class="price-currency">ILS</span></span></div>' +
                   '</div>' +
                   (desc ? '<div class="product-description">' + desc + '</div>' : '') +
                 '</div>';
@@ -831,73 +420,33 @@
     }
 
     function toggleProductSelection(card, product) {
-        var id        = card.getAttribute("data-product-id");
-        var isAlready = card.classList.contains("selected");
-
-        console.log("🖱️ [Click] Product card clicked:", {
-            id:           id,
-            Product_Name: product.Product_Name,
-            Unit_Price:   product.Unit_Price,
-            wasSelected:  isAlready
-        });
-
-        // If already selected, deselect it
-        if (isAlready) {
+        if (card.classList.contains("selected")) {
             selectedProducts = [];
             card.classList.remove("selected");
-            console.log("❎ [Selection] Product deselected. selectedProducts:", selectedProducts);
-            updateSelectionBar();
             return;
         }
-
-        // Deselect any previously selected card
-        document.querySelectorAll(".product-card.selected").forEach(function (c) {
-            c.classList.remove("selected");
-        });
-
-        // Select the new one
+        document.querySelectorAll(".product-card.selected").forEach(function (c) { c.classList.remove("selected"); });
         selectedProducts = [product];
         card.classList.add("selected");
         document.getElementById("products-grid").classList.remove("field-error");
-
-        console.log("✅ [Selection] Product selected:", product);
-        console.log("📌 [Selection] Current selectedProducts:", selectedProducts);
-
-        updateSelectionBar();
     }
 
-    function updateSelectionBar() {
-        var bar   = document.getElementById("selection-bar");
-        var count = document.getElementById("selection-count");
-        if (selectedProducts.length > 0) {
-            count.textContent = selectedProducts.length;
-            bar.classList.add("visible");
-        } else {
-            bar.classList.remove("visible");
-        }
-    }
-
-    // ─── UI feedback helpers ──────────────────────────────────────────────────
-    function setButtonState(action, state) {
-        var btn = document.querySelector('.action-btn[data-action="' + action + '"]');
+    // ─── Button states ────────────────────────────────────────────────────────
+    function setButtonState(state) {
+        var btn = document.getElementById("btn-next");
         if (!btn) return;
-
-        var configs = {
-            matching_process: {
-                idle:    { icon: '<svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>', label: "Next" },
-                loading: { icon: '<svg viewBox="0 0 24 24" class="spin"><circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="10"/></svg>', label: "Saving…" },
-                done:    { icon: '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>', label: "Proceeding…" },
-                error:   { icon: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>', label: "Failed – retry" }
-            }
+        var icons = {
+            idle   : '<svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>',
+            loading: '<svg viewBox="0 0 24 24" class="spin"><circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="10"/></svg>',
+            done   : '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>',
+            error  : '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
         };
-
-        var cfg = configs[action] && configs[action][state];
-        if (!cfg) return;
-        btn.innerHTML    = cfg.icon + " " + cfg.label;
-        btn.disabled     = (state === "loading");
-        btn.classList.toggle("btn-loading", state === "loading");
+        var labels = { idle: t("next"), loading: t("saving"), done: t("proceeding"), error: t("failedRetry") };
+        btn.innerHTML = (icons[state] || "") + '<span class="btn-label" style="margin-left:7px">' + (labels[state] || "") + '</span>';
+        btn.disabled  = (state === "loading");
     }
 
+    // ─── Toast ────────────────────────────────────────────────────────────────
     function showToast(msg, type) {
         var toast = document.getElementById("toast");
         toast.textContent = msg;
@@ -906,132 +455,66 @@
         toast._t = setTimeout(function () { toast.classList.remove("visible"); }, 3500);
     }
 
-    // ─── Build the lead update payload ───────────────────────────────────────
-    function buildLeadPayload(statusValue) {
-        var description   = document.getElementById("lead-description").value.trim();
+    // ─── Validation ───────────────────────────────────────────────────────────
+    function validate() {
+        var ok = true;
+        if (!document.querySelector(".interest-btn.active")) {
+            document.getElementById("interest-buttons").classList.add("field-error");
+            if (ok) { showToast(t("errSelectInterest"), "error"); ok = false; }
+        } else document.getElementById("interest-buttons").classList.remove("field-error");
+
+        if (selectedProducts.length === 0) {
+            document.getElementById("products-grid").classList.add("field-error");
+            if (ok) { showToast(t("errSelectPackage"), "error"); ok = false; }
+        } else document.getElementById("products-grid").classList.remove("field-error");
+
+        var desc = document.getElementById("lead-description").value.trim();
+        if (!desc) {
+            document.getElementById("lead-description").classList.add("field-error");
+            if (ok) { showToast(t("errDescription"), "error"); ok = false; }
+        } else document.getElementById("lead-description").classList.remove("field-error");
+
+        return ok;
+    }
+
+    // ─── Save & proceed ───────────────────────────────────────────────────────
+    function buildLeadPayload() {
         var interestedBtn = document.querySelector(".interest-btn.active");
-        var interestedIn  = interestedBtn ? interestedBtn.getAttribute("data-value") : null;
-
         var payload = { id: currentLeadId };
-
-        if (statusValue) {
-            payload.Lead_Status = statusValue;
-        }
-
-        payload.Description   = description;
-
-        if (interestedIn) {
-            payload.Interested_In = interestedIn;
-        }
-
+        if (interestedBtn) payload.Interested_In = interestedBtn.getAttribute("data-value");
+        payload.Description   = document.getElementById("lead-description").value.trim();
         payload.Product_Offerd = selectedProducts.length > 0 ? selectedProducts[0].id : null;
-
-        console.log("🏗️ [Payload] Built lead payload:", payload);
+        console.log("Lead payload:", payload);
         return payload;
     }
 
-    // ─── Validation ───────────────────────────────────────────────────────────
-    function validate() {
-        var errors = [];
+    function handleCancel() { ZOHO.CRM.UI.Popup.close(); }
 
-        var interestedBtn = document.querySelector(".interest-btn.active");
-        if (!interestedBtn) {
-            errors.push("interested");
-            document.getElementById("interest-buttons").classList.add("field-error");
-        } else {
-            document.getElementById("interest-buttons").classList.remove("field-error");
-        }
-
-        if (selectedProducts.length === 0) {
-            errors.push("product");
-            document.getElementById("products-grid").classList.add("field-error");
-        } else {
-            document.getElementById("products-grid").classList.remove("field-error");
-        }
-
-        var description = document.getElementById("lead-description").value.trim();
-        if (!description) {
-            errors.push("description");
-            document.getElementById("lead-description").classList.add("field-error");
-        } else {
-            document.getElementById("lead-description").classList.remove("field-error");
-        }
-
-        if (errors.length > 0) {
-            console.warn("⚠️ [Validation] Failed. Missing fields:", errors);
-            var msgs = {
-                interested:  "Please select an interest category",
-                product:     "Please select a package",
-                description: "Please enter a description"
-            };
-            showToast(msgs[errors[0]], "error");
-            return false;
-        }
-
-        console.log("✅ [Validation] Passed. All required fields present.");
-        return true;
-    }
-
-    // ─── Core: update lead record ─────────────────────────────────────────────
-    function updateLeadRecord(payload) {
-        console.log("📡 [CRM] Calling updateRecord with payload:", payload);
-        return ZOHO.CRM.API.updateRecord({
-            Entity : "Leads",
-            APIData: payload,
-            Trigger: []
-        });
-    }
-
-    // ─── Action handlers ──────────────────────────────────────────────────────
-
-    function handleCancel() {
-        console.log("🖱️ [Click] Cancel button clicked. Closing popup.");
-        ZOHO.CRM.UI.Popup.close();
-    }
-
-    /**
-     * NEXT (Matching Process)
-     * 1. Validate all mandatory fields
-     * 2. Save: Description, Interested_In, Product_Offerd
-     * 3. Proceed blueprint
-     */
-    function handleMatchingProcess() {
-        console.log("🖱️ [Click] Next (Matching Process) button clicked.");
-        console.log("🔄 [State] isProcessing:", isProcessing);
-
-        if (isProcessing) {
-            console.warn("⚠️ [Click] Already processing — ignoring duplicate click.");
-            return;
-        }
+    function handleNext() {
+        if (isProcessing) return;
         if (!validate()) return;
-
         isProcessing = true;
-        setButtonState("matching_process", "loading");
+        setButtonState("loading");
 
-        var payload = buildLeadPayload(null);
-
-        updateLeadRecord(payload)
-            .then(function (response) {
-                console.log("✅ [CRM] updateRecord success:", response);
-                console.log("📡 [Blueprint] Calling ZOHO.CRM.BLUEPRINT.proceed()...");
-                return ZOHO.CRM.BLUEPRINT.proceed();
-            })
-            .then(function (blueprintResponse) {
-                console.log("✅ [Blueprint] proceed() success:", blueprintResponse);
-                setButtonState("matching_process", "done");
+        ZOHO.CRM.API.updateRecord({ Entity: "Leads", APIData: buildLeadPayload(), Trigger: [] })
+            .then(function () { return ZOHO.CRM.BLUEPRINT.proceed(); })
+            .then(function () {
+                setButtonState("done");
                 setTimeout(function () {
-                    try { ZOHO.CRM.UI.Popup.close(); } catch (e) {
-                        console.warn("⚠️ [Popup] close() failed:", e);
-                    }
+                    try { ZOHO.CRM.UI.Popup.close(); } catch (e) {}
                 }, 1200);
             })
             .catch(function (err) {
-                console.error("❌ [Error] Matching process failed:", err);
-                setButtonState("matching_process", "error");
+                console.error("Failed:", err);
+                setButtonState("error");
                 showToast("Failed: " + JSON.stringify(err), "error");
                 isProcessing = false;
-                setTimeout(function () { setButtonState("matching_process", "idle"); }, 2500);
+                setTimeout(function () { setButtonState("idle"); }, 2500);
             });
+    }
+
+    function errorBox(msg) {
+        return '<div class="error-box"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><p>' + msg + '</p></div>';
     }
 </script>
 </head>
@@ -1042,16 +525,20 @@
         <div class="icon">
             <svg viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
         </div>
-        <h1>Package Selector</h1>
-        <p>Select a category, then choose packages</p>
+        <h1 id="widget-title">Package Selector</h1>
+        <p id="widget-subtitle">Select a category, then choose a package</p>
     </div>
 
-    <div class="section-label">Interested In<span class="required-star">*</span></div>
+    <div class="section-label">
+        <span id="label-interested">Interested In</span><span class="required-star">*</span>
+    </div>
     <div id="interest-buttons" class="button-group">
         <div class="loading-dots" style="padding: 8px 0;"><span></span><span></span><span></span></div>
     </div>
 
-    <div class="section-label">Main Package<span class="required-star">*</span></div>
+    <div class="section-label">
+        <span id="label-main-pkg">Main Package</span><span class="required-star">*</span>
+    </div>
     <div id="products-grid" class="products-grid">
         <div class="state-box">
             <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -1059,29 +546,27 @@
         </div>
     </div>
 
-    <!-- Description + Actions -->
     <div class="bottom-section">
-        <div class="section-label" style="margin-top: 28px;">Description<span class="required-star">*</span></div>
-        <textarea id="lead-description" class="description-field" placeholder="Add notes or context about this lead…" oninput="this.classList.remove('field-error')"></textarea>
+        <div class="section-label" style="margin-top: 28px;">
+            <span id="label-description">Description</span><span class="required-star">*</span>
+        </div>
+        <textarea id="lead-description" class="description-field"
+            placeholder="Add notes or context about this lead…"
+            oninput="this.classList.remove('field-error')"></textarea>
 
         <div class="action-bar">
-            <button class="action-btn btn-cancel" data-action="cancel" onclick="handleCancel()">
+            <button class="action-btn btn-cancel" id="btn-cancel" onclick="handleCancel()">
                 <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                Cancel
+                <span class="btn-label">Cancel</span>
             </button>
-            <button class="action-btn btn-success" data-action="matching_process" onclick="handleMatchingProcess()">
+            <button class="action-btn btn-success" id="btn-next" onclick="handleNext()">
                 <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-                Next
+                <span class="btn-label">Next</span>
             </button>
         </div>
     </div>
 
 </div>
-
-<!-- <div class="selection-bar" id="selection-bar">
-    <span>Products selected <span class="count-badge" id="selection-count">0</span></span>
-    <span style="color: rgba(255,255,255,0.5); font-size: 12px; font-weight: 400;">Click any card to deselect</span>
-</div> -->
 <div id="toast" class="toast"></div>
 </body>
 </html>
