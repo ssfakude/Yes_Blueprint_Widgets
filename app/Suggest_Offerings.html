@@ -552,9 +552,9 @@
         .then(function (response) {
             if (!response) return;
             var all      = response.data || [];
-            var regular  = all.filter(function (a) { return (a.Product_Category || "").toLowerCase() !== "equipment"; });
-            var equip    = all.filter(function (a) { return (a.Product_Category || "").toLowerCase() === "equipment"; });
 
+            var equip    = all.filter(function (a) { var c = (a.Product_Category || "").toLowerCase(); return c === "equipment" || c === "ציוד"; });
+            var regular  = all.filter(function (a) { var c = (a.Product_Category || "").toLowerCase(); return c !== "equipment" || c !== "ציוד"; });
             if (regular.length) displayAddons(regular, "addon-grid",       false);
             else section.style.display = "none";
 
