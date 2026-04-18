@@ -346,20 +346,23 @@
     .toast.toast-error { background: #ef4444; }
     .toast.toast-success { background: #16a34a; }
 
-    .product-card, .addon-card { animation: cardIn 0.3s ease both; }
+    #equip-addons-section { margin-bottom: 32px; }
+    .section-label-equip { color: #7c3aed; }
+    .section-label-equip::after { background: #ede9fe; }
     @keyframes cardIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     .interest-btn { animation: btnIn 0.25s ease both; }
     @keyframes btnIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
 </style>
 <script src="https://live.zwidgets.com/js-sdk/1.5/ZohoEmbededAppSDK.min.js"></script>
 <script>
-    var currentDealId   = null;
-    var selectedProduct = null;
-    var selectedAddons  = [];
-    var isProcessing    = false;
+    var currentDealId        = null;
+    var selectedProduct      = null;
+    var selectedAddons       = [];   // non-equipment add-ons
+    var selectedEquipAddons  = [];   // equipment add-ons
+    var isProcessing         = false;
 
     // IDs of add-ons already saved on the deal — used to pre-tick add-on cards
-    var prefillAddonIds = [];
+    var prefillAddonIds          = [];  // all saved add-on IDs (used for both sections)
 
     ZOHO.embeddedApp.on("PageLoad", function (data) {
         console.log("PageLoad:", data);
@@ -469,9 +472,10 @@
         document.querySelectorAll(".interest-btn").forEach(function (b) { b.classList.remove("active"); });
         button.classList.add("active");
         document.getElementById("interest-buttons").classList.remove("field-error");
-        selectedProduct = null;
-        selectedAddons  = [];
-        prefillAddonIds = []; // clear prefill — user is making a new manual choice
+        selectedProduct     = null;
+        selectedAddons      = [];
+        selectedEquipAddons = [];
+        prefillAddonIds     = []; // clear prefill — user is making a new manual choice
         hideAddonsSection();
         updateSelectionBar();
         fetchProducts(button.getAttribute("data-value"), null);
@@ -564,15 +568,26 @@
         section.style.display = "none";
         document.getElementById("addon-grid").innerHTML = "";
         selectedAddons = [];
+
+        var equipSection = document.getElementById("equip-addons-section");
+        equipSection.style.display = "none";
+        document.getElementById("equip-addon-grid").innerHTML = "";
+        selectedEquipAddons = [];
+
         updateTotalBar();
     }
 
     function loadAddons(product) {
-        var section = document.getElementById("addons-section");
-        var grid    = document.getElementById("addon-grid");
+        // Fetch all related add-on IDs first, then split by Product_Category
+        var section      = document.getElementById("addons-section");
+        var equipSection = document.getElementById("equip-addons-section");
+        var grid         = document.getElementById("addon-grid");
+        var equipGrid    = document.getElementById("equip-addon-grid");
 
-        section.style.display = "block";
-        grid.innerHTML = '<div class="loading-dots" style="padding:12px 0"><span></span><span></span><span></span></div>';
+        section.style.display      = "block";
+        equipSection.style.display = "block";
+        grid.innerHTML      = '<div class="loading-dots" style="padding:12px 0"><span></span><span></span><span></span></div>';
+        equipGrid.innerHTML = '<div class="loading-dots" style="padding:12px 0"><span></span><span></span><span></span></div>';
 
         ZOHO.CRM.API.getRelatedRecords({
             Entity     : "Products",
@@ -584,35 +599,58 @@
         .then(function (response) {
             console.log("Related add-ons response:", JSON.stringify(response));
             var records = response.data;
-            if (!records || records.length === 0) { section.style.display = "none"; return Promise.resolve(null); }
+            if (!records || records.length === 0) {
+                section.style.display      = "none";
+                equipSection.style.display = "none";
+                return Promise.resolve(null);
+            }
 
             var productIds = records
                 .map(function (r) { return r.Related_Ad_Ons1 && r.Related_Ad_Ons1.id; })
                 .filter(Boolean);
 
-            if (productIds.length === 0) { section.style.display = "none"; return Promise.resolve(null); }
+            if (productIds.length === 0) {
+                section.style.display      = "none";
+                equipSection.style.display = "none";
+                return Promise.resolve(null);
+            }
 
             var idList = productIds.map(function (id) { return "'" + id + "'"; }).join(", ");
             return ZOHO.CRM.API.coql({
-                select_query: "select id, Product_Name, Unit_Price, Unit_Price_2nd_period, Description from Products where id in (" + idList + ")"
+                select_query: "select id, Product_Name, Unit_Price, Unit_Price_2nd_period, Description, Product_Category from Products where id in (" + idList + ")"
             });
         })
         .then(function (response) {
             if (!response) return;
-            if (response.data && response.data.length > 0) {
-                displayAddons(response.data);
+
+            var all       = response.data || [];
+            var regular   = all.filter(function (a) { return (a.Product_Category || "").toLowerCase() !== "equipment"; });
+            var equipment = all.filter(function (a) { return (a.Product_Category || "").toLowerCase() === "equipment"; });
+
+            if (regular.length > 0) {
+                displayAddons(regular, "addon-grid", selectedAddons, false);
             } else {
                 section.style.display = "none";
+            }
+
+            if (equipment.length > 0) {
+                displayAddons(equipment, "equip-addon-grid", selectedEquipAddons, true);
+            } else {
+                equipSection.style.display = "none";
             }
         })
         .catch(function (err) {
             console.error("Error loading add-ons:", JSON.stringify(err));
-            section.style.display = "none";
+            section.style.display      = "none";
+            equipSection.style.display = "none";
         });
     }
 
-    function displayAddons(addons) {
-        var grid = document.getElementById("addon-grid");
+    // gridId: which grid element to render into
+    // targetArray: selectedAddons or selectedEquipAddons
+    // isEquip: controls which toggle function to call
+    function displayAddons(addons, gridId, targetArray, isEquip) {
+        var grid = document.getElementById(gridId);
         grid.innerHTML = "";
 
         addons.forEach(function (addon, i) {
@@ -636,24 +674,25 @@
                   '</div>' +
                 '</div>';
 
-            card.onclick = function () { toggleAddonSelection(this, addon); };
+            card.onclick = function () { toggleAddonSelection(this, addon, isEquip); };
             grid.appendChild(card);
 
             // Auto-tick add-ons that were previously saved on the deal
             if (prefillAddonIds.indexOf(String(addon.id)) !== -1) {
-                toggleAddonSelection(card, addon);
+                toggleAddonSelection(card, addon, isEquip);
             }
         });
     }
 
-    function toggleAddonSelection(card, addon) {
-        var id    = String(card.getAttribute("data-addon-id"));
-        var index = selectedAddons.findIndex(function (a) { return String(a.id) === id; });
+    function toggleAddonSelection(card, addon, isEquip) {
+        var id          = String(card.getAttribute("data-addon-id"));
+        var targetArray = isEquip ? selectedEquipAddons : selectedAddons;
+        var index       = targetArray.findIndex(function (a) { return String(a.id) === id; });
         if (index > -1) {
-            selectedAddons.splice(index, 1);
+            targetArray.splice(index, 1);
             card.classList.remove("selected");
         } else {
-            selectedAddons.push(addon);
+            targetArray.push(addon);
             card.classList.add("selected");
         }
         updateSelectionBar();
@@ -661,9 +700,13 @@
     }
 
     // ─── Total calculation ────────────────────────────────────────────────────
+    function allSelectedAddons() {
+        return selectedAddons.concat(selectedEquipAddons);
+    }
+
     function calculateTotal() {
         var mainPrice   = selectedProduct ? (parseFloat(selectedProduct.Unit_Price) || 0) : 0;
-        var addonsTotal = selectedAddons.reduce(function (sum, addon) {
+        var addonsTotal = allSelectedAddons().reduce(function (sum, addon) {
             return sum + (parseFloat(addon.Unit_Price) || 0);
         }, 0);
         return mainPrice + addonsTotal;
@@ -675,14 +718,15 @@
         bar.style.display = "flex";
 
         var mainPrice   = parseFloat(selectedProduct.Unit_Price) || 0;
-        var addonsTotal = selectedAddons.reduce(function (sum, addon) {
+        var addonsTotal = allSelectedAddons().reduce(function (sum, addon) {
             return sum + (parseFloat(addon.Unit_Price) || 0);
         }, 0);
-        var total = mainPrice + addonsTotal;
+        var total      = mainPrice + addonsTotal;
+        var totalAddons = allSelectedAddons().length;
 
         var breakdown = selectedProduct.Product_Name || "Package";
-        if (selectedAddons.length > 0) {
-            breakdown += " + " + selectedAddons.length + " add-on" + (selectedAddons.length > 1 ? "s" : "");
+        if (totalAddons > 0) {
+            breakdown += " + " + totalAddons + " add-on" + (totalAddons > 1 ? "s" : "");
         }
 
         document.getElementById("total-breakdown").textContent = breakdown;
@@ -692,7 +736,7 @@
     function updateSelectionBar() {
         var bar   = document.getElementById("selection-bar");
         var count = document.getElementById("selection-count");
-        var total = (selectedProduct ? 1 : 0) + selectedAddons.length;
+        var total = (selectedProduct ? 1 : 0) + allSelectedAddons().length;
         if (total > 0) { count.textContent = total; bar.classList.add("visible"); }
         else { bar.classList.remove("visible"); }
     }
@@ -752,7 +796,7 @@
         payload.Product_Offerd = selectedProduct ? selectedProduct.id : null;
 
         var mainPrice   = selectedProduct ? (parseFloat(selectedProduct.Unit_Price) || 0) : 0;
-        var addonsTotal = selectedAddons.reduce(function (sum, addon) {
+        var addonsTotal = allSelectedAddons().reduce(function (sum, addon) {
             return sum + (parseFloat(addon.Unit_Price) || 0);
         }, 0);
         payload.Amount = mainPrice + addonsTotal;
@@ -769,9 +813,10 @@
         })
         .then(function (response) {
             console.log("Deal saved:", response);
-            if (selectedAddons.length === 0) { return Promise.resolve(response); }
+            var all = allSelectedAddons();
+            if (all.length === 0) { return Promise.resolve(response); }
 
-            var subformRows = selectedAddons.map(function (addon) {
+            var subformRows = all.map(function (addon) {
                 return { Add_On: { id: addon.id } };
             });
 
@@ -850,6 +895,11 @@
     <div id="addons-section" style="display:none;">
         <div class="section-label">Available Add-ons</div>
         <div id="addon-grid" class="addon-grid"></div>
+    </div>
+
+    <div id="equip-addons-section" style="display:none;">
+        <div class="section-label section-label-equip">Other Add-ons</div>
+        <div id="equip-addon-grid" class="addon-grid"></div>
     </div>
 
     <div class="bottom-section">
