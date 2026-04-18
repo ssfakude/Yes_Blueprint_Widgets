@@ -218,7 +218,6 @@
     .description-field::placeholder { color: var(--text-muted); }
     .description-field:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
 
-    /* ── Total summary bar ── */
     .total-bar {
         display: flex;
         align-items: center;
@@ -359,23 +358,87 @@
     var selectedAddons  = [];
     var isProcessing    = false;
 
+    // IDs of add-ons already saved on the deal — used to pre-tick add-on cards
+    var prefillAddonIds = [];
+
     ZOHO.embeddedApp.on("PageLoad", function (data) {
         console.log("PageLoad:", data);
         if (data && data.EntityId) currentDealId = data.EntityId;
         else if (data && data.ID)  currentDealId = data.ID;
-        loadInterestedInOptions().then(function () {
-            return prefillFromDeal();
-        });
+
+        // 1. Fetch deal record first so we have prefill values
+        // 2. Then load picklist buttons (so we can mark the right one)
+        // 3. Then fetch products for the saved category (and preselect saved product)
+        prefetchDealThenBuild();
     });
 
     ZOHO.embeddedApp.init();
 
-    function loadInterestedInOptions() {
+    // ─── Orchestration ────────────────────────────────────────────────────────
+    function prefetchDealThenBuild() {
+        if (!currentDealId) {
+            // No deal context — just load the picklist with nothing pre-selected
+            loadInterestedInOptions(null, null);
+            return;
+        }
+
+        ZOHO.CRM.API.getRecord({ Entity: "Deals", RecordID: currentDealId })
+            .then(function (response) {
+                var deal = response.data && response.data[0];
+                console.log("Deal record:", deal);
+
+                var interestedInValue = null;
+                var preselectProductId = null;
+
+                if (deal) {
+                    // Interested_In is a plain string picklist value
+                    interestedInValue = deal.Interested_In || null;
+
+                    // Product_Offerd is a lookup — could be an object {id, name} or a plain id string
+                    if (deal.Product_Offerd) {
+                        preselectProductId = (typeof deal.Product_Offerd === "object")
+                            ? deal.Product_Offerd.id
+                            : deal.Product_Offerd;
+                    }
+
+                    // Collect previously saved add-on IDs from the Add_Ons subform
+                    // The subform rows typically look like: { Add_On: { id, name }, ... }
+                    prefillAddonIds = [];
+                    if (Array.isArray(deal.Add_Ons)) {
+                        deal.Add_Ons.forEach(function (row) {
+                            var addonRef = row.Add_On || row.Add_Ons || row;
+                            var addonId = (addonRef && typeof addonRef === "object") ? addonRef.id : addonRef;
+                            if (addonId) prefillAddonIds.push(String(addonId));
+                        });
+                    }
+                    console.log("Prefill — Interested_In:", interestedInValue, "| Product:", preselectProductId, "| Add-ons:", prefillAddonIds);
+                }
+
+                loadInterestedInOptions(interestedInValue, preselectProductId);
+            })
+            .catch(function (err) {
+                console.warn("Could not fetch deal for prefill:", err);
+                loadInterestedInOptions(null, null);
+            });
+    }
+
+    // ─── Load Interested_In picklist, then auto-select + fetch products ───────
+    function loadInterestedInOptions(interestedInValue, preselectProductId) {
         return ZOHO.CRM.META.getFields({ Entity: "Deals" })
             .then(function (response) {
                 var field = response.fields.find(function (f) { return f.api_name === "Interested_In"; });
                 if (field && field.pick_list_values) {
                     displayInterestButtons(field.pick_list_values);
+
+                    // Auto-select the saved value if present
+                    if (interestedInValue) {
+                        var btn = document.querySelector('.interest-btn[data-value="' + interestedInValue + '"]');
+                        if (btn) {
+                            btn.classList.add("active");
+                            // Now load products for this category and preselect the saved product
+                            fetchProducts(interestedInValue, preselectProductId);
+                        }
+                    }
                 } else {
                     document.getElementById("interest-buttons").innerHTML =
                         '<div class="error-box"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><p>Interested_In field not found</p></div>';
@@ -385,25 +448,6 @@
                 document.getElementById("interest-buttons").innerHTML =
                     '<div class="error-box"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><p>Error loading fields: ' + JSON.stringify(err) + '</p></div>';
             });
-    }
-
-    function prefillFromDeal() {
-        if (!currentDealId) return Promise.resolve();
-        return ZOHO.CRM.API.getRecord({ Entity: "Deals", RecordID: currentDealId })
-            .then(function (response) {
-                var deal = response.data && response.data[0];
-                if (!deal) return;
-                console.log("Deal record:", deal);
-                if (deal.Interested_In) {
-                    var btn = document.querySelector('.interest-btn[data-value="' + deal.Interested_In + '"]');
-                    if (btn) {
-                        document.querySelectorAll(".interest-btn").forEach(function (b) { b.classList.remove("active"); });
-                        btn.classList.add("active");
-                        return fetchProducts(deal.Interested_In, deal.Product_Offerd);
-                    }
-                }
-            })
-            .catch(function (err) { console.warn("Could not prefill deal:", err); });
     }
 
     function displayInterestButtons(options) {
@@ -420,18 +464,20 @@
         });
     }
 
+    // Called when the user manually clicks an interest button
     function selectInterest(button) {
         document.querySelectorAll(".interest-btn").forEach(function (b) { b.classList.remove("active"); });
         button.classList.add("active");
         document.getElementById("interest-buttons").classList.remove("field-error");
         selectedProduct = null;
         selectedAddons  = [];
+        prefillAddonIds = []; // clear prefill — user is making a new manual choice
         hideAddonsSection();
         updateSelectionBar();
         fetchProducts(button.getAttribute("data-value"), null);
     }
 
-    function fetchProducts(category, preselectId) {
+    function fetchProducts(category, preselectProductId) {
         var container = document.getElementById("products-grid");
         container.innerHTML = '<div class="state-box"><div class="loading-dots"><span></span><span></span><span></span></div><p>Loading packages…</p></div>';
         hideAddonsSection();
@@ -441,7 +487,7 @@
         })
         .then(function (response) {
             if (response.data && response.data.length > 0) {
-                displayProducts(response.data, preselectId);
+                displayProducts(response.data, preselectProductId);
             } else {
                 container.innerHTML = '<div class="state-box"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg><p>No packages found for this category</p></div>';
             }
@@ -456,7 +502,7 @@
         return Number(val).toLocaleString("en-IL");
     }
 
-    function displayProducts(products, preselectId) {
+    function displayProducts(products, preselectProductId) {
         var container = document.getElementById("products-grid");
         container.innerHTML = "";
 
@@ -488,7 +534,8 @@
             card.onclick = function () { toggleProductSelection(this, product); };
             container.appendChild(card);
 
-            if (preselectId && (product.id === preselectId || String(product.id) === String(preselectId))) {
+            // Auto-select if this product matches the saved Product_Offerd
+            if (preselectProductId && String(product.id) === String(preselectProductId)) {
                 toggleProductSelection(card, product);
             }
         });
@@ -591,12 +638,17 @@
 
             card.onclick = function () { toggleAddonSelection(this, addon); };
             grid.appendChild(card);
+
+            // Auto-tick add-ons that were previously saved on the deal
+            if (prefillAddonIds.indexOf(String(addon.id)) !== -1) {
+                toggleAddonSelection(card, addon);
+            }
         });
     }
 
     function toggleAddonSelection(card, addon) {
-        var id    = card.getAttribute("data-addon-id");
-        var index = selectedAddons.findIndex(function (a) { return a.id === id; });
+        var id    = String(card.getAttribute("data-addon-id"));
+        var index = selectedAddons.findIndex(function (a) { return String(a.id) === id; });
         if (index > -1) {
             selectedAddons.splice(index, 1);
             card.classList.remove("selected");
@@ -619,10 +671,7 @@
 
     function updateTotalBar() {
         var bar = document.getElementById("total-bar");
-        if (!selectedProduct) {
-            bar.style.display = "none";
-            return;
-        }
+        if (!selectedProduct) { bar.style.display = "none"; return; }
         bar.style.display = "flex";
 
         var mainPrice   = parseFloat(selectedProduct.Unit_Price) || 0;
@@ -692,7 +741,6 @@
         return ok;
     }
 
-    // ─── Build payload — includes Amount = main + addons Unit_Price sum ───────
     function buildDealPayload() {
         var interestedBtn = document.querySelector(".interest-btn.active");
         var payload = { id: currentDealId };
@@ -703,21 +751,16 @@
 
         payload.Product_Offerd = selectedProduct ? selectedProduct.id : null;
 
-        // Sum Unit_Price of main package + all selected add-ons → save to Amount
         var mainPrice   = selectedProduct ? (parseFloat(selectedProduct.Unit_Price) || 0) : 0;
         var addonsTotal = selectedAddons.reduce(function (sum, addon) {
             return sum + (parseFloat(addon.Unit_Price) || 0);
         }, 0);
         payload.Amount = mainPrice + addonsTotal;
 
-        console.log("mainPrice:", mainPrice);
-        console.log("addonsTotal:", addonsTotal);
-        console.log("Amount total:", payload.Amount);
-
+        console.log("mainPrice:", mainPrice, "| addonsTotal:", addonsTotal, "| Amount:", payload.Amount);
         return payload;
     }
 
-    // ─── Save deal record + Add_Ons subform ───────────────────────────────────
     function saveDealRecord() {
         return ZOHO.CRM.API.updateRecord({
             Entity : "Deals",
@@ -810,7 +853,6 @@
     </div>
 
     <div class="bottom-section">
-        <!-- Total summary bar -->
         <div class="total-bar" id="total-bar" style="display:none;">
             <span class="total-breakdown" id="total-breakdown"></span>
             <span class="total-label">Total</span>
