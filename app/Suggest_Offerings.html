@@ -695,7 +695,7 @@
         payload.Product_Offerd = selectedProduct ? selectedProduct.id : null;
         if (selectedProduct) {
             payload.Product_Details = [{
-                product: { id: selectedProduct.id }, quantity: 1,
+                Product: { id: selectedProduct.id }, quantity: 1,
                 unit_price: parseFloat(selectedProduct.Unit_Price) || 0,
                 total: parseFloat(selectedProduct.Unit_Price) || 0,
                 discount: 0, net_total: parseFloat(selectedProduct.Unit_Price) || 0
