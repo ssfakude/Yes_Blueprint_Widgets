@@ -34,7 +34,22 @@
         color: var(--text-primary);
         padding: 20px 24px 100px;
         min-height: 100vh;
+        direction: rtl; /* default RTL — flipped to LTR for English below */
     }
+
+    /* ── LTR override for English ── */
+    body.ltr                       { direction: ltr; }
+    body.ltr .page-title           { text-align: left; direction: ltr; }
+    body.ltr .form-label           { text-align: left; }
+    body.ltr .select-wrap::after   { right: 14px; left: auto; }
+    body.ltr .select-dot           { left: 14px; right: auto; }
+    body.ltr .select-wrap .form-select { padding-left: 34px; padding-right: 14px; }
+    body.ltr .form-select,
+    body.ltr .form-input           { border-left: 3px solid var(--accent); border-right: 1.5px solid var(--border); }
+    body.ltr .input-icon-btn       { right: 8px; left: auto; }
+    body.ltr .input-icon-wrap .form-input { padding-right: 46px; padding-left: 14px; }
+    body.ltr .logo-tile.selected::after { right: 4px; left: auto; }
+    body.ltr .combo-list           { left: 0; right: 0; }
 
     /* ── Title ── */
     .page-title {
@@ -58,7 +73,7 @@
     }
 
     .form-label {
-        min-width: 120px;
+        min-width: 130px;
         font-size: 13px;
         font-weight: 500;
         color: var(--text-secondary);
@@ -67,9 +82,7 @@
         flex-shrink: 0;
     }
 
-    .form-control-wrap {
-        flex: 1;
-    }
+    .form-control-wrap { flex: 1; }
 
     /* ── Select / Input shared styles ── */
     .form-select,
@@ -82,13 +95,14 @@
         color: var(--text-primary);
         background: var(--surface-card);
         border: 1.5px solid var(--border);
-        border-left: 3px solid var(--accent);
+        border-right: 3px solid var(--accent); /* RTL default: accent on right */
         border-radius: var(--radius);
         outline: none;
         transition: border-color 0.2s, box-shadow 0.2s;
         box-shadow: var(--shadow-sm);
         appearance: none;
         -webkit-appearance: none;
+        direction: inherit;
     }
 
     .form-select:focus,
@@ -102,19 +116,16 @@
         box-shadow: 0 0 0 3px rgba(239,68,68,0.1);
     }
 
-    /* Select wrapper for custom chevron */
-    .select-wrap {
-        position: relative;
-    }
+    /* Select wrapper — chevron on LEFT for RTL */
+    .select-wrap { position: relative; }
 
     .select-wrap::after {
         content: '';
         position: absolute;
-        right: 14px;
+        left: 14px;
         top: 50%;
         transform: translateY(-50%);
-        width: 0;
-        height: 0;
+        width: 0; height: 0;
         border-left: 5px solid transparent;
         border-right: 5px solid transparent;
         border-top: 6px solid var(--text-muted);
@@ -123,236 +134,129 @@
 
     .select-dot {
         position: absolute;
-        left: 14px;
+        right: 14px;
         top: 50%;
         transform: translateY(-50%);
-        width: 10px;
-        height: 10px;
+        width: 10px; height: 10px;
         background: var(--accent);
         border-radius: 50%;
         pointer-events: none;
     }
 
-    .select-wrap .form-select {
-        padding-left: 34px;
-    }
+    .select-wrap .form-select { padding-right: 34px; }
 
-    /* Input with icon on the right */
-    .input-icon-wrap {
-        position: relative;
-    }
-
-    .input-icon-wrap .form-input {
-        padding-right: 46px;
-    }
+    /* Input icon */
+    .input-icon-wrap { position: relative; }
+    .input-icon-wrap .form-input { padding-left: 46px; }
 
     .input-icon-btn {
         position: absolute;
-        right: 8px;
+        left: 8px;
         top: 50%;
         transform: translateY(-50%);
-        width: 28px;
-        height: 28px;
+        width: 28px; height: 28px;
         background: var(--surface);
         border: 1px solid var(--border);
         border-radius: 6px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: background 0.15s;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; transition: background 0.15s;
     }
-
     .input-icon-btn:hover { background: var(--border); }
-    .input-icon-btn svg {
-        width: 15px; height: 15px;
-        stroke: var(--text-secondary);
-        stroke-width: 1.8;
-        fill: none;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-    }
+    .input-icon-btn svg { width: 15px; height: 15px; stroke: var(--text-secondary); stroke-width: 1.8; fill: none; stroke-linecap: round; stroke-linejoin: round; }
 
     /* ── Logo grid ── */
-    .logo-grid {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-    }
+    .logo-grid { display: flex; flex-wrap: wrap; gap: 10px; }
 
     .logo-tile {
-        width: 82px;
-        height: 52px;
+        width: 82px; height: 52px;
         border: 2px solid var(--border);
         border-radius: 8px;
         background: var(--surface-card);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        padding: 6px;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; padding: 6px;
         transition: all 0.2s ease;
         box-shadow: var(--shadow-sm);
-        position: relative;
-        overflow: hidden;
+        position: relative; overflow: hidden;
     }
-
-    .logo-tile img {
-        max-width: 100%;
-        max-height: 100%;
-        object-fit: contain;
-    }
-
-    .logo-tile:hover {
-        border-color: var(--accent);
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-md);
-    }
-
-    .logo-tile.selected {
-        border-color: var(--navy);
-        box-shadow: 0 0 0 3px var(--accent-glow), var(--shadow-sm);
-        background: #f0f8ff;
-    }
-
+    .logo-tile img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .logo-tile:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .logo-tile.selected { border-color: var(--navy); box-shadow: 0 0 0 3px var(--accent-glow), var(--shadow-sm); background: #f0f8ff; }
     .logo-tile.selected::after {
         content: '✓';
-        position: absolute;
-        top: 3px;
-        right: 4px;
-        width: 15px;
-        height: 15px;
-        background: var(--navy);
-        color: white;
-        font-size: 9px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        line-height: 15px;
-        text-align: center;
-        font-weight: 700;
+        position: absolute; top: 3px; right: 4px;
+        width: 15px; height: 15px;
+        background: var(--navy); color: white;
+        font-size: 9px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        line-height: 15px; text-align: center; font-weight: 700;
     }
 
-    .logo-tile-label {
-        font-size: 9px;
-        color: var(--text-muted);
-        text-align: center;
-        margin-top: 4px;
-    }
+    .logo-tile-label { font-size: 9px; color: var(--text-muted); text-align: center; margin-top: 4px; }
+    .logo-tile-wrap  { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
 
-    .logo-tile-wrap {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        cursor: pointer;
-    }
-
-    /* ── Action bar (bottom sticky) ── */
+    /* ── Action bar ── */
     .action-bar {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: white;
-        border-top: 1px solid var(--border);
+        position: fixed; bottom: 0; left: 0; right: 0;
+        background: white; border-top: 1px solid var(--border);
         padding: 12px 24px;
-        display: flex;
-        gap: 10px;
-        justify-content: center;
+        display: flex; gap: 10px; justify-content: center;
         box-shadow: 0 -4px 20px rgba(15,31,53,0.08);
         z-index: 100;
     }
 
     .action-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 9px 20px;
-        border: none;
-        border-radius: 8px;
-        font-family: 'Sora', sans-serif;
-        font-size: 13px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        letter-spacing: 0.01em;
-        min-width: 110px;
-        justify-content: center;
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 9px 20px; border: none; border-radius: 8px;
+        font-family: 'Sora', sans-serif; font-size: 13px; font-weight: 600;
+        cursor: pointer; transition: all 0.2s ease; letter-spacing: 0.01em;
+        min-width: 110px; justify-content: center;
     }
-
-    .action-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+    .action-btn:hover  { transform: translateY(-1px); box-shadow: var(--shadow-md); }
     .action-btn:active { transform: translateY(0); }
     .action-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
 
-    .btn-danger    { background: #ef4444; color: white; }
-    .btn-danger:hover  { background: #dc2626; }
-    .btn-warning   { background: #f97316; color: white; }
-    .btn-warning:hover { background: #ea6a0a; }
-    .btn-primary   { background: var(--accent); color: white; }
+    .btn-primary      { background: var(--accent); color: white; }
     .btn-primary:hover { background: #2e8ab5; }
-    .btn-success   { background: #22c55e; color: white; }
-    .btn-success:hover { background: #16a34a; }
-    .btn-cancel-style  { background: var(--surface-card); color: var(--text-secondary); border: 1.5px solid var(--border); }
+    .btn-cancel-style { background: var(--surface-card); color: var(--text-secondary); border: 1.5px solid var(--border); }
     .btn-cancel-style:hover { background: #e8edf3; border-color: #b0bfce; }
 
     /* ── Toast ── */
     .toast {
-        position: fixed;
-        bottom: 72px;
-        left: 50%;
+        position: fixed; bottom: 72px; left: 50%;
         transform: translateX(-50%) translateY(16px);
-        background: var(--navy);
-        color: white;
-        font-size: 13px;
-        font-weight: 500;
-        padding: 10px 20px;
-        border-radius: 50px;
+        background: var(--navy); color: white;
+        font-size: 13px; font-weight: 500;
+        padding: 10px 20px; border-radius: 50px;
         box-shadow: var(--shadow-lg);
-        opacity: 0;
-        pointer-events: none;
-        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        white-space: nowrap;
-        z-index: 200;
+        opacity: 0; pointer-events: none;
+        transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+        white-space: nowrap; z-index: 200;
     }
     .toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
     .toast.toast-error   { background: #ef4444; }
     .toast.toast-success { background: #16a34a; }
 
-    /* Loading spinner */
     .spin { animation: spinIcon 0.8s linear infinite; }
-    @keyframes spinIcon { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    @keyframes spinIcon { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
 
     .loading-dots { display: flex; gap: 6px; align-items: center; padding: 10px 0; }
     .loading-dots span { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); animation: pulse 1.2s ease-in-out infinite; }
     .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
     .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes pulse { 0%, 80%, 100% { transform: scale(0.7); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
+    @keyframes pulse { 0%,80%,100% { transform:scale(0.7); opacity:0.4; } 40% { transform:scale(1); opacity:1; } }
 
-
-    /* ── Combo-box (type-to-filter dropdown) ── */
+    /* ── Combo-box ── */
     .combo-wrap { position: relative; }
-
     .combo-list {
-        position: absolute;
-        top: calc(100% + 3px);
-        left: 0; right: 0;
+        position: absolute; top: calc(100% + 3px); left: 0; right: 0;
         background: var(--surface-card);
         border: 1.5px solid var(--border-active);
-        border-radius: var(--radius);
-        box-shadow: var(--shadow-lg);
-        z-index: 500;
-        max-height: 220px;
-        overflow-y: auto;
+        border-radius: var(--radius); box-shadow: var(--shadow-lg);
+        z-index: 500; max-height: 220px; overflow-y: auto;
     }
-
     .combo-row {
-        padding: 9px 14px;
-        font-size: 13px;
-        color: var(--text-primary);
-        cursor: pointer;
-        border-bottom: 1px solid var(--border);
-        transition: background 0.12s;
+        padding: 9px 14px; font-size: 13px; color: var(--text-primary);
+        cursor: pointer; border-bottom: 1px solid var(--border); transition: background 0.12s;
     }
     .combo-row:last-child { border-bottom: none; }
     .combo-row:hover,
@@ -362,21 +266,68 @@
 </style>
 <script src="https://live.zwidgets.com/js-sdk/1.5/ZohoEmbededAppSDK.min.js"></script>
 <script>
+    // ─── i18n ─────────────────────────────────────────────────────────────────
+    var TRANSLATIONS = {
+        en_US: {
+            pageTitle      : "Enter the company the customer is leaving, email (optional) and ID",
+            labelIdType    : "ID Type",
+            labelIdNumber  : "ID Number",
+            labelLeaving   : "Leaving Company",
+            labelEmail     : "Email",
+            labelCity      : "City",
+            labelStreet    : "Street",
+            labelNumber    : "Number",
+            cancel         : "Cancel",
+            next           : "Next",
+            saving         : "Saving\u2026",
+            selectPlaceholder : "\u2014 Select \u2014",
+            cityPlaceholder   : "Type or select a city\u2026",
+            streetPlaceholder : "Type or select a street\u2026",
+            streetDisabled    : "Select a city first\u2026",
+            streetLoading     : "Loading streets\u2026",
+            noResults         : "No results",
+            noOptions         : "No options found",
+            savedProceeded    : "Saved & proceeded",
+            errLoad           : "Error loading data: ",
+            errStreets        : "Error loading streets: ",
+            errSave           : "Error: "
+        },
+        iw_IL: {
+            pageTitle      : "\u05e4\u05e8\u05d8\u05d5 \u05de\u05d0\u05d9\u05d6\u05d5 \u05d7\u05d1\u05e8\u05d4 \u05d4\u05dc\u05e7\u05d5\u05d7 \u05e2\u05d5\u05d1\u05e8 \u05d0\u05dc\u05d9\u05e0\u05d5 , \u05d0\u05d9\u05de\u05d9\u05d9\u05dc (\u05dc\u05d0 \u05d7\u05d5\u05d1\u05d4) \u05d5\u05de\u05e1\u05e4\u05e8 \u05d6\u05d9\u05d4\u05d5\u05d9",
+            labelIdType    : "\u05e1\u05d5\u05d2 \u05ea\u05e2\u05d5\u05d3\u05d4",
+            labelIdNumber  : "\u05de\u05e1\u05e4\u05e8 \u05ea\u05e2\u05d5\u05d3\u05d4",
+            labelLeaving   : "\u05d7\u05d1\u05e8\u05d4 \u05e2\u05d5\u05d6\u05d1\u05ea",
+            labelEmail     : "\u05d0\u05d9\u05de\u05d9\u05d9\u05dc",
+            labelCity      : "\u05e2\u05d9\u05e8",
+            labelStreet    : "\u05e8\u05d7\u05d5\u05d1",
+            labelNumber    : "\u05de\u05e1\u05e4\u05e8",
+            cancel         : "\u05d1\u05d9\u05d8\u05d5\u05dc",
+            next           : "\u05d4\u05de\u05e9\u05da",
+            saving         : "\u05e9\u05d5\u05de\u05e8\u2026",
+            selectPlaceholder : "\u2014 \u05d1\u05d7\u05e8 \u2014",
+            cityPlaceholder   : "\u05d4\u05e7\u05dc\u05d3 \u05d0\u05d5 \u05d1\u05d7\u05e8 \u05e2\u05d9\u05e8\u2026",
+            streetPlaceholder : "\u05d4\u05e7\u05dc\u05d3 \u05d0\u05d5 \u05d1\u05d7\u05e8 \u05e8\u05d7\u05d5\u05d1\u2026",
+            streetDisabled    : "\u05d1\u05d7\u05e8 \u05e2\u05d9\u05e8 \u05ea\u05d7\u05d9\u05dc\u05d4\u2026",
+            streetLoading     : "\u05d8\u05d5\u05e2\u05df \u05e8\u05d7\u05d5\u05d1\u05d5\u05ea\u2026",
+            noResults         : "\u05dc\u05d0 \u05e0\u05de\u05e6\u05d0\u05d5 \u05ea\u05d5\u05e6\u05d0\u05d5\u05ea",
+            noOptions         : "\u05dc\u05d0 \u05e0\u05de\u05e6\u05d0\u05d5 \u05d0\u05e4\u05e9\u05e8\u05d5\u05d9\u05d5\u05ea",
+            savedProceeded    : "\u05e0\u05e9\u05de\u05e8 \u05d5\u05d4\u05d5\u05de\u05e9\u05da",
+            errLoad           : "\u05e9\u05d2\u05d9\u05d0\u05d4 \u05d1\u05d8\u05e2\u05d9\u05e0\u05ea \u05e0\u05ea\u05d5\u05e0\u05d9\u05dd: ",
+            errStreets        : "\u05e9\u05d2\u05d9\u05d0\u05d4 \u05d1\u05d8\u05e2\u05d9\u05e0\u05ea \u05e8\u05d7\u05d5\u05d1\u05d5\u05ea: ",
+            errSave           : "\u05e9\u05d2\u05d9\u05d0\u05d4: "
+        }
+    };
+
+    var currentLocale = "iw_IL"; // default Hebrew (this widget was Hebrew-first)
+    function t(key) { return (TRANSLATIONS[currentLocale] || TRANSLATIONS.iw_IL)[key] || key; }
+
+    // ─── State ────────────────────────────────────────────────────────────────
     var currentLeadId   = null;
     var isProcessing    = false;
-
-    // FIX 1: selectedCompany holds the CRM picklist actual_value (e.g. "012", "Partner")
-    // The logo filename is derived separately — it never pollutes this value.
     var selectedCompany = null;
+    var selectedCity    = null;
+    var selectedStreet  = null;
 
-    // City / Street lookup state
-    // Each stores { id, name } of the selected lookup record, or null
-    var selectedCity   = null;
-    var selectedStreet = null;
-
-    // Logo filename map — keys must match the picklist actual_value exactly.
-    // Only used to locate the image; never written to CRM.
-    // "None" and "HOTNet" are intentionally excluded from the grid.
     var LOGO_MAP = {
         "012":     "012.png",
         "019":     "019.png",
@@ -389,20 +340,18 @@
         "HOT":     "HOT.png"
     };
 
-    // Values to hide from the Leaving Company grid
     var COMPANY_EXCLUDE = { "None": true, "HOTNet": true };
 
-    // ─── Boot ───────────────────────────────────────────────────────────────
+    // ─── Boot ─────────────────────────────────────────────────────────────────
     ZOHO.embeddedApp.on("PageLoad", function (data) {
         console.log("PageLoad:", data);
         if (data && data.EntityId) currentLeadId = data.EntityId;
         else if (data && data.ID)  currentLeadId = data.ID;
-        initWidget();
+        detectLocaleAndInit();
     });
 
     ZOHO.embeddedApp.init();
 
-    // Close combos when clicking outside
     document.addEventListener("mousedown", function (e) {
         ["city", "street"].forEach(function (which) {
             var wrap = document.getElementById(which + "-combo-wrap");
@@ -410,6 +359,54 @@
         });
     });
 
+    // ─── Locale detection ─────────────────────────────────────────────────────
+    function detectLocaleAndInit() {
+        ZOHO.CRM.CONFIG.getCurrentUser()
+            .then(function (resp) {
+                var user = resp && resp.users && resp.users[0];
+                var lang = (user && (user.language || user.Language || user.locale || "")) + "";
+                console.log("CRM user locale:", lang);
+                currentLocale = (lang.indexOf("iw") === 0 || lang.indexOf("he") === 0) ? "iw_IL" : "en_US";
+            })
+            .catch(function () { currentLocale = "iw_IL"; })
+            .then(function () {
+                applyLocale();
+                initWidget();
+            });
+    }
+
+    function applyLocale() {
+        var isHebrew = currentLocale === "iw_IL";
+        document.documentElement.setAttribute("lang", isHebrew ? "he" : "en");
+
+        // RTL is default; add .ltr class for English
+        document.body.classList.toggle("ltr", !isHebrew);
+
+        // Static strings
+        setText("page-title",        t("pageTitle"));
+        setText("label-id-type",     t("labelIdType"));
+        setText("label-id-number",   t("labelIdNumber"));
+        setText("label-leaving",     t("labelLeaving"));
+        setText("label-email",       t("labelEmail"));
+        setText("label-city",        t("labelCity"));
+        setText("label-street",      t("labelStreet"));
+        setText("label-number",      t("labelNumber"));
+        setText("btn-cancel-label",  t("cancel"));
+        setText("btn-next-label",    t("next"));
+
+        // Placeholders
+        setAttr("city-lp-input",   "placeholder", t("cityPlaceholder"));
+        setAttr("street-lp-input", "placeholder", t("streetDisabled"));
+
+        // Select default option
+        var defOpt = document.getElementById("id-type-default-opt");
+        if (defOpt) defOpt.textContent = t("selectPlaceholder");
+    }
+
+    function setText(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; }
+    function setAttr(id, attr, val) { var el = document.getElementById(id); if (el) el.setAttribute(attr, val); }
+
+    // ─── Init ─────────────────────────────────────────────────────────────────
     function initWidget() {
         Promise.all([
             ZOHO.CRM.META.getFields({ Entity: "Leads" }),
@@ -423,7 +420,6 @@
             buildIdTypeSelect(meta.fields);
             buildLeavingCompanyGrid(meta.fields);
 
-            // Load cities into the select, then prefill if record exists
             loadAllCities().then(function (cities) {
                 populateCitySelect(cities);
                 if (record) prefillForm(record);
@@ -432,48 +428,42 @@
                 if (record) prefillForm(record);
             });
         }).catch(function (err) {
-            showToast("Error loading data: " + JSON.stringify(err), "error");
+            showToast(t("errLoad") + JSON.stringify(err), "error");
             console.error(err);
         });
     }
 
-    // ─── Build ID Type dropdown ─────────────────────────────────────────────
+    // ─── Build ID Type dropdown ───────────────────────────────────────────────
     function buildIdTypeSelect(fields) {
         var field  = fields.find(function (f) { return f.api_name === "ID_Type"; });
         var select = document.getElementById("id-type-select");
         if (!field || !field.pick_list_values) return;
         field.pick_list_values.forEach(function (opt) {
             var o = document.createElement("option");
-            o.value = opt.actual_value;
+            o.value       = opt.actual_value;
             o.textContent = opt.display_value || opt.actual_value;
             select.appendChild(o);
         });
     }
 
-    // ─── Build Leaving Company logo grid ───────────────────────────────────
+    // ─── Build Leaving Company grid ───────────────────────────────────────────
     function buildLeavingCompanyGrid(fields) {
         var field     = fields.find(function (f) { return f.api_name === "Leaving_Company"; });
         var container = document.getElementById("leaving-company-grid");
-
         if (!field || !field.pick_list_values) {
-            container.innerHTML = '<p style="font-size:12px;color:var(--text-muted)">No options found</p>';
+            container.innerHTML = '<p style="font-size:12px;color:var(--text-muted)">' + t("noOptions") + '</p>';
             return;
         }
-
         container.innerHTML = "";
-
         field.pick_list_values.forEach(function (opt) {
-            var val   = opt.actual_value;          // ← this is what gets saved to CRM
+            var val   = opt.actual_value;
             var label = opt.display_value || val;
-
-            // Skip excluded companies
             if (COMPANY_EXCLUDE[val]) return;
 
             var logoFile = findLogoFile(val);
-
             var wrap = document.createElement("div");
             wrap.className = "logo-tile-wrap";
-            wrap.setAttribute("data-value", val);  // data-value = CRM picklist actual_value
+            wrap.setAttribute("data-value", val);
             wrap.onclick = function () { selectCompany(val, this); };
 
             var tile = document.createElement("div");
@@ -484,13 +474,11 @@
                 img.src = "logos/" + logoFile;
                 img.alt = label;
                 img.onerror = function () {
-                    this.parentNode.innerHTML =
-                        '<span style="font-size:10px;font-weight:600;color:var(--text-secondary);text-align:center;padding:4px">' + label + '</span>';
+                    this.parentNode.innerHTML = '<span style="font-size:10px;font-weight:600;color:var(--text-secondary);text-align:center;padding:4px">' + label + '</span>';
                 };
                 tile.appendChild(img);
             } else {
-                tile.innerHTML =
-                    '<span style="font-size:10px;font-weight:600;color:var(--text-secondary);text-align:center;padding:4px">' + label + '</span>';
+                tile.innerHTML = '<span style="font-size:10px;font-weight:600;color:var(--text-secondary);text-align:center;padding:4px">' + label + '</span>';
             }
 
             var lbl = document.createElement("div");
@@ -503,62 +491,38 @@
         });
     }
 
-    // Returns just the filename string from LOGO_MAP, or null.
     function findLogoFile(val) {
         if (LOGO_MAP[val]) return LOGO_MAP[val];
         var lower = val.toLowerCase();
-        for (var key in LOGO_MAP) {
-            if (key.toLowerCase() === lower) return LOGO_MAP[key];
-        }
-        for (var key in LOGO_MAP) {
-            if (val.indexOf(key) !== -1 || key.indexOf(val) !== -1) return LOGO_MAP[key];
-        }
+        for (var key in LOGO_MAP) { if (key.toLowerCase() === lower) return LOGO_MAP[key]; }
+        for (var key in LOGO_MAP) { if (val.indexOf(key) !== -1 || key.indexOf(val) !== -1) return LOGO_MAP[key]; }
         return null;
     }
 
-    // ─── FIX 1: selectCompany — always stores the picklist actual_value ────
     function selectCompany(val, wrapEl) {
-        document.querySelectorAll(".logo-tile-wrap .logo-tile").forEach(function (t) {
-            t.classList.remove("selected");
-        });
-
-        if (selectedCompany === val) {
-            // Clicking the same tile again → deselect
-            selectedCompany = null;
-            return;
-        }
-
-        selectedCompany = val;   // ← plain picklist actual_value, e.g. "Partner"
+        document.querySelectorAll(".logo-tile-wrap .logo-tile").forEach(function (t) { t.classList.remove("selected"); });
+        if (selectedCompany === val) { selectedCompany = null; return; }
+        selectedCompany = val;
         wrapEl.querySelector(".logo-tile").classList.add("selected");
-        console.log("Leaving_Company selected:", selectedCompany);
     }
 
-    // ─── Pre-fill form from existing record ─────────────────────────────────
+    // ─── Prefill ──────────────────────────────────────────────────────────────
     function prefillForm(record) {
-        if (record.ID_Type) {
-            document.getElementById("id-type-select").value = record.ID_Type;
-        }
-        if (record.ID_Number) {
-            document.getElementById("id-number-input").value = record.ID_Number;
-        }
+        if (record.ID_Type)   document.getElementById("id-type-select").value   = record.ID_Type;
+        if (record.ID_Number) document.getElementById("id-number-input").value  = record.ID_Number;
+        if (record.Email)     document.getElementById("email-input").value      = record.Email;
+        if (record.Number)    document.getElementById("number-input").value     = record.Number;
+
         if (record.Leaving_Company) {
             var wrap = document.querySelector('.logo-tile-wrap[data-value="' + record.Leaving_Company + '"]');
-            if (wrap) {
-                selectedCompany = record.Leaving_Company;
-                wrap.querySelector(".logo-tile").classList.add("selected");
-            }
-        }
-        if (record.Email) {
-            document.getElementById("email-input").value = record.Email;
+            if (wrap) { selectedCompany = record.Leaving_Company; wrap.querySelector(".logo-tile").classList.add("selected"); }
         }
 
-        // City_LP and Street_LP are lookup fields — set the combo inputs
         if (record.City_LP && record.City_LP.id) {
             selectedCity = { id: String(record.City_LP.id), name: record.City_LP.name };
             var cityInp = document.getElementById("city-lp-input");
             if (cityInp) cityInp.value = record.City_LP.name;
 
-            // Load streets for this city then prefill street
             var streetRecord = record["Street LP"] || record.Street_LP;
             loadStreetsForCity(record.City_LP.name).then(function (streets) {
                 populateStreetSelect(streets);
@@ -569,14 +533,10 @@
                 }
             });
         }
-
-        if (record.Number) {
-            document.getElementById("number-input").value = record.Number;
-        }
     }
 
-    // ─── Lookup caches ───────────────────────────────────────────────────────
-    var allCities = null;  // [{ id, name }] — loaded once
+    // ─── City / Street data ───────────────────────────────────────────────────
+    var allCities = null;
 
     function loadAllCities() {
         if (allCities !== null) return Promise.resolve(allCities);
@@ -588,17 +548,9 @@
             select_query: "select id, Name from Cities WHERE id is not null LIMIT 200 OFFSET " + offset
         }).then(function (resp) {
             var rows = resp.data || [];
-            rows.forEach(function (r) {
-                accum.push({ id: String(r.id), name: r.Name });
-            });
-            if (rows.length === 200) {
-                return fetchCitiesPage(accum, offset + 200);
-            }
+            rows.forEach(function (r) { accum.push({ id: String(r.id), name: r.Name }); });
+            if (rows.length === 200) return fetchCitiesPage(accum, offset + 200);
             allCities = accum;
-            console.log("=== ALL CITIES LOADED (" + allCities.length + ") ===");
-            allCities.forEach(function (c) {
-                console.log("City | id:", c.id, "| name:", c.name);
-            });
             return allCities;
         });
     }
@@ -606,117 +558,89 @@
     function loadStreetsForCity(cityName) {
         if (!cityName) return Promise.resolve([]);
         return ZOHO.CRM.API.coql({
-            select_query: "select id, Name from Streets WHERE City = '" + cityName.replace(/'/g, "\'") + "'"
+            select_query: "select id, Name from Streets WHERE City = '" + cityName.replace(/'/g, "\\'") + "'"
         }).then(function (resp) {
-            var streets = (resp.data || []).map(function (r) {
-                return { id: String(r.id), name: r.Name };
-            });
-            console.log("=== STREETS LOADED FOR CITY: " + cityName + " (" + streets.length + ") ===");
-            streets.forEach(function (s) {
-                console.log("Street | id:", s.id, "| name:", s.name);
-            });
-            return streets;
+            return (resp.data || []).map(function (r) { return { id: String(r.id), name: r.Name }; });
         });
     }
 
-    // ─── Combo-box state ────────────────────────────────────────────────────
-    var comboData   = { city: [], street: [] };   // full item arrays
-    var comboActive = { city: -1, street: -1 };   // keyboard-focused index
+    // ─── Combo-box ────────────────────────────────────────────────────────────
+    var comboData   = { city: [], street: [] };
+    var comboActive = { city: -1, street: -1 };
 
-    // ─── Populate city combo after cities load ───────────────────────────────
-    function populateCitySelect(cities) {
-        comboData.city = cities;
-    }
+    function populateCitySelect(cities)   { comboData.city = cities; }
 
-    // ─── Populate street combo ───────────────────────────────────────────────
     function populateStreetSelect(streets) {
         comboData.street = streets;
         var inp = document.getElementById("street-lp-input");
         inp.disabled    = streets.length === 0;
-        inp.placeholder = streets.length === 0 ? "No streets found" : "Type or select a street…";
+        inp.placeholder = streets.length === 0 ? t("streetDisabled") : t("streetPlaceholder");
         inp.value       = "";
         selectedStreet  = null;
         closeCombo("street");
     }
 
-    // ─── Open combo list ─────────────────────────────────────────────────────
     function openCombo(which) {
         if (which === "street" && comboData.street.length === 0) return;
         renderComboList(which, document.getElementById(which + "-lp-input").value);
         document.getElementById(which + "-combo-list").style.display = "block";
     }
 
-    // ─── Close combo list ────────────────────────────────────────────────────
     function closeCombo(which) {
         document.getElementById(which + "-combo-list").style.display = "none";
         comboActive[which] = -1;
     }
 
-    // ─── Filter as user types ────────────────────────────────────────────────
     function filterCombo(which) {
         var val = document.getElementById(which + "-lp-input").value;
-        // If user clears the input, clear the selection
         if (!val) {
             if (which === "city") { selectedCity = null; resetStreetCombo(); }
-            else                  { selectedStreet = null; }
+            else selectedStreet = null;
         }
         renderComboList(which, val);
         document.getElementById(which + "-combo-list").style.display = "block";
         comboActive[which] = -1;
     }
 
-    // ─── Render filtered rows ────────────────────────────────────────────────
     function renderComboList(which, filterStr) {
-        var list  = document.getElementById(which + "-combo-list");
-        var lower = (filterStr || "").toLowerCase();
-        var items = comboData[which];
+        var list     = document.getElementById(which + "-combo-list");
+        var lower    = (filterStr || "").toLowerCase();
         var filtered = lower
-            ? items.filter(function (it) { return it.name.toLowerCase().indexOf(lower) !== -1; })
-            : items;
+            ? comboData[which].filter(function (it) { return it.name.toLowerCase().indexOf(lower) !== -1; })
+            : comboData[which];
 
         list.innerHTML = "";
         if (filtered.length === 0) {
-            list.innerHTML = '<div class="combo-row combo-empty">No results</div>';
+            list.innerHTML = '<div class="combo-row combo-empty">' + t("noResults") + '</div>';
             return;
         }
-        filtered.forEach(function (item, idx) {
+        filtered.forEach(function (item) {
             var row = document.createElement("div");
             row.className   = "combo-row";
             row.textContent = item.name;
-            row.setAttribute("data-idx", idx);
-            row.onmousedown = function (e) {
-                e.preventDefault();
-                selectComboItem(which, item);
-            };
+            row.onmousedown = function (e) { e.preventDefault(); selectComboItem(which, item); };
             list.appendChild(row);
         });
     }
 
-    // ─── Select an item ──────────────────────────────────────────────────────
     function selectComboItem(which, item) {
         document.getElementById(which + "-lp-input").value = item.name;
         closeCombo(which);
-
         if (which === "city") {
             selectedCity   = item;
             selectedStreet = null;
-            console.log("=== CITY SELECTED ===");
-            console.log("City id:", selectedCity.id, "| name:", selectedCity.name);
             resetStreetCombo();
-            // Load streets for this city
             var streetInp = document.getElementById("street-lp-input");
             streetInp.disabled    = true;
-            streetInp.placeholder = "Loading streets…";
+            streetInp.placeholder = t("streetLoading");
             comboData.street      = [];
             loadStreetsForCity(item.name).then(function (streets) {
                 populateStreetSelect(streets);
             }).catch(function (err) {
-                showToast("Error loading streets: " + JSON.stringify(err), "error");
+                showToast(t("errStreets") + JSON.stringify(err), "error");
             });
         } else {
             selectedStreet = item;
-            console.log("=== STREET SELECTED ===");
-            console.log("Street id:", selectedStreet.id, "| name:", selectedStreet.name);
         }
     }
 
@@ -725,12 +649,11 @@
         var inp = document.getElementById("street-lp-input");
         inp.value       = "";
         inp.disabled    = true;
-        inp.placeholder = "Select a city first…";
+        inp.placeholder = t("streetDisabled");
         closeCombo("street");
         selectedStreet  = null;
     }
 
-    // ─── Keyboard navigation ─────────────────────────────────────────────────
     function comboKeydown(e, which) {
         var list = document.getElementById(which + "-combo-list");
         if (list.style.display === "none") {
@@ -738,65 +661,31 @@
             return;
         }
         var rows = list.querySelectorAll(".combo-row:not(.combo-empty)");
-        if (e.key === "ArrowDown") {
-            e.preventDefault();
-            comboActive[which] = Math.min(comboActive[which] + 1, rows.length - 1);
-            highlightComboRow(rows, comboActive[which]);
-        } else if (e.key === "ArrowUp") {
-            e.preventDefault();
-            comboActive[which] = Math.max(comboActive[which] - 1, 0);
-            highlightComboRow(rows, comboActive[which]);
-        } else if (e.key === "Enter") {
-            e.preventDefault();
-            if (comboActive[which] >= 0 && rows[comboActive[which]]) {
-                rows[comboActive[which]].onmousedown(e);
-            }
-        } else if (e.key === "Escape") {
-            closeCombo(which);
-        }
+        if (e.key === "ArrowDown")  { e.preventDefault(); comboActive[which] = Math.min(comboActive[which] + 1, rows.length - 1); highlightComboRow(rows, comboActive[which]); }
+        else if (e.key === "ArrowUp") { e.preventDefault(); comboActive[which] = Math.max(comboActive[which] - 1, 0); highlightComboRow(rows, comboActive[which]); }
+        else if (e.key === "Enter") { e.preventDefault(); if (comboActive[which] >= 0 && rows[comboActive[which]]) rows[comboActive[which]].onmousedown(e); }
+        else if (e.key === "Escape") closeCombo(which);
     }
 
     function highlightComboRow(rows, idx) {
         rows.forEach(function (r) { r.classList.remove("combo-highlighted"); });
-        if (rows[idx]) {
-            rows[idx].classList.add("combo-highlighted");
-            rows[idx].scrollIntoView({ block: "nearest" });
-        }
+        if (rows[idx]) { rows[idx].classList.add("combo-highlighted"); rows[idx].scrollIntoView({ block: "nearest" }); }
     }
 
-    // ─── Build save payload ──────────────────────────────────────────────────
+    // ─── Save ─────────────────────────────────────────────────────────────────
     function buildPayload() {
-        var payload = { id: currentLeadId };
-
-        payload.ID_Type         = document.getElementById("id-type-select").value || null;
-        payload.ID_Number       = document.getElementById("id-number-input").value.trim() || null;
-
-        // FIX 1: Save the picklist actual_value string directly
+        var payload         = { id: currentLeadId };
+        payload.ID_Type     = document.getElementById("id-type-select").value  || null;
+        payload.ID_Number   = document.getElementById("id-number-input").value.trim() || null;
         payload.Leaving_Company = selectedCompany || null;
-
-        payload.Email  = document.getElementById("email-input").value.trim() || null;
-
-        // Lookup fields: pass id as a number (Zoho CRM requires numeric id for lookups)
-        // IDs are kept as strings — they exceed JS MAX_SAFE_INTEGER so parseInt corrupts them
-        payload.City_LP      = selectedCity   ? { id: selectedCity.id   } : null;
-        payload.Street_LP = selectedStreet ? { id: selectedStreet.id } : null;
-
-        payload.Number = document.getElementById("number-input").value.trim() || null;
-
-        console.log("Saving payload:", JSON.stringify(payload));
+        payload.Email       = document.getElementById("email-input").value.trim() || null;
+        payload.City_LP     = selectedCity   ? { id: selectedCity.id   } : null;
+        payload.Street_LP   = selectedStreet ? { id: selectedStreet.id } : null;
+        payload.Number      = document.getElementById("number-input").value.trim() || null;
+        console.log("Payload:", JSON.stringify(payload));
         return payload;
     }
 
-    // ─── Save lead record ────────────────────────────────────────────────────
-    function saveLeadRecord(payload) {
-        return ZOHO.CRM.API.updateRecord({
-            Entity : "Leads",
-            APIData: payload,
-            Trigger: []
-        });
-    }
-
-    // ─── Toast ───────────────────────────────────────────────────────────────
     function showToast(msg, type) {
         var toast = document.getElementById("toast");
         toast.textContent = msg;
@@ -805,7 +694,6 @@
         toast._t = setTimeout(function () { toast.classList.remove("visible"); }, 3500);
     }
 
-    // ─── Button state helpers ────────────────────────────────────────────────
     function setBtn(id, html, disabled) {
         var btn = document.getElementById(id);
         if (!btn) return;
@@ -813,51 +701,43 @@
         btn.disabled  = !!disabled;
     }
 
-    // ─── Action: Cancel — just close the popup ──────────────────────────────
-    function handleCancel() {
-        try { ZOHO.CRM.UI.Popup.close(); } catch (e) {}
+    function spinnerHtml(label) {
+        return '<svg class="spin" viewBox="0 0 24 24" width="14" height="14" style="stroke:currentColor;stroke-width:2;fill:none;margin-right:6px;vertical-align:middle"><circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="10"/></svg>' + label;
     }
 
-    // ─── Action: Next — save all fields then proceed blueprint ───────────────
+    function handleCancel() { try { ZOHO.CRM.UI.Popup.close(); } catch (e) {} }
+
     function handleNext() {
         if (isProcessing) return;
         isProcessing = true;
-        setBtn("btn-next", spinnerHtml("Next"), true);
+        setBtn("btn-next", spinnerHtml(t("saving")), true);
 
-        saveLeadRecord(buildPayload())
+        ZOHO.CRM.API.updateRecord({ Entity: "Leads", APIData: buildPayload(), Trigger: [] })
+            .then(function () { return ZOHO.CRM.BLUEPRINT.proceed(); })
             .then(function () {
-                return ZOHO.CRM.BLUEPRINT.proceed();
-            })
-            .then(function () {
-                showToast("Saved & proceeded", "success");
+                showToast(t("savedProceeded"), "success");
                 setTimeout(function () { try { ZOHO.CRM.UI.Popup.close(); } catch (e) {} }, 1000);
             })
             .catch(function (err) {
-                showToast("Error: " + JSON.stringify(err), "error");
-                setBtn("btn-next", "Next");
+                showToast(t("errSave") + JSON.stringify(err), "error");
+                setBtn("btn-next", '<span id="btn-next-label">' + t("next") + '</span>');
                 isProcessing = false;
             });
     }
-
-    function spinnerHtml(label) {
-        return '<svg class="spin" viewBox="0 0 24 24" width="14" height="14" style="stroke:currentColor;stroke-width:2;fill:none;margin-right:6px;vertical-align:middle"><circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="10"/></svg>' + label + '…';
-    }
-
-
 </script>
 </head>
 <body>
 
-<p class="page-title">פרטו מאיזו חברה הלקוח עובר אלינו , אימייל (לא חובה) ומספר זיהוי</p>
+<p class="page-title" id="page-title">פרטו מאיזו חברה הלקוח עובר אלינו , אימייל (לא חובה) ומספר זיהוי</p>
 
 <!-- ID Type -->
 <div class="form-row">
-    <div class="form-label">ID Type</div>
+    <div class="form-label" id="label-id-type">סוג תעודה</div>
     <div class="form-control-wrap">
         <div class="select-wrap">
             <span class="select-dot"></span>
             <select id="id-type-select" class="form-select">
-                <option value="">— Select —</option>
+                <option id="id-type-default-opt" value="">— בחר —</option>
             </select>
         </div>
     </div>
@@ -865,7 +745,7 @@
 
 <!-- ID Number -->
 <div class="form-row">
-    <div class="form-label">ID Number</div>
+    <div class="form-label" id="label-id-number">מספר תעודה</div>
     <div class="form-control-wrap">
         <input id="id-number-input" type="text" class="form-input" placeholder="" />
     </div>
@@ -873,7 +753,7 @@
 
 <!-- Leaving Company -->
 <div class="form-row">
-    <div class="form-label" style="padding-top:14px">Leaving Company</div>
+    <div class="form-label" id="label-leaving" style="padding-top:14px">חברה עוזבת</div>
     <div class="form-control-wrap">
         <div id="leaving-company-grid" class="logo-grid">
             <div class="loading-dots"><span></span><span></span><span></span></div>
@@ -883,7 +763,7 @@
 
 <!-- Email -->
 <div class="form-row" style="margin-top:10px">
-    <div class="form-label">Email</div>
+    <div class="form-label" id="label-email">אימייל</div>
     <div class="form-control-wrap">
         <input id="email-input" type="email" class="form-input" placeholder="" />
     </div>
@@ -891,11 +771,11 @@
 
 <!-- City LP -->
 <div class="form-row">
-    <div class="form-label">City LP</div>
+    <div class="form-label" id="label-city">עיר</div>
     <div class="form-control-wrap">
         <div class="combo-wrap" id="city-combo-wrap">
             <input id="city-lp-input" type="text" class="form-input combo-input"
-                   placeholder="Type or select a city…" autocomplete="off"
+                   placeholder="הקלד או בחר עיר…" autocomplete="off"
                    oninput="filterCombo('city')"
                    onfocus="openCombo('city')"
                    onkeydown="comboKeydown(event,'city')" />
@@ -906,11 +786,11 @@
 
 <!-- Street LP -->
 <div class="form-row">
-    <div class="form-label">Street LP</div>
+    <div class="form-label" id="label-street">רחוב</div>
     <div class="form-control-wrap">
         <div class="combo-wrap" id="street-combo-wrap">
             <input id="street-lp-input" type="text" class="form-input combo-input"
-                   placeholder="Select a city first…" autocomplete="off"
+                   placeholder="בחר עיר תחילה…" autocomplete="off"
                    oninput="filterCombo('street')"
                    onfocus="openCombo('street')"
                    onkeydown="comboKeydown(event,'street')"
@@ -922,16 +802,20 @@
 
 <!-- Number -->
 <div class="form-row">
-    <div class="form-label">Number</div>
+    <div class="form-label" id="label-number">מספר</div>
     <div class="form-control-wrap">
         <input id="number-input" type="text" class="form-input" placeholder="" />
     </div>
 </div>
 
-<!-- Bottom action bar -->
+<!-- Action bar -->
 <div class="action-bar">
-    <button id="btn-cancel" class="action-btn btn-cancel-style" onclick="handleCancel()">Cancel</button>
-    <button id="btn-next"   class="action-btn btn-primary"      onclick="handleNext()">Next</button>
+    <button id="btn-cancel" class="action-btn btn-cancel-style" onclick="handleCancel()">
+        <span id="btn-cancel-label">ביטול</span>
+    </button>
+    <button id="btn-next" class="action-btn btn-primary" onclick="handleNext()">
+        <span id="btn-next-label">המשך</span>
+    </button>
 </div>
 
 <div id="toast" class="toast"></div>
