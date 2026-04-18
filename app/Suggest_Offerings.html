@@ -34,40 +34,41 @@
         min-height: 100vh;
     }
 
+    /* ── RTL overrides ── */
+    body.rtl { direction: rtl; }
+    body.rtl .widget-header p              { margin-left: 0; margin-right: auto; }
+    body.rtl .section-label::after         { display: none; }
+    body.rtl .section-label::before        { content: ''; flex: 1; height: 1px; background: var(--border); order: -1; }
+    body.rtl .required-star                { margin-left: 0; margin-right: 3px; }
+    body.rtl .card-header                  { flex-direction: row-reverse; }
+    body.rtl .product-name                 { padding-right: 0; padding-left: 12px; }
+    body.rtl .price-row                    { flex-direction: row-reverse; }
+    body.rtl .addon-inner                  { flex-direction: row-reverse; }
+    body.rtl .total-bar                    { flex-direction: row-reverse; }
+    body.rtl .total-bar .total-breakdown   { margin-right: 0; margin-left: auto; }
+    body.rtl .selection-bar                { flex-direction: row-reverse; }
+    body.rtl .action-btn                   { flex-direction: row-reverse; }
+    body.rtl .count-badge                  { margin-left: 0; margin-right: 8px; }
+
     .container { max-width: 1200px; margin: 0 auto; }
 
     .widget-header {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 28px;
-        padding-bottom: 20px;
+        display: flex; align-items: center; gap: 10px;
+        margin-bottom: 28px; padding-bottom: 20px;
         border-bottom: 1px solid var(--border);
     }
     .widget-header .icon {
-        width: 34px; height: 34px;
-        background: var(--navy);
-        border-radius: 8px;
-        display: flex; align-items: center; justify-content: center;
+        width: 34px; height: 34px; background: var(--navy);
+        border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
     }
-    .widget-header .icon svg {
-        width: 18px; height: 18px;
-        fill: none; stroke: var(--accent-bright);
-        stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
-    }
+    .widget-header .icon svg { width: 18px; height: 18px; fill: none; stroke: var(--accent-bright); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
     .widget-header h1 { font-size: 15px; font-weight: 600; color: var(--navy); letter-spacing: -0.01em; }
     .widget-header p  { font-size: 12px; color: var(--text-muted); margin-left: auto; font-weight: 400; }
 
     .section-label {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 11px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        color: var(--text-muted);
-        margin-bottom: 12px;
+        display: flex; align-items: center; gap: 8px;
+        font-size: 11px; font-weight: 600; text-transform: uppercase;
+        letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 12px;
     }
     .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
     .required-star { color: #ef4444; margin-left: 3px; font-size: 12px; }
@@ -75,50 +76,26 @@
     .button-group { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 32px; }
 
     .interest-btn {
-        padding: 8px 18px;
-        border: 1.5px solid var(--border);
-        border-radius: 50px;
-        background: var(--surface-card);
-        color: var(--text-secondary);
-        font-family: 'Sora', sans-serif;
-        font-size: 13px; font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        outline: none;
-        box-shadow: var(--shadow-sm);
-        position: relative; overflow: hidden;
+        padding: 8px 18px; border: 1.5px solid var(--border); border-radius: 50px;
+        background: var(--surface-card); color: var(--text-secondary);
+        font-family: 'Sora', sans-serif; font-size: 13px; font-weight: 500;
+        cursor: pointer; transition: all 0.2s ease; outline: none;
+        box-shadow: var(--shadow-sm); position: relative; overflow: hidden;
     }
-    .interest-btn::before {
-        content: ''; position: absolute; inset: 0;
-        background: var(--accent-glow); opacity: 0; transition: opacity 0.2s;
-    }
+    .interest-btn::before { content: ''; position: absolute; inset: 0; background: var(--accent-glow); opacity: 0; transition: opacity 0.2s; }
     .interest-btn:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); box-shadow: var(--shadow-md); }
     .interest-btn:hover::before { opacity: 1; }
     .interest-btn.active { background: var(--navy); border-color: var(--navy); color: #fff; box-shadow: 0 4px 14px rgba(15,31,53,0.2); }
     .interest-btn.active::before { opacity: 0; }
 
-    .products-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 16px;
-        margin-bottom: 32px;
-    }
+    .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 32px; }
 
     .product-card {
-        background: var(--surface-card);
-        border: 1.5px solid var(--border);
-        border-radius: var(--radius);
-        cursor: pointer;
-        transition: all 0.25s ease;
-        box-shadow: var(--shadow-sm);
-        overflow: hidden;
-        position: relative;
+        background: var(--surface-card); border: 1.5px solid var(--border);
+        border-radius: var(--radius); cursor: pointer; transition: all 0.25s ease;
+        box-shadow: var(--shadow-sm); overflow: hidden; position: relative;
     }
-    .product-card::before {
-        content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-        background: linear-gradient(90deg, var(--accent), var(--accent-bright));
-        opacity: 0; transition: opacity 0.25s;
-    }
+    .product-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--accent-bright)); opacity: 0; transition: opacity 0.25s; }
     .product-card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: var(--shadow-lg); }
     .product-card:hover::before { opacity: 1; }
     .product-card.selected { border-color: var(--navy); box-shadow: 0 0 0 3px var(--accent-glow), var(--shadow-md); }
@@ -128,21 +105,12 @@
     .card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; }
     .product-name { font-size: 14px; font-weight: 600; color: var(--text-primary); line-height: 1.35; flex: 1; padding-right: 12px; }
 
-    .selected-badge {
-        width: 22px; height: 22px; border-radius: 50%;
-        border: 2px solid var(--border);
-        display: flex; align-items: center; justify-content: center;
-        flex-shrink: 0; transition: all 0.2s;
-    }
+    .selected-badge { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; }
     .product-card.selected .selected-badge { background: var(--navy); border-color: var(--navy); }
     .selected-badge svg { width: 11px; height: 11px; stroke: white; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; opacity: 0; transition: opacity 0.2s; fill: none; }
     .product-card.selected .selected-badge svg { opacity: 1; }
 
-    .pricing-block {
-        background: var(--surface); border-radius: var(--radius-sm);
-        padding: 12px 14px; margin-bottom: 12px;
-        display: flex; flex-direction: column; gap: 6px;
-    }
+    .pricing-block { background: var(--surface); border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 6px; }
     .price-row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
     .price-label { font-size: 10.5px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
     .price-value { font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 500; color: var(--text-primary); }
@@ -151,259 +119,268 @@
     .price-row.secondary .price-value { font-size: 12.5px; color: var(--text-secondary); }
     .product-description { font-size: 12px; line-height: 1.6; color: var(--text-secondary); border-top: 1px solid var(--border); padding-top: 12px; margin-top: 2px; }
 
-    #addons-section { margin-bottom: 32px; }
+    #addons-section, #equip-addons-section { margin-bottom: 32px; }
+    .section-label-equip { color: #7c3aed; }
+    .section-label-equip::after { background: #ede9fe; }
 
-    .addon-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-        gap: 12px;
-    }
+    .addon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
 
     .addon-card {
-        background: var(--surface-card);
-        border: 1.5px solid var(--border);
-        border-radius: var(--radius);
-        cursor: pointer;
-        transition: all 0.2s ease;
-        box-shadow: var(--shadow-sm);
-        overflow: hidden;
-        position: relative;
+        background: var(--surface-card); border: 1.5px solid var(--border);
+        border-radius: var(--radius); cursor: pointer; transition: all 0.2s ease;
+        box-shadow: var(--shadow-sm); overflow: hidden; position: relative;
     }
-    .addon-card::before {
-        content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-        background: linear-gradient(90deg, #a78bfa, #7c3aed);
-        opacity: 0; transition: opacity 0.2s;
-    }
+    .addon-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #a78bfa, #7c3aed); opacity: 0; transition: opacity 0.2s; }
     .addon-card:hover { border-color: #a78bfa; transform: translateY(-2px); box-shadow: var(--shadow-md); }
     .addon-card:hover::before { opacity: 1; }
     .addon-card.selected { border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124,58,237,0.1), var(--shadow-md); }
     .addon-card.selected::before { opacity: 1; }
 
     .addon-inner { padding: 16px; display: flex; align-items: flex-start; gap: 12px; }
-
-    .addon-checkbox {
-        width: 20px; height: 20px; border-radius: 5px;
-        border: 2px solid var(--border);
-        display: flex; align-items: center; justify-content: center;
-        flex-shrink: 0; margin-top: 1px; transition: all 0.2s;
-    }
+    .addon-checkbox { width: 20px; height: 20px; border-radius: 5px; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; transition: all 0.2s; }
     .addon-card.selected .addon-checkbox { background: #7c3aed; border-color: #7c3aed; }
     .addon-checkbox svg { width: 11px; height: 11px; stroke: white; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; opacity: 0; transition: opacity 0.2s; fill: none; }
     .addon-card.selected .addon-checkbox svg { opacity: 1; }
-
     .addon-info { flex: 1; min-width: 0; }
-    .addon-name { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; line-height: 1.3; }
+    .addon-name  { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; line-height: 1.3; }
     .addon-price { font-family: 'DM Mono', monospace; font-size: 12px; color: #7c3aed; font-weight: 500; margin-bottom: 4px; }
-    .addon-desc { font-size: 11.5px; color: var(--text-secondary); line-height: 1.5; margin-top: 4px; }
+    .addon-desc  { font-size: 11.5px; color: var(--text-secondary); line-height: 1.5; margin-top: 4px; }
 
     .bottom-section { margin-top: 8px; padding-top: 24px; border-top: 1px solid var(--border); }
 
-    .description-field {
-        width: 100%;
-        min-height: 90px;
-        padding: 12px 14px;
-        font-family: 'Sora', sans-serif;
-        font-size: 13px;
-        color: var(--text-primary);
-        background: var(--surface-card);
-        border: 1.5px solid var(--border);
-        border-radius: var(--radius);
-        resize: vertical;
-        outline: none;
-        transition: border-color 0.2s, box-shadow 0.2s;
-        box-shadow: var(--shadow-sm);
-        margin-bottom: 20px;
-        line-height: 1.6;
-    }
-    .description-field::placeholder { color: var(--text-muted); }
-    .description-field:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
-
     .total-bar {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        gap: 12px;
-        padding: 12px 16px;
-        background: var(--surface-card);
-        border: 1.5px solid var(--border);
-        border-radius: var(--radius);
-        margin-bottom: 16px;
-        box-shadow: var(--shadow-sm);
+        display: flex; align-items: center; justify-content: flex-end; gap: 12px;
+        padding: 12px 16px; background: var(--surface-card); border: 1.5px solid var(--border);
+        border-radius: var(--radius); margin-bottom: 16px; box-shadow: var(--shadow-sm);
     }
-    .total-bar .total-label {
-        font-size: 11px; font-weight: 600;
-        text-transform: uppercase; letter-spacing: 0.08em;
-        color: var(--text-muted);
-    }
-    .total-bar .total-value {
-        font-family: 'DM Mono', monospace;
-        font-size: 16px; font-weight: 500;
-        color: var(--navy);
-    }
-    .total-bar .total-currency {
-        font-size: 11px; color: var(--text-muted); font-weight: 400; margin-left: 3px;
-    }
-    .total-bar .total-breakdown {
-        font-size: 11px; color: var(--text-muted);
-        margin-right: auto;
-    }
+    .total-bar .total-label     { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
+    .total-bar .total-value     { font-family: 'DM Mono', monospace; font-size: 16px; font-weight: 500; color: var(--navy); }
+    .total-bar .total-currency  { font-size: 11px; color: var(--text-muted); font-weight: 400; margin-left: 3px; }
+    .total-bar .total-breakdown { font-size: 11px; color: var(--text-muted); margin-right: auto; }
 
     .action-bar { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; padding: 4px 0 8px; }
 
     .action-btn {
-        display: inline-flex; align-items: center; gap: 7px;
-        padding: 10px 22px;
-        border: none; border-radius: 8px;
-        font-family: 'Sora', sans-serif;
-        font-size: 13px; font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        letter-spacing: 0.01em;
+        display: inline-flex; align-items: center; gap: 7px; padding: 10px 22px;
+        border: none; border-radius: 8px; font-family: 'Sora', sans-serif;
+        font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; letter-spacing: 0.01em;
     }
     .action-btn svg { width: 15px; height: 15px; stroke: currentColor; stroke-width: 2.2; fill: none; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
     .action-btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
     .action-btn:active { transform: translateY(0); }
     .action-btn:disabled { opacity: 0.65; cursor: not-allowed; transform: none !important; }
-
-    .btn-cancel { background: var(--surface); color: var(--text-secondary); border: 1.5px solid var(--border); box-shadow: var(--shadow-sm); }
-    .btn-cancel:hover { background: #e8edf3; border-color: #b0bfce; box-shadow: var(--shadow-md); }
+    .btn-cancel  { background: var(--surface); color: var(--text-secondary); border: 1.5px solid var(--border); box-shadow: var(--shadow-sm); }
+    .btn-cancel:hover { background: #e8edf3; border-color: #b0bfce; }
     .btn-success { background: #22c55e; color: white; box-shadow: 0 2px 8px rgba(34,197,94,0.25); }
     .btn-success:hover { background: #16a34a; box-shadow: 0 6px 16px rgba(34,197,94,0.3); }
-
-    .action-btn svg.spin { animation: spinIcon 0.8s linear infinite; stroke-linecap: round; }
+    .action-btn svg.spin { animation: spinIcon 0.8s linear infinite; }
     @keyframes spinIcon { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
     .state-box {
-        grid-column: 1 / -1;
-        display: flex; flex-direction: column; align-items: center; justify-content: center;
-        padding: 48px 24px;
-        background: var(--surface-card);
-        border: 1.5px dashed var(--border);
-        border-radius: var(--radius);
-        gap: 10px;
+        grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center;
+        justify-content: center; padding: 48px 24px; background: var(--surface-card);
+        border: 1.5px dashed var(--border); border-radius: var(--radius); gap: 10px;
     }
     .state-box svg { width: 32px; height: 32px; stroke: var(--text-muted); stroke-width: 1.5; fill: none; opacity: 0.6; }
-    .state-box p { font-size: 13px; color: var(--text-muted); }
+    .state-box p   { font-size: 13px; color: var(--text-muted); }
 
     .loading-dots { display: flex; gap: 6px; align-items: center; }
     .loading-dots span { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); animation: pulse 1.2s ease-in-out infinite; }
     .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
     .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes pulse { 0%, 80%, 100% { transform: scale(0.7); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
+    @keyframes pulse { 0%,80%,100% { transform: scale(0.7); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
 
-    .error-box {
-        grid-column: 1 / -1;
-        background: #fff5f5; border: 1.5px solid #fecaca;
-        border-radius: var(--radius); padding: 16px 18px;
-        display: flex; align-items: flex-start; gap: 10px;
-    }
+    .error-box { grid-column: 1/-1; background: #fff5f5; border: 1.5px solid #fecaca; border-radius: var(--radius); padding: 16px 18px; display: flex; align-items: flex-start; gap: 10px; }
     .error-box svg { width: 18px; height: 18px; stroke: #ef4444; stroke-width: 2; fill: none; flex-shrink: 0; margin-top: 1px; }
-    .error-box p { font-size: 12.5px; color: #b91c1c; line-height: 1.5; }
+    .error-box p   { font-size: 12.5px; color: #b91c1c; line-height: 1.5; }
 
     .button-group.field-error .interest-btn { border-color: #ef4444; }
-    .description-field.field-error { border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.12); }
     .products-grid.field-error .state-box,
     .products-grid.field-error .product-card { border-color: #ef4444; box-shadow: 0 0 0 2px rgba(239,68,68,0.1); }
-
-    .button-group.field-error,
-    .description-field.field-error,
-    .products-grid.field-error { animation: shakeX 0.4s ease; }
-
-    @keyframes shakeX {
-        0%, 100% { transform: translateX(0); }
-        20% { transform: translateX(-5px); }
-        40% { transform: translateX(5px); }
-        60% { transform: translateX(-4px); }
-        80% { transform: translateX(4px); }
-    }
+    .button-group.field-error, .products-grid.field-error { animation: shakeX 0.4s ease; }
+    @keyframes shakeX { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-5px); } 40% { transform: translateX(5px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
 
     .selection-bar {
-        position: fixed; bottom: 0; left: 0; right: 0;
-        background: var(--navy); color: white;
-        padding: 12px 24px;
-        display: flex; align-items: center; justify-content: space-between;
-        font-size: 13px; font-weight: 500;
-        transform: translateY(100%);
-        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        z-index: 100;
+        position: fixed; bottom: 0; left: 0; right: 0; background: var(--navy); color: white;
+        padding: 12px 24px; display: flex; align-items: center; justify-content: space-between;
+        font-size: 13px; font-weight: 500; transform: translateY(100%);
+        transition: transform 0.3s cubic-bezier(0.16,1,0.3,1); z-index: 100;
         box-shadow: 0 -4px 20px rgba(15,31,53,0.2);
     }
     .selection-bar.visible { transform: translateY(0); }
     .count-badge { background: var(--accent); color: white; font-size: 11px; font-weight: 700; font-family: 'DM Mono', monospace; padding: 2px 8px; border-radius: 50px; margin-left: 8px; }
 
     .toast {
-        position: fixed; bottom: 72px; left: 50%;
-        transform: translateX(-50%) translateY(16px);
-        background: var(--navy); color: white;
-        font-size: 13px; font-weight: 500;
-        padding: 10px 20px; border-radius: 50px;
-        box-shadow: var(--shadow-lg);
-        opacity: 0; pointer-events: none;
-        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        position: fixed; bottom: 72px; left: 50%; transform: translateX(-50%) translateY(16px);
+        background: var(--navy); color: white; font-size: 13px; font-weight: 500;
+        padding: 10px 20px; border-radius: 50px; box-shadow: var(--shadow-lg);
+        opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
         white-space: nowrap; z-index: 200;
     }
     .toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
-    .toast.toast-error { background: #ef4444; }
+    .toast.toast-error   { background: #ef4444; }
     .toast.toast-success { background: #16a34a; }
 
-    #equip-addons-section { margin-bottom: 32px; }
-    .section-label-equip { color: #7c3aed; }
-    .section-label-equip::after { background: #ede9fe; }
-    @keyframes cardIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .product-card, .addon-card { animation: cardIn 0.3s ease both; }
+    @keyframes cardIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
     .interest-btn { animation: btnIn 0.25s ease both; }
-    @keyframes btnIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    @keyframes btnIn { from { opacity:0; transform:scale(0.95); } to { opacity:1; transform:scale(1); } }
 </style>
 <script src="https://live.zwidgets.com/js-sdk/1.5/ZohoEmbededAppSDK.min.js"></script>
 <script>
-    var currentDealId        = null;
-    var selectedProduct      = null;
-    var selectedAddons       = [];   // non-equipment add-ons
-    var selectedEquipAddons  = [];   // equipment add-ons
-    var isProcessing         = false;
+    // ─── i18n ─────────────────────────────────────────────────────────────────
+    var TRANSLATIONS = {
+        en_US: {
+            widgetTitle      : "Deal Package Selector",
+            widgetSubtitle   : "Review and confirm the deal package",
+            interestedIn     : "Interested In",
+            mainPackage      : "Main Package",
+            availableAddons  : "Available Add-ons",
+            otherAddons      : "Other Add-ons",
+            total            : "Total",
+            cancel           : "Cancel",
+            next             : "Next",
+            saving           : "Saving\u2026",
+            proceeding       : "Proceeding\u2026",
+            failedRetry      : "Failed \u2013 retry",
+            selectCategory   : "Select a category above to view packages",
+            loadingPackages  : "Loading packages\u2026",
+            noPackages       : "No packages found for this category",
+            itemsSelected    : "Items selected",
+            packageAddons    : "1 package + add-ons",
+            errSelectInterest: "Please select an interest category",
+            errSelectPackage : "Please select a main package",
+            errFieldNotFound : "Interested_In field not found",
+            errLoadFields    : "Error loading fields: ",
+            errLoadPackages  : "Error loading packages: ",
+            first12          : "First 12 months",
+            thereafter       : "Thereafter",
+            addOn            : "Add-on",
+            ilsPerMonth      : " ILS/mo",
+            addonCount1      : " + 1 add-on",
+            addonCountN      : " + {n} add-ons"
+        },
+        iw_IL: {
+            widgetTitle      : "\u05d1\u05d5\u05d7\u05e8 \u05d7\u05d1\u05d9\u05dc\u05ea \u05d4\u05e2\u05e1\u05e7\u05d0\u05d4",
+            widgetSubtitle   : "\u05e1\u05e7\u05d5\u05e8 \u05d5\u05d0\u05e9\u05e8 \u05d0\u05ea \u05d7\u05d1\u05d9\u05dc\u05ea \u05d4\u05e2\u05e1\u05e7\u05d0\u05d4",
+            interestedIn     : "\u05de\u05ea\u05e2\u05e0\u05d9\u05d9\u05df \u05d1",
+            mainPackage      : "\u05d7\u05d1\u05d9\u05dc\u05d4 \u05e8\u05d0\u05e9\u05d9\u05ea",
+            availableAddons  : "\u05ea\u05d5\u05e1\u05e4\u05d5\u05ea \u05d6\u05de\u05d9\u05e0\u05d5\u05ea",
+            otherAddons      : "\u05ea\u05d5\u05e1\u05e4\u05d5\u05ea \u05e0\u05d5\u05e1\u05e4\u05d5\u05ea",
+            total            : "\u05e1\u05d4\u05b4\u05da",
+            cancel           : "\u05d1\u05d9\u05d8\u05d5\u05dc",
+            next             : "\u05d4\u05de\u05e9\u05da",
+            saving           : "\u05e9\u05d5\u05de\u05e8\u2026",
+            proceeding       : "\u05de\u05de\u05e9\u05d9\u05da\u2026",
+            failedRetry      : "\u05e0\u05db\u05e9\u05dc \u2013 \u05e0\u05e1\u05d4 \u05e9\u05e0\u05d9\u05ea",
+            selectCategory   : "\u05d1\u05d7\u05e8 \u05e7\u05d8\u05d2\u05d5\u05e8\u05d9\u05d4 \u05de\u05dc\u05de\u05e2\u05dc\u05d4 \u05dc\u05e6\u05e4\u05d9\u05d9\u05ea \u05d7\u05d1\u05d9\u05dc\u05d5\u05ea",
+            loadingPackages  : "\u05d8\u05d5\u05e2\u05df \u05d7\u05d1\u05d9\u05dc\u05d5\u05ea\u2026",
+            noPackages       : "\u05dc\u05d0 \u05e0\u05de\u05e6\u05d0\u05d5 \u05d7\u05d1\u05d9\u05dc\u05d5\u05ea \u05e2\u05d1\u05d5\u05e8 \u05e7\u05d8\u05d2\u05d5\u05e8\u05d9\u05d4 \u05d6\u05d5",
+            itemsSelected    : "\u05e4\u05e8\u05d9\u05d8\u05d9\u05dd \u05e0\u05d1\u05d7\u05e8\u05d5",
+            packageAddons    : "\u05d7\u05d1\u05d9\u05dc\u05d4 1 + \u05ea\u05d5\u05e1\u05e4\u05d5\u05ea",
+            errSelectInterest: "\u05e0\u05d0 \u05d1\u05d7\u05e8 \u05e7\u05d8\u05d2\u05d5\u05e8\u05d9\u05d9\u05ea \u05e2\u05e0\u05d9\u05d9\u05df",
+            errSelectPackage : "\u05e0\u05d0 \u05d1\u05d7\u05e8 \u05d7\u05d1\u05d9\u05dc\u05d4 \u05e8\u05d0\u05e9\u05d9\u05ea",
+            errFieldNotFound : "\u05e9\u05d3\u05d4 Interested_In \u05dc\u05d0 \u05e0\u05de\u05e6\u05d0",
+            errLoadFields    : "\u05e9\u05d2\u05d9\u05d0\u05d4 \u05d1\u05d8\u05e2\u05d9\u05e0\u05ea \u05e9\u05d3\u05d5\u05ea: ",
+            errLoadPackages  : "\u05e9\u05d2\u05d9\u05d0\u05d4 \u05d1\u05d8\u05e2\u05d9\u05e0\u05ea \u05d7\u05d1\u05d9\u05dc\u05d5\u05ea: ",
+            first12          : "12 \u05d7\u05d5\u05d3\u05e9\u05d9\u05dd \u05e8\u05d0\u05e9\u05d5\u05e0\u05d9\u05dd",
+            thereafter       : "\u05dc\u05d0\u05d7\u05e8 \u05de\u05db\u05df",
+            addOn            : "\u05ea\u05d5\u05e1\u05e4\u05ea",
+            ilsPerMonth      : " \u05e9\u05f4\u05d7/\u05d7\u05d5\u05d3\u05e9",
+            addonCount1      : " + \u05ea\u05d5\u05e1\u05e4\u05ea 1",
+            addonCountN      : " + {n} \u05ea\u05d5\u05e1\u05e4\u05d5\u05ea"
+        }
+    };
 
+    var currentLocale = "en_US";
+    function t(key) { return (TRANSLATIONS[currentLocale] || TRANSLATIONS.en_US)[key] || key; }
+    function tAddonCount(n) {
+        return n === 1 ? t("addonCount1") : t("addonCountN").replace("{n}", n);
+    }
+
+    // ─── State ────────────────────────────────────────────────────────────────
+    var currentDealId       = null;
+    var selectedProduct     = null;
+    var selectedAddons      = [];
+    var selectedEquipAddons = [];
+    var isProcessing        = false;
+
+    // ─── Boot ─────────────────────────────────────────────────────────────────
     ZOHO.embeddedApp.on("PageLoad", function (data) {
         console.log("PageLoad:", data);
         if (data && data.EntityId) currentDealId = data.EntityId;
         else if (data && data.ID)  currentDealId = data.ID;
-
-        // 1. Fetch deal record first so we have prefill values
-        // 2. Then load picklist buttons (so we can mark the right one)
-        // 3. Then fetch products for the saved category (and preselect saved product)
-        prefetchDealThenBuild();
+        detectLocaleAndInit();
     });
 
     ZOHO.embeddedApp.init();
 
+    function detectLocaleAndInit() {
+        ZOHO.CRM.CONFIG.getCurrentUser()
+            .then(function (resp) {
+                var user   = resp && resp.users && resp.users[0];
+                // CRM exposes language as "iw" or locale as "iw_IL" depending on version
+                var lang   = (user && (user.language || user.Language || user.locale || "")) + "";
+                console.log("CRM user language/locale raw:", lang);
+                currentLocale = (lang.indexOf("iw") === 0 || lang.indexOf("he") === 0) ? "iw_IL" : "en_US";
+            })
+            .catch(function (err) {
+                console.warn("Locale detection failed, defaulting to en_US:", err);
+                currentLocale = "en_US";
+            })
+            .then(function () {
+                applyLocale();
+                prefetchDealThenBuild();
+            });
+    }
+
+    function applyLocale() {
+        var isHebrew = currentLocale === "iw_IL";
+        document.body.classList.toggle("rtl", isHebrew);
+        document.documentElement.setAttribute("lang", isHebrew ? "he" : "en");
+
+        // Static UI strings
+        setText("widget-title",      t("widgetTitle"));
+        setText("widget-subtitle",   t("widgetSubtitle"));
+        setText("label-interested",  t("interestedIn"));
+        setText("label-main-pkg",    t("mainPackage"));
+        setText("label-addons",      t("availableAddons"));
+        setText("label-equip-addons",t("otherAddons"));
+        setText("total-label",       t("total"));
+        setText("selection-label",   t("itemsSelected"));
+        setText("selection-hint",    t("packageAddons"));
+
+        // Buttons keep their SVG — update only the text span
+        var cancelSpan = document.querySelector("#btn-cancel .btn-label");
+        var nextSpan   = document.querySelector("#btn-next .btn-label");
+        if (cancelSpan) cancelSpan.textContent = t("cancel");
+        if (nextSpan)   nextSpan.textContent   = t("next");
+
+        // Products grid placeholder
+        var ph = document.querySelector("#products-grid .state-box p");
+        if (ph) ph.textContent = t("selectCategory");
+    }
+
+    function setText(id, val) {
+        var el = document.getElementById(id);
+        if (el) el.textContent = val;
+    }
+
     // ─── Orchestration ────────────────────────────────────────────────────────
     function prefetchDealThenBuild() {
-        if (!currentDealId) {
-            // No deal context — just load the picklist with nothing pre-selected
-            loadInterestedInOptions(null, null);
-            return;
-        }
+        if (!currentDealId) { loadInterestedInOptions(null, null); return; }
 
         ZOHO.CRM.API.getRecord({ Entity: "Deals", RecordID: currentDealId })
             .then(function (response) {
                 var deal = response.data && response.data[0];
                 console.log("Deal record:", deal);
-
-                var interestedInValue = null;
+                var interestedInValue  = deal ? (deal.Interested_In || null) : null;
                 var preselectProductId = null;
-
-                if (deal) {
-                    // Interested_In is a plain string picklist value
-                    interestedInValue = deal.Interested_In || null;
-
-                    // Product_Offerd is a lookup — could be an object {id, name} or a plain id string
-                    if (deal.Product_Offerd) {
-                        preselectProductId = (typeof deal.Product_Offerd === "object")
-                            ? deal.Product_Offerd.id
-                            : deal.Product_Offerd;
-                    }
-
-                    console.log("Prefill — Interested_In:", interestedInValue, "| Product:", preselectProductId);
+                if (deal && deal.Product_Offerd) {
+                    preselectProductId = (typeof deal.Product_Offerd === "object")
+                        ? deal.Product_Offerd.id : deal.Product_Offerd;
                 }
-
+                console.log("Prefill — Interested_In:", interestedInValue, "| Product:", preselectProductId);
                 loadInterestedInOptions(interestedInValue, preselectProductId);
             })
             .catch(function (err) {
@@ -412,31 +389,23 @@
             });
     }
 
-    // ─── Load Interested_In picklist, then auto-select + fetch products ───────
+    // ─── Interested In ────────────────────────────────────────────────────────
     function loadInterestedInOptions(interestedInValue, preselectProductId) {
         return ZOHO.CRM.META.getFields({ Entity: "Deals" })
             .then(function (response) {
                 var field = response.fields.find(function (f) { return f.api_name === "Interested_In"; });
                 if (field && field.pick_list_values) {
                     displayInterestButtons(field.pick_list_values);
-
-                    // Auto-select the saved value if present
                     if (interestedInValue) {
                         var btn = document.querySelector('.interest-btn[data-value="' + interestedInValue + '"]');
-                        if (btn) {
-                            btn.classList.add("active");
-                            // Now load products for this category and preselect the saved product
-                            fetchProducts(interestedInValue, preselectProductId);
-                        }
+                        if (btn) { btn.classList.add("active"); fetchProducts(interestedInValue, preselectProductId); }
                     }
                 } else {
-                    document.getElementById("interest-buttons").innerHTML =
-                        '<div class="error-box"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><p>Interested_In field not found</p></div>';
+                    document.getElementById("interest-buttons").innerHTML = errorBox(t("errFieldNotFound"));
                 }
             })
             .catch(function (err) {
-                document.getElementById("interest-buttons").innerHTML =
-                    '<div class="error-box"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><p>Error loading fields: ' + JSON.stringify(err) + '</p></div>';
+                document.getElementById("interest-buttons").innerHTML = errorBox(t("errLoadFields") + JSON.stringify(err));
             });
     }
 
@@ -454,22 +423,20 @@
         });
     }
 
-    // Called when the user manually clicks an interest button
     function selectInterest(button) {
         document.querySelectorAll(".interest-btn").forEach(function (b) { b.classList.remove("active"); });
         button.classList.add("active");
         document.getElementById("interest-buttons").classList.remove("field-error");
-        selectedProduct     = null;
-        selectedAddons      = [];
-        selectedEquipAddons = [];
+        selectedProduct = null; selectedAddons = []; selectedEquipAddons = [];
         hideAddonsSection();
         updateSelectionBar();
         fetchProducts(button.getAttribute("data-value"), null);
     }
 
+    // ─── Products ─────────────────────────────────────────────────────────────
     function fetchProducts(category, preselectProductId) {
         var container = document.getElementById("products-grid");
-        container.innerHTML = '<div class="state-box"><div class="loading-dots"><span></span><span></span><span></span></div><p>Loading packages…</p></div>';
+        container.innerHTML = '<div class="state-box"><div class="loading-dots"><span></span><span></span><span></span></div><p>' + t("loadingPackages") + '</p></div>';
         hideAddonsSection();
 
         return ZOHO.CRM.API.coql({
@@ -479,30 +446,29 @@
             if (response.data && response.data.length > 0) {
                 displayProducts(response.data, preselectProductId);
             } else {
-                container.innerHTML = '<div class="state-box"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg><p>No packages found for this category</p></div>';
+                container.innerHTML = '<div class="state-box"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg><p>' + t("noPackages") + '</p></div>';
             }
         })
         .catch(function (err) {
-            container.innerHTML = '<div class="error-box"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><p>Error loading packages: ' + JSON.stringify(err) + '</p></div>';
+            container.innerHTML = errorBox(t("errLoadPackages") + JSON.stringify(err));
         });
     }
 
     function formatPrice(val) {
-        if (!val && val !== 0) return "—";
+        if (!val && val !== 0) return "\u2014";
         return Number(val).toLocaleString("en-IL");
     }
 
     function displayProducts(products, preselectProductId) {
         var container = document.getElementById("products-grid");
         container.innerHTML = "";
-
         products.forEach(function (product, i) {
             var card = document.createElement("div");
             card.className = "product-card";
             card.style.animationDelay = (i * 0.06) + "s";
             card.setAttribute("data-product-id", product.id);
 
-            var name   = product.Product_Name || "Unnamed Product";
+            var name   = product.Product_Name || t("addOn");
             var price1 = formatPrice(product.Unit_Price);
             var price2 = formatPrice(product.Unit_Price_2nd_period);
             var desc   = product.Description || "";
@@ -514,17 +480,15 @@
                     '<div class="selected-badge"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>' +
                   '</div>' +
                   '<div class="pricing-block">' +
-                    '<div class="price-row"><span class="price-label">First 12 months</span><span class="price-value">' + price1 + '<span class="price-currency">ILS</span></span></div>' +
+                    '<div class="price-row"><span class="price-label">' + t("first12") + '</span><span class="price-value">' + price1 + '<span class="price-currency">ILS</span></span></div>' +
                     '<div class="price-divider"></div>' +
-                    '<div class="price-row secondary"><span class="price-label">Thereafter</span><span class="price-value">' + price2 + '<span class="price-currency">ILS</span></span></div>' +
+                    '<div class="price-row secondary"><span class="price-label">' + t("thereafter") + '</span><span class="price-value">' + price2 + '<span class="price-currency">ILS</span></span></div>' +
                   '</div>' +
                   (desc ? '<div class="product-description">' + desc + '</div>' : '') +
                 '</div>';
 
             card.onclick = function () { toggleProductSelection(this, product); };
             container.appendChild(card);
-
-            // Auto-select if this product matches the saved Product_Offerd
             if (preselectProductId && String(product.id) === String(preselectProductId)) {
                 toggleProductSelection(card, product);
             }
@@ -535,28 +499,26 @@
         if (card.classList.contains("selected")) {
             selectedProduct = null;
             card.classList.remove("selected");
-            hideAddonsSection();
-            updateSelectionBar();
-            updateTotalBar();
+            hideAddonsSection(); updateSelectionBar(); updateTotalBar();
             return;
         }
         document.querySelectorAll(".product-card.selected").forEach(function (c) { c.classList.remove("selected"); });
         selectedProduct = product;
         card.classList.add("selected");
         document.getElementById("products-grid").classList.remove("field-error");
-        updateSelectionBar();
-        updateTotalBar();
+        updateSelectionBar(); updateTotalBar();
         loadAddons(product);
     }
 
+    // ─── Add-ons ──────────────────────────────────────────────────────────────
     function hideAddonsSection() {
-        var section = document.getElementById("addons-section");
-        section.style.display = "none";
+        var s = document.getElementById("addons-section");
+        s.style.display = "none";
         document.getElementById("addon-grid").innerHTML = "";
         selectedAddons = [];
 
-        var equipSection = document.getElementById("equip-addons-section");
-        equipSection.style.display = "none";
+        var es = document.getElementById("equip-addons-section");
+        es.style.display = "none";
         document.getElementById("equip-addon-grid").innerHTML = "";
         selectedEquipAddons = [];
 
@@ -564,154 +526,95 @@
     }
 
     function loadAddons(product) {
-        // Fetch all related add-on IDs first, then split by Product_Category
         var section      = document.getElementById("addons-section");
         var equipSection = document.getElementById("equip-addons-section");
         var grid         = document.getElementById("addon-grid");
         var equipGrid    = document.getElementById("equip-addon-grid");
 
-        section.style.display      = "block";
-        equipSection.style.display = "block";
-        grid.innerHTML      = '<div class="loading-dots" style="padding:12px 0"><span></span><span></span><span></span></div>';
-        equipGrid.innerHTML = '<div class="loading-dots" style="padding:12px 0"><span></span><span></span><span></span></div>';
+        section.style.display = equipSection.style.display = "block";
+        var dots = '<div class="loading-dots" style="padding:12px 0"><span></span><span></span><span></span></div>';
+        grid.innerHTML = equipGrid.innerHTML = dots;
 
-        ZOHO.CRM.API.getRelatedRecords({
-            Entity     : "Products",
-            RecordID   : product.id,
-            RelatedList: "Related_Ad_Ons3",
-            page       : 1,
-            per_page   : 200
-        })
+        ZOHO.CRM.API.getRelatedRecords({ Entity: "Products", RecordID: product.id, RelatedList: "Related_Ad_Ons3", page: 1, per_page: 200 })
         .then(function (response) {
-            console.log("Related add-ons response:", JSON.stringify(response));
             var records = response.data;
             if (!records || records.length === 0) {
-                section.style.display      = "none";
-                equipSection.style.display = "none";
+                section.style.display = equipSection.style.display = "none";
                 return Promise.resolve(null);
             }
-
-            var productIds = records
-                .map(function (r) { return r.Related_Ad_Ons1 && r.Related_Ad_Ons1.id; })
-                .filter(Boolean);
-
-            if (productIds.length === 0) {
-                section.style.display      = "none";
-                equipSection.style.display = "none";
-                return Promise.resolve(null);
-            }
-
-            var idList = productIds.map(function (id) { return "'" + id + "'"; }).join(", ");
+            var ids = records.map(function (r) { return r.Related_Ad_Ons1 && r.Related_Ad_Ons1.id; }).filter(Boolean);
+            if (!ids.length) { section.style.display = equipSection.style.display = "none"; return Promise.resolve(null); }
+            var idList = ids.map(function (id) { return "'" + id + "'"; }).join(", ");
             return ZOHO.CRM.API.coql({
                 select_query: "select id, Product_Name, Unit_Price, Unit_Price_2nd_period, Description, Product_Category from Products where id in (" + idList + ")"
             });
         })
         .then(function (response) {
             if (!response) return;
+            var all      = response.data || [];
+            var regular  = all.filter(function (a) { return (a.Product_Category || "").toLowerCase() !== "equipment"; });
+            var equip    = all.filter(function (a) { return (a.Product_Category || "").toLowerCase() === "equipment"; });
 
-            var all       = response.data || [];
-            var regular   = all.filter(function (a) { return (a.Product_Category || "").toLowerCase() !== "equipment"; });
-            var equipment = all.filter(function (a) { return (a.Product_Category || "").toLowerCase() === "equipment"; });
+            if (regular.length) displayAddons(regular, "addon-grid",       false);
+            else section.style.display = "none";
 
-            if (regular.length > 0) {
-                displayAddons(regular, "addon-grid", selectedAddons, false);
-            } else {
-                section.style.display = "none";
-            }
-
-            if (equipment.length > 0) {
-                displayAddons(equipment, "equip-addon-grid", selectedEquipAddons, true);
-            } else {
-                equipSection.style.display = "none";
-            }
+            if (equip.length)   displayAddons(equip,   "equip-addon-grid", true);
+            else equipSection.style.display = "none";
         })
         .catch(function (err) {
-            console.error("Error loading add-ons:", JSON.stringify(err));
-            section.style.display      = "none";
-            equipSection.style.display = "none";
+            console.error("Error loading add-ons:", err);
+            section.style.display = equipSection.style.display = "none";
         });
     }
 
-    // gridId: which grid element to render into
-    // targetArray: selectedAddons or selectedEquipAddons
-    // isEquip: controls which toggle function to call
-    function displayAddons(addons, gridId, targetArray, isEquip) {
+    function displayAddons(addons, gridId, isEquip) {
         var grid = document.getElementById(gridId);
         grid.innerHTML = "";
-
         addons.forEach(function (addon, i) {
             var card = document.createElement("div");
             card.className = "addon-card";
             card.style.animationDelay = (i * 0.05) + "s";
             card.setAttribute("data-addon-id", addon.id);
-
-            var name      = addon.Product_Name || "Add-on";
-            var unitPrice = addon.Unit_Price || null;
-            var price     = unitPrice ? formatPrice(unitPrice) + " ILS/mo" : "";
-            var desc      = addon.Description || "";
-
+            var name  = addon.Product_Name || t("addOn");
+            var price = addon.Unit_Price ? formatPrice(addon.Unit_Price) + t("ilsPerMonth") : "";
+            var desc  = addon.Description || "";
             card.innerHTML =
                 '<div class="addon-inner">' +
                   '<div class="addon-checkbox"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>' +
                   '<div class="addon-info">' +
-                    '<div class="addon-name">' + name + '</div>' +
+                    '<div class="addon-name">'  + name  + '</div>' +
                     (price ? '<div class="addon-price">' + price + '</div>' : '') +
                     (desc  ? '<div class="addon-desc">'  + desc  + '</div>' : '') +
                   '</div>' +
                 '</div>';
-
             card.onclick = function () { toggleAddonSelection(this, addon, isEquip); };
             grid.appendChild(card);
         });
     }
 
     function toggleAddonSelection(card, addon, isEquip) {
-        var id          = String(card.getAttribute("data-addon-id"));
-        var targetArray = isEquip ? selectedEquipAddons : selectedAddons;
-        var index       = targetArray.findIndex(function (a) { return String(a.id) === id; });
-        if (index > -1) {
-            targetArray.splice(index, 1);
-            card.classList.remove("selected");
-        } else {
-            targetArray.push(addon);
-            card.classList.add("selected");
-        }
+        var id  = String(card.getAttribute("data-addon-id"));
+        var arr = isEquip ? selectedEquipAddons : selectedAddons;
+        var idx = arr.findIndex(function (a) { return String(a.id) === id; });
+        if (idx > -1) { arr.splice(idx, 1); card.classList.remove("selected"); }
+        else          { arr.push(addon);    card.classList.add("selected"); }
         updateSelectionBar();
         updateTotalBar();
     }
 
-    // ─── Total calculation ────────────────────────────────────────────────────
-    function allSelectedAddons() {
-        return selectedAddons.concat(selectedEquipAddons);
-    }
-
-    function calculateTotal() {
-        var mainPrice   = selectedProduct ? (parseFloat(selectedProduct.Unit_Price) || 0) : 0;
-        var addonsTotal = allSelectedAddons().reduce(function (sum, addon) {
-            return sum + (parseFloat(addon.Unit_Price) || 0);
-        }, 0);
-        return mainPrice + addonsTotal;
-    }
+    // ─── Totals ───────────────────────────────────────────────────────────────
+    function allSelectedAddons() { return selectedAddons.concat(selectedEquipAddons); }
 
     function updateTotalBar() {
         var bar = document.getElementById("total-bar");
         if (!selectedProduct) { bar.style.display = "none"; return; }
         bar.style.display = "flex";
-
         var mainPrice   = parseFloat(selectedProduct.Unit_Price) || 0;
-        var addonsTotal = allSelectedAddons().reduce(function (sum, addon) {
-            return sum + (parseFloat(addon.Unit_Price) || 0);
-        }, 0);
-        var total      = mainPrice + addonsTotal;
-        var totalAddons = allSelectedAddons().length;
-
-        var breakdown = selectedProduct.Product_Name || "Package";
-        if (totalAddons > 0) {
-            breakdown += " + " + totalAddons + " add-on" + (totalAddons > 1 ? "s" : "");
-        }
-
+        var addonsTotal = allSelectedAddons().reduce(function (s, a) { return s + (parseFloat(a.Unit_Price) || 0); }, 0);
+        var n           = allSelectedAddons().length;
+        var breakdown   = (selectedProduct.Product_Name || "") + (n > 0 ? tAddonCount(n) : "");
         document.getElementById("total-breakdown").textContent = breakdown;
-        document.getElementById("total-value").textContent     = Number(total).toLocaleString("en-IL");
+        document.getElementById("total-value").textContent     = Number(mainPrice + addonsTotal).toLocaleString("en-IL");
     }
 
     function updateSelectionBar() {
@@ -719,27 +622,25 @@
         var count = document.getElementById("selection-count");
         var total = (selectedProduct ? 1 : 0) + allSelectedAddons().length;
         if (total > 0) { count.textContent = total; bar.classList.add("visible"); }
-        else { bar.classList.remove("visible"); }
+        else bar.classList.remove("visible");
     }
 
+    // ─── Button states ────────────────────────────────────────────────────────
     function setButtonState(action, state) {
-        var btn = document.querySelector('.action-btn[data-action="' + action + '"]');
+        var btn = document.getElementById("btn-" + action);
         if (!btn) return;
-        var configs = {
-            next: {
-                idle:    { icon: '<svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>', label: "Next" },
-                loading: { icon: '<svg viewBox="0 0 24 24" class="spin"><circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="10"/></svg>', label: "Saving…" },
-                done:    { icon: '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>', label: "Proceeding…" },
-                error:   { icon: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>', label: "Failed – retry" }
-            }
+        var icons = {
+            idle   : '<svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>',
+            loading: '<svg viewBox="0 0 24 24" class="spin"><circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="10"/></svg>',
+            done   : '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>',
+            error  : '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
         };
-        var cfg = configs[action] && configs[action][state];
-        if (!cfg) return;
-        btn.innerHTML = cfg.icon + " " + cfg.label;
+        var labels = { idle: t("next"), loading: t("saving"), done: t("proceeding"), error: t("failedRetry") };
+        btn.innerHTML = (icons[state] || "") + '<span class="btn-label" style="margin-left:7px">' + (labels[state] || "") + '</span>';
         btn.disabled  = (state === "loading");
-        btn.classList.toggle("btn-loading", state === "loading");
     }
 
+    // ─── Toast ────────────────────────────────────────────────────────────────
     function showToast(msg, type) {
         var toast = document.getElementById("toast");
         toast.textContent = msg;
@@ -748,109 +649,65 @@
         toast._t = setTimeout(function () { toast.classList.remove("visible"); }, 3500);
     }
 
+    // ─── Validation ───────────────────────────────────────────────────────────
     function validate() {
         var ok = true;
-        var interestedBtn = document.querySelector(".interest-btn.active");
-        if (!interestedBtn) {
+        if (!document.querySelector(".interest-btn.active")) {
             document.getElementById("interest-buttons").classList.add("field-error");
-            if (ok) { showToast("Please select an interest category", "error"); ok = false; }
-        } else {
-            document.getElementById("interest-buttons").classList.remove("field-error");
-        }
+            if (ok) { showToast(t("errSelectInterest"), "error"); ok = false; }
+        } else document.getElementById("interest-buttons").classList.remove("field-error");
+
         if (!selectedProduct) {
             document.getElementById("products-grid").classList.add("field-error");
-            if (ok) { showToast("Please select a main package", "error"); ok = false; }
-        } else {
-            document.getElementById("products-grid").classList.remove("field-error");
-        }
+            if (ok) { showToast(t("errSelectPackage"), "error"); ok = false; }
+        } else document.getElementById("products-grid").classList.remove("field-error");
+
         return ok;
     }
 
+    // ─── Save ─────────────────────────────────────────────────────────────────
     function buildDealPayload() {
         var interestedBtn = document.querySelector(".interest-btn.active");
         var payload = { id: currentDealId };
-
-        if (interestedBtn) {
-            payload.Interested_In = interestedBtn.getAttribute("data-value");
-        }
-
+        if (interestedBtn) payload.Interested_In = interestedBtn.getAttribute("data-value");
         payload.Product_Offerd = selectedProduct ? selectedProduct.id : null;
-
-        // Populate the Product_Details line-items subform with the selected main package
         if (selectedProduct) {
             payload.Product_Details = [{
-                product: { id: selectedProduct.id },
-                quantity: 1,
+                Product: { id: selectedProduct.id }, quantity: 1,
                 unit_price: parseFloat(selectedProduct.Unit_Price) || 0,
                 total: parseFloat(selectedProduct.Unit_Price) || 0,
-                discount: 0,
-                net_total: parseFloat(selectedProduct.Unit_Price) || 0
+                discount: 0, net_total: parseFloat(selectedProduct.Unit_Price) || 0
             }];
         }
-
         var mainPrice   = selectedProduct ? (parseFloat(selectedProduct.Unit_Price) || 0) : 0;
-        var addonsTotal = allSelectedAddons().reduce(function (sum, addon) {
-            return sum + (parseFloat(addon.Unit_Price) || 0);
-        }, 0);
-        payload.Amount = mainPrice + addonsTotal;
-
-        console.log("mainPrice:", mainPrice, "| addonsTotal:", addonsTotal, "| Amount:", payload.Amount);
+        var addonsTotal = allSelectedAddons().reduce(function (s, a) { return s + (parseFloat(a.Unit_Price) || 0); }, 0);
+        payload.Amount  = mainPrice + addonsTotal;
         return payload;
     }
 
     function saveDealRecord() {
-        var dealUpdate = ZOHO.CRM.API.updateRecord({
-            Entity : "Deals",
-            APIData: buildDealPayload(),
-            Trigger: []
-        });
-
-        var all = allSelectedAddons();
-        var subformUpdate;
-        if (all.length > 0) {
-            var subformRows = all.map(function (addon) {
-                return { Add_On: { id: addon.id } };
-            });
-            subformUpdate = ZOHO.CRM.API.updateRecord({
-                Entity : "Deals",
-                APIData: { id: currentDealId, Add_Ons: subformRows },
-                Trigger: []
-            });
-        } else {
-            subformUpdate = Promise.resolve(null);
-        }
-
-        return Promise.all([dealUpdate, subformUpdate]).then(function (results) {
-            console.log("Deal saved:", results[0]);
-            console.log("Add_Ons subform saved:", results[1]);
-            return results;
-        });
+        var dealUpdate    = ZOHO.CRM.API.updateRecord({ Entity: "Deals", APIData: buildDealPayload(), Trigger: [] });
+        var all           = allSelectedAddons();
+        var subformUpdate = all.length > 0
+            ? ZOHO.CRM.API.updateRecord({ Entity: "Deals", APIData: { id: currentDealId, Add_Ons: all.map(function (a) { return { Add_On: { id: a.id } }; }) }, Trigger: [] })
+            : Promise.resolve(null);
+        return Promise.all([dealUpdate, subformUpdate]).then(function (r) { console.log("Saved:", r); return r; });
     }
 
-    function handleCancel() {
-        ZOHO.CRM.UI.Popup.close();
-    }
+    function handleCancel() { ZOHO.CRM.UI.Popup.close(); }
 
     function handleNext() {
         if (isProcessing) return;
         if (!validate()) return;
-
         isProcessing = true;
         setButtonState("next", "loading");
-
         saveDealRecord()
+            .then(function () { return ZOHO.CRM.BLUEPRINT.proceed(); })
             .then(function () {
-                return ZOHO.CRM.BLUEPRINT.proceed();
-            })
-            .then(function (blueprintResponse) {
-                console.log("Blueprint proceeded:", blueprintResponse);
                 setButtonState("next", "done");
                 setTimeout(function () {
-                    try {
-                        ZOHO.CRM.UI.Popup.closeReload().then(function(data){ console.log(data); });
-                    } catch (e) {
-                        ZOHO.CRM.UI.Popup.close();
-                    }
+                    try { ZOHO.CRM.UI.Popup.closeReload().then(function(d){ console.log(d); }); }
+                    catch (e) { ZOHO.CRM.UI.Popup.close(); }
                 }, 1200);
             })
             .catch(function (err) {
@@ -861,6 +718,10 @@
                 setTimeout(function () { setButtonState("next", "idle"); }, 2500);
             });
     }
+
+    function errorBox(msg) {
+        return '<div class="error-box"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><p>' + msg + '</p></div>';
+    }
 </script>
 </head>
 <body>
@@ -870,16 +731,20 @@
         <div class="icon">
             <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
         </div>
-        <h1>Deal Package Selector</h1>
-        <p>Review and confirm the deal package</p>
+        <h1 id="widget-title">Deal Package Selector</h1>
+        <p id="widget-subtitle">Review and confirm the deal package</p>
     </div>
 
-    <div class="section-label">Interested In<span class="required-star">*</span></div>
+    <div class="section-label">
+        <span id="label-interested">Interested In</span><span class="required-star">*</span>
+    </div>
     <div id="interest-buttons" class="button-group">
         <div class="loading-dots" style="padding: 8px 0;"><span></span><span></span><span></span></div>
     </div>
 
-    <div class="section-label">Main Package<span class="required-star">*</span></div>
+    <div class="section-label">
+        <span id="label-main-pkg">Main Package</span><span class="required-star">*</span>
+    </div>
     <div id="products-grid" class="products-grid">
         <div class="state-box">
             <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -888,30 +753,29 @@
     </div>
 
     <div id="addons-section" style="display:none;">
-        <div class="section-label">Available Add-ons</div>
+        <div class="section-label"><span id="label-addons">Available Add-ons</span></div>
         <div id="addon-grid" class="addon-grid"></div>
     </div>
 
     <div id="equip-addons-section" style="display:none;">
-        <div class="section-label section-label-equip">Other Add-ons</div>
+        <div class="section-label section-label-equip"><span id="label-equip-addons">Other Add-ons</span></div>
         <div id="equip-addon-grid" class="addon-grid"></div>
     </div>
 
     <div class="bottom-section">
         <div class="total-bar" id="total-bar" style="display:none;">
             <span class="total-breakdown" id="total-breakdown"></span>
-            <span class="total-label">Total</span>
+            <span class="total-label" id="total-label">Total</span>
             <span class="total-value" id="total-value">0<span class="total-currency">ILS</span></span>
         </div>
-
         <div class="action-bar">
-            <button class="action-btn btn-cancel" data-action="cancel" onclick="handleCancel()">
+            <button class="action-btn btn-cancel" id="btn-cancel" onclick="handleCancel()">
                 <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                Cancel
+                <span class="btn-label">Cancel</span>
             </button>
-            <button class="action-btn btn-success" data-action="next" onclick="handleNext()">
+            <button class="action-btn btn-success" id="btn-next" onclick="handleNext()">
                 <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-                Next
+                <span class="btn-label">Next</span>
             </button>
         </div>
     </div>
@@ -919,8 +783,8 @@
 </div>
 
 <div class="selection-bar" id="selection-bar">
-    <span>Items selected <span class="count-badge" id="selection-count">0</span></span>
-    <span style="color: rgba(255,255,255,0.5); font-size: 12px; font-weight: 400;">1 package + add-ons</span>
+    <span><span id="selection-label">Items selected</span> <span class="count-badge" id="selection-count">0</span></span>
+    <span id="selection-hint" style="color:rgba(255,255,255,0.5);font-size:12px;font-weight:400;">1 package + add-ons</span>
 </div>
 <div id="toast" class="toast"></div>
 </body>
