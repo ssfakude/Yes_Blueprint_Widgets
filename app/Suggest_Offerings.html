@@ -398,7 +398,7 @@
                     displayInterestButtons(field.pick_list_values);
                     if (interestedInValue) {
                         var btn = document.querySelector('.interest-btn[data-value="' + interestedInValue + '"]');
-                        if (btn) { btn.classList.add("active"); fetchProducts(interestedInValue, preselectProductId); }
+                        if (btn) { btn.classList.add("active"); fetchProducts(interestedInValue, btn.getAttribute("data-display"), preselectProductId); }
                     }
                 } else {
                     document.getElementById("interest-buttons").innerHTML = errorBox(t("errFieldNotFound"));
@@ -417,7 +417,8 @@
             btn.className = "interest-btn";
             btn.style.animationDelay = (i * 0.04) + "s";
             btn.textContent = option.display_value || option.actual_value;
-            btn.setAttribute("data-value", option.actual_value);
+            btn.setAttribute("data-value",   option.actual_value);
+            btn.setAttribute("data-display", option.display_value || option.actual_value);
             btn.onclick = function () { selectInterest(this); };
             container.appendChild(btn);
         });
@@ -430,17 +431,38 @@
         selectedProduct = null; selectedAddons = []; selectedEquipAddons = [];
         hideAddonsSection();
         updateSelectionBar();
-        fetchProducts(button.getAttribute("data-value"), null);
+        fetchProducts(button.getAttribute("data-value"), button.getAttribute("data-display"), null);
     }
 
+    // ─── actual_value → Hebrew Product_Category map ───────────────────────────
+    // Keys are the CRM picklist actual_values; values are how products are stored
+    // in the Hebrew CRM instance under Product_Category.
+    var CATEGORY_HE_MAP = {
+        "yes"          : "yes",
+        "+sting"       : "+sting",
+        "TV + Internet": "\u05d8\u05dc\u05d5\u05d9\u05d6\u05d9\u05d4 + \u05d0\u05d9\u05e0\u05d8\u05e8\u05e0\u05d8",   // טלויזיה + אינטרנט
+        "Internet yes" : "\u05d0\u05d9\u05e0\u05d8\u05e8\u05e0\u05d8 \u05d9\u05e1",                                     // אינטרנט יס
+        "Cellular"     : "\u05e1\u05dc\u05d5\u05dc\u05e8\u05d9",                                                        // סלולרי
+        "Internet"     : "\u05d0\u05d9\u05e0\u05d8\u05e8\u05e0\u05d8"                                                   // אינטרנט
+    };
+
     // ─── Products ─────────────────────────────────────────────────────────────
-    function fetchProducts(category, preselectProductId) {
+    function fetchProducts(category, categoryDisplay, preselectProductId) {
         var container = document.getElementById("products-grid");
         container.innerHTML = '<div class="state-box"><div class="loading-dots"><span></span><span></span><span></span></div><p>' + t("loadingPackages") + '</p></div>';
         hideAddonsSection();
 
+        // Always query the English actual_value.
+        // If a Hebrew equivalent exists in the map AND it differs, add it as OR
+        // so products stored under either label are found.
+        var hebrewCat    = CATEGORY_HE_MAP[category];
+        var catCondition = "(Product_Category = '" + category + "')";
+        if (hebrewCat && hebrewCat !== category) {
+            catCondition = "(Product_Category = '" + category + "' or Product_Category = '" + hebrewCat + "')";
+        }
+
         return ZOHO.CRM.API.coql({
-            select_query: "select id, Product_Name, Unit_Price, Unit_Price_2nd_period, Description from Products where ((Usage_Unit = 'חבילה חודשית' or Usage_Unit ='Monthly Package') and (Product_Category = '" + category + "'))"
+            select_query: "select id, Product_Name, Unit_Price, Unit_Price_2nd_period, Description from Products where ((Usage_Unit ='Monthly Package') and " + catCondition + ")"
         })
         .then(function (response) {
             if (response.data && response.data.length > 0) {
@@ -552,9 +574,9 @@
         .then(function (response) {
             if (!response) return;
             var all      = response.data || [];
-
             var equip    = all.filter(function (a) { var c = (a.Product_Category || "").toLowerCase(); return c === "equipment" || c === "ציוד"; });
-            var regular  = all.filter(function (a) { var c = (a.Product_Category || "").toLowerCase(); return c !== "equipment" || c !== "ציוד"; });
+            var regular  = all.filter(function (a) { var c = (a.Product_Category || "").toLowerCase(); return c !== "equipment" && c !== "ציוד"; });
+
             if (regular.length) displayAddons(regular, "addon-grid",       false);
             else section.style.display = "none";
 
