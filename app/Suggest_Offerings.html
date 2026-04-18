@@ -361,9 +361,6 @@
     var selectedEquipAddons  = [];   // equipment add-ons
     var isProcessing         = false;
 
-    // IDs of add-ons already saved on the deal — used to pre-tick add-on cards
-    var prefillAddonIds          = [];  // all saved add-on IDs (used for both sections)
-
     ZOHO.embeddedApp.on("PageLoad", function (data) {
         console.log("PageLoad:", data);
         if (data && data.EntityId) currentDealId = data.EntityId;
@@ -404,17 +401,7 @@
                             : deal.Product_Offerd;
                     }
 
-                    // Collect previously saved add-on IDs from the Add_Ons subform
-                    // The subform rows typically look like: { Add_On: { id, name }, ... }
-                    prefillAddonIds = [];
-                    if (Array.isArray(deal.Add_Ons)) {
-                        deal.Add_Ons.forEach(function (row) {
-                            var addonRef = row.Add_On || row.Add_Ons || row;
-                            var addonId = (addonRef && typeof addonRef === "object") ? addonRef.id : addonRef;
-                            if (addonId) prefillAddonIds.push(String(addonId));
-                        });
-                    }
-                    console.log("Prefill — Interested_In:", interestedInValue, "| Product:", preselectProductId, "| Add-ons:", prefillAddonIds);
+                    console.log("Prefill — Interested_In:", interestedInValue, "| Product:", preselectProductId);
                 }
 
                 loadInterestedInOptions(interestedInValue, preselectProductId);
@@ -475,7 +462,6 @@
         selectedProduct     = null;
         selectedAddons      = [];
         selectedEquipAddons = [];
-        prefillAddonIds     = []; // clear prefill — user is making a new manual choice
         hideAddonsSection();
         updateSelectionBar();
         fetchProducts(button.getAttribute("data-value"), null);
@@ -676,11 +662,6 @@
 
             card.onclick = function () { toggleAddonSelection(this, addon, isEquip); };
             grid.appendChild(card);
-
-            // Auto-tick add-ons that were previously saved on the deal
-            if (prefillAddonIds.indexOf(String(addon.id)) !== -1) {
-                toggleAddonSelection(card, addon, isEquip);
-            }
         });
     }
 
@@ -795,6 +776,18 @@
 
         payload.Product_Offerd = selectedProduct ? selectedProduct.id : null;
 
+        // Populate the Product_Details line-items subform with the selected main package
+        if (selectedProduct) {
+            payload.Product_Details = [{
+                product: { id: selectedProduct.id },
+                quantity: 1,
+                unit_price: parseFloat(selectedProduct.Unit_Price) || 0,
+                total: parseFloat(selectedProduct.Unit_Price) || 0,
+                discount: 0,
+                net_total: parseFloat(selectedProduct.Unit_Price) || 0
+            }];
+        }
+
         var mainPrice   = selectedProduct ? (parseFloat(selectedProduct.Unit_Price) || 0) : 0;
         var addonsTotal = allSelectedAddons().reduce(function (sum, addon) {
             return sum + (parseFloat(addon.Unit_Price) || 0);
@@ -806,29 +799,31 @@
     }
 
     function saveDealRecord() {
-        return ZOHO.CRM.API.updateRecord({
+        var dealUpdate = ZOHO.CRM.API.updateRecord({
             Entity : "Deals",
             APIData: buildDealPayload(),
             Trigger: []
-        })
-        .then(function (response) {
-            console.log("Deal saved:", response);
-            var all = allSelectedAddons();
-            if (all.length === 0) { return Promise.resolve(response); }
+        });
 
+        var all = allSelectedAddons();
+        var subformUpdate;
+        if (all.length > 0) {
             var subformRows = all.map(function (addon) {
                 return { Add_On: { id: addon.id } };
             });
-
-            return ZOHO.CRM.API.updateRecord({
+            subformUpdate = ZOHO.CRM.API.updateRecord({
                 Entity : "Deals",
                 APIData: { id: currentDealId, Add_Ons: subformRows },
                 Trigger: []
             });
-        })
-        .then(function (response) {
-            console.log("Add_Ons subform saved:", response);
-            return response;
+        } else {
+            subformUpdate = Promise.resolve(null);
+        }
+
+        return Promise.all([dealUpdate, subformUpdate]).then(function (results) {
+            console.log("Deal saved:", results[0]);
+            console.log("Add_Ons subform saved:", results[1]);
+            return results;
         });
     }
 
