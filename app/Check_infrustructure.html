@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -16,201 +16,136 @@
       padding-bottom: 0;
       font-size: 13px;
       color: #3d3d3d;
+      direction: ltr;
     }
+
+    body.rtl { direction: rtl; }
+    body.rtl .card-header        { flex-direction: row-reverse; }
+    body.rtl .card-header-left   { flex-direction: row-reverse; }
+    body.rtl .section-header     { flex-direction: row-reverse; }
+    body.rtl .field-cell:nth-child(odd)  { border-right: none; border-left: 1px solid #efefef; }
+    body.rtl .field-cell:nth-child(even) { border-left: none; }
+    body.rtl .confirmed-badge    { flex-direction: row-reverse; }
+    body.rtl .card-footer        { flex-direction: row-reverse; }
+    body.rtl .btn-next           { flex-direction: row-reverse; }
 
     /* ── Section header ── */
     .section-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 10px;
+      display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
     }
-    .section-icon svg { width: 16px; height: 16px; display: block; }
     .section-title {
-      font-size: 11px; font-weight: 700;
-      color: #666;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
+      font-size: 11px; font-weight: 700; color: #666;
+      text-transform: uppercase; letter-spacing: 0.08em;
     }
     .section-line { flex: 1; height: 1px; background: #d0d0d0; }
 
     /* ── Card wrapper ── */
-    .card-wrapper {
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      overflow: hidden;
-    }
-
-    /* ── Card ── */
-    .zoho-card {
-      background: #fff;
-      overflow: hidden;
-    }
+    .card-wrapper { background: #fff; border: 1px solid #ddd; border-radius: 4px; overflow: hidden; }
 
     /* ── Card header ── */
     .card-header {
-      background: #3a9e5f;
-      padding: 14px 18px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
+      background: #3a9e5f; padding: 14px 18px;
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
     }
     .card-header.inactive { background: #c0392b; }
 
     .card-header-left { display: flex; align-items: center; gap: 10px; }
-    .pulse-dot {
-      width: 11px; height: 11px;
-      border-radius: 50%;
-      background: #7ef5bb;
-      flex-shrink: 0;
-    }
+    .pulse-dot { width: 11px; height: 11px; border-radius: 50%; background: #7ef5bb; flex-shrink: 0; }
     .pulse-dot.inactive { background: #f1948a; }
 
     .header-title { font-size: 14px; font-weight: 700; color: #fff; line-height: 1.3; }
     .header-sub   { font-size: 11px; color: rgba(255,255,255,0.8); margin-top: 2px; }
 
     .header-badge {
-      background: transparent;
-      border: 1.5px solid rgba(255,255,255,0.7);
-      border-radius: 20px;
-      padding: 3px 12px;
-      font-size: 11px; font-weight: 700;
-      color: #fff; letter-spacing: 0.06em;
-      white-space: nowrap; flex-shrink: 0;
+      background: transparent; border: 1.5px solid rgba(255,255,255,0.7);
+      border-radius: 20px; padding: 3px 12px;
+      font-size: 11px; font-weight: 700; color: #fff;
+      letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0;
     }
 
     /* ── Fields grid ── */
-    .fields-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-    }
+    .fields-grid { display: grid; grid-template-columns: 1fr 1fr; }
     .field-cell {
       padding: 14px 18px;
       border-bottom: 1px solid #efefef;
       border-right: 1px solid #efefef;
     }
-    .field-cell:nth-child(even)       { border-right: none; }
-    .field-cell:nth-last-child(-n+2)  { border-bottom: none; }
+    .field-cell:nth-child(even)      { border-right: none; }
+    .field-cell:nth-last-child(-n+2) { border-bottom: none; }
 
     .field-label {
-      font-size: 10px; font-weight: 700;
-      color: #aaa;
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-      margin-bottom: 6px;
+      font-size: 10px; font-weight: 700; color: #aaa;
+      text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 6px;
     }
-    .field-value {
-      font-size: 13px; font-weight: 600;
-      color: #222;
-      display: flex; align-items: center; gap: 6px;
-    }
+    .field-value { font-size: 13px; font-weight: 600; color: #222; display: flex; align-items: center; gap: 6px; }
     .field-value.muted { font-weight: 400; color: #555; }
 
     /* ── Available badge ── */
     .confirmed-badge {
       display: inline-flex; align-items: center; gap: 5px;
-      background: #e6f4ec;
-      border: 1px solid #a8d5b8;
-      border-radius: 4px;
-      padding: 3px 9px;
-      font-size: 12px; font-weight: 700;
-      color: #2a7a48;
+      background: #e6f4ec; border: 1px solid #a8d5b8;
+      border-radius: 4px; padding: 3px 9px;
+      font-size: 12px; font-weight: 700; color: #2a7a48;
     }
     .check-circle {
-      width: 15px; height: 15px;
-      background: #3a9e5f;
-      border-radius: 50%;
-      display: inline-flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
+      width: 15px; height: 15px; background: #3a9e5f; border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
     }
     .check-circle svg { width: 8px; height: 8px; }
 
     /* ── Speed tags ── */
     .speed-tag {
-      display: inline-block;
-      background: #eef2ff;
-      border: 1px solid #c7d2fe;
-      border-radius: 4px;
-      padding: 2px 9px;
-      font-size: 13px; font-weight: 700;
-      color: #3b4fce;
+      display: inline-block; background: #eef2ff; border: 1px solid #c7d2fe;
+      border-radius: 4px; padding: 2px 9px;
+      font-size: 13px; font-weight: 700; color: #3b4fce;
     }
-    .speed-tag.copper {
-      background: #fffbeb;
-      border-color: #fcd34d;
-      color: #92600a;
-    }
+    .speed-tag.copper { background: #fffbeb; border-color: #fcd34d; color: #92600a; }
 
     /* ── Card footer ── */
     .card-footer {
-      background: #fafafa;
-      border-top: 1px solid #efefef;
-      padding: 8px 18px;
-      display: flex; align-items: center; gap: 7px;
+      background: #fafafa; border-top: 1px solid #efefef;
+      padding: 8px 18px; display: flex; align-items: center; gap: 7px;
     }
     .footer-dot  { width: 7px; height: 7px; border-radius: 50%; background: #3a9e5f; flex-shrink: 0; }
     .footer-text { font-size: 11px; color: #999; }
 
     /* ── Action bar ── */
     .card-actions {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 12px;
-      padding: 14px 20px;
-      background: #fff;
-      border-top: 1px solid #e0e0e0;
+      display: flex; justify-content: center; align-items: center; gap: 12px;
+      padding: 14px 20px; background: #fff; border-top: 1px solid #e0e0e0;
     }
 
     .btn-cancel {
-      padding: 8px 28px;
-      font-family: 'Lato', Arial, sans-serif;
-      font-size: 13px; font-weight: 600;
-      color: #444;
-      background: #fff;
-      border: 1.5px solid #c8c8c8;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background 0.12s, border-color 0.12s;
-      min-width: 90px;
+      padding: 8px 28px; font-family: 'Lato', Arial, sans-serif;
+      font-size: 13px; font-weight: 600; color: #444;
+      background: #fff; border: 1.5px solid #c8c8c8; border-radius: 4px;
+      cursor: pointer; transition: background 0.12s, border-color 0.12s; min-width: 90px;
     }
     .btn-cancel:hover  { background: #f5f5f5; border-color: #aaa; }
     .btn-cancel:active { background: #ebebeb; }
 
     .btn-next {
       display: inline-flex; align-items: center; gap: 6px;
-      padding: 8px 28px;
-      font-family: 'Lato', Arial, sans-serif;
-      font-size: 13px; font-weight: 700;
-      color: #fff;
-      background: #3b8ad4;
-      border: 1.5px solid #3b8ad4;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background 0.12s, border-color 0.12s;
-      min-width: 90px;
+      padding: 8px 28px; font-family: 'Lato', Arial, sans-serif;
+      font-size: 13px; font-weight: 700; color: #fff;
+      background: #3b8ad4; border: 1.5px solid #3b8ad4; border-radius: 4px;
+      cursor: pointer; transition: background 0.12s, border-color 0.12s; min-width: 90px;
     }
     .btn-next:hover  { background: #2f74bb; border-color: #2f74bb; }
     .btn-next:active { background: #2563a3; border-color: #2563a3; }
     .btn-next svg    { width: 13px; height: 13px; }
-
     .btn-next:disabled, .btn-cancel:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    /* ── Loading / error states ── */
+    /* ── States ── */
     .state-loading, .state-error {
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      padding: 40px 16px; gap: 10px;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; padding: 40px 16px; gap: 10px;
       color: #888; font-size: 13px;
     }
     .spinner {
       width: 24px; height: 24px;
-      border: 2px solid #e0e0e0;
-      border-top-color: #3a9e5f;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
+      border: 2px solid #e0e0e0; border-top-color: #3a9e5f;
+      border-radius: 50%; animation: spin 0.8s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
     .error-icon  { font-size: 24px; }
@@ -224,7 +159,7 @@
   <!-- Loading -->
   <div id="state-loading" class="state-loading">
     <div class="spinner"></div>
-    <span>Checking infrastructure…</span>
+    <span id="txt-loading">Checking infrastructure…</span>
   </div>
 
   <!-- Error -->
@@ -237,141 +172,221 @@
   <div id="widget-content">
 
     <div class="section-header">
-      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;flex-shrink:0;">
+      <svg viewBox="0 0 16 16" fill="none" style="width:16px;height:16px;flex-shrink:0;">
         <path d="M1.5 7C3.5 4.8 5.6 3.8 8 3.8C10.4 3.8 12.5 4.8 14.5 7" stroke="#888" stroke-width="1.4" stroke-linecap="round"/>
         <path d="M3.5 9.5C5 7.8 6.4 7 8 7C9.6 7 11 7.8 12.5 9.5" stroke="#888" stroke-width="1.4" stroke-linecap="round"/>
         <path d="M5.5 12C6.4 10.8 7.1 10.3 8 10.3C8.9 10.3 9.6 10.8 10.5 12" stroke="#888" stroke-width="1.4" stroke-linecap="round"/>
         <circle cx="8" cy="13.5" r="0.8" fill="#888"/>
       </svg>
-      <span class="section-title">Fiber Service Details</span>
+      <span class="section-title" id="txt-section-title">Fiber Service Details</span>
       <div class="section-line"></div>
     </div>
 
     <div class="card-wrapper">
-    <div class="zoho-card">
-      <div class="card-header" id="card-header">
-        <div class="card-header-left">
-          <div class="pulse-dot" id="pulse-dot"></div>
-          <div>
-            <div class="header-title" id="header-title">Fiber Service Available</div>
-            <div class="header-sub" id="address-line">Loading address...</div>
+      <div class="zoho-card">
+        <div class="card-header" id="card-header">
+          <div class="card-header-left">
+            <div class="pulse-dot" id="pulse-dot"></div>
+            <div>
+              <div class="header-title" id="header-title">Fiber Service Available</div>
+              <div class="header-sub"  id="address-line">Loading address...</div>
+            </div>
+          </div>
+          <div class="header-badge" id="header-badge">ACTIVE</div>
+        </div>
+
+        <div class="fields-grid">
+          <div class="field-cell">
+            <div class="field-label" id="lbl-optical">Optical Wiring</div>
+            <div class="field-value" id="optical-wiring">—</div>
+          </div>
+          <div class="field-cell">
+            <div class="field-label" id="lbl-conn-type">Connection Type</div>
+            <div class="field-value muted" id="txt-conn-type">Fiber Optic</div>
+          </div>
+          <div class="field-cell">
+            <div class="field-label" id="lbl-fiber-speed">Max Fiber Speed</div>
+            <div class="field-value" id="fiber-speed">—</div>
+          </div>
+          <div class="field-cell">
+            <div class="field-label" id="lbl-copper-speed">Max Copper Speed</div>
+            <div class="field-value" id="copper-speed">—</div>
           </div>
         </div>
-        <div class="header-badge" id="header-badge">ACTIVE</div>
-      </div>
 
-      <div class="fields-grid">
-        <div class="field-cell">
-          <div class="field-label">Optical Wiring</div>
-          <div class="field-value" id="optical-wiring">—</div>
-        </div>
-
-        <div class="field-cell">
-          <div class="field-label">Connection Type</div>
-          <div class="field-value muted">Fiber Optic</div>
-        </div>
-
-        <div class="field-cell">
-          <div class="field-label">Max Fiber Speed</div>
-          <div class="field-value" id="fiber-speed">—</div>
-        </div>
-
-        <div class="field-cell">
-          <div class="field-label">Max Copper Speed</div>
-          <div class="field-value" id="copper-speed">—</div>
+        <div class="card-footer">
+          <div class="footer-dot"></div>
+          <span class="footer-text" id="txt-footer">Service verified for this address</span>
         </div>
       </div>
 
-      <div class="card-footer">
-        <div class="footer-dot"></div>
-        <span class="footer-text">Service verified for this address</span>
+      <div class="card-actions">
+        <button class="btn-cancel" id="btn-cancel" onclick="handleCancel()">Cancel</button>
+        <button class="btn-next"   id="btn-next"   onclick="handleNext()">
+          <span id="btn-next-label">Next</span>
+          <svg viewBox="0 0 12 12" fill="none">
+            <path d="M2.5 6H9.5M6.5 3L9.5 6L6.5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
       </div>
     </div>
-
-    <div class="card-actions">
-      <button class="btn-cancel" id="btn-cancel" onclick="handleCancel()">Cancel</button>
-      <button class="btn-next" id="btn-next" onclick="handleNext()">
-        Next
-        <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M2.5 6H9.5M6.5 3L9.5 6L6.5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-    </div>
-    </div><!-- /card-wrapper -->
   </div>
 
   <script>
+    // ─── i18n ─────────────────────────────────────────────────────────────────
+    var TRANSLATIONS = {
+      en_US: {
+        loading        : "Checking infrastructure\u2026",
+        errDefault     : "Unable to load service data.",
+        errNoRecord    : "Deal record not found.",
+        errNoAddress   : "No address on record",
+        errLoadFailed  : "Could not load deal record.",
+        errSaveFailed  : "Save failed: ",
+        sectionTitle   : "Fiber Service Details",
+        headerActive   : "Fiber Service Available",
+        headerBadge    : "ACTIVE",
+        lblOptical     : "Optical Wiring",
+        lblConnType    : "Connection Type",
+        connTypeVal    : "Fiber Optic",
+        lblFiberSpeed  : "Max Fiber Speed",
+        lblCopperSpeed : "Max Copper Speed",
+        footer         : "Service verified for this address",
+        available      : "Available",
+        unavailable    : "Unavailable",
+        cancel         : "Cancel",
+        next           : "Next",
+        saving         : "Saving\u2026",
+        moving         : "Moving\u2026"
+      },
+      iw_IL: {
+        loading        : "\u05d1\u05d5\u05d3\u05e7 \u05ea\u05e9\u05ea\u05d9\u05ea\u2026",
+        errDefault     : "\u05dc\u05d0 \u05e0\u05d9\u05ea\u05df \u05dc\u05d8\u05e2\u05d5\u05df \u05e0\u05ea\u05d5\u05e0\u05d9 \u05e9\u05d9\u05e8\u05d5\u05ea.",
+        errNoRecord    : "\u05dc\u05d0 \u05e0\u05de\u05e6\u05d0 \u05e8\u05e9\u05d5\u05de\u05ea \u05e2\u05e1\u05e7\u05d0\u05d4.",
+        errNoAddress   : "\u05d0\u05d9\u05df \u05db\u05ea\u05d5\u05d1\u05ea \u05d1\u05e8\u05e9\u05d5\u05de\u05d4",
+        errLoadFailed  : "\u05dc\u05d0 \u05e0\u05d9\u05ea\u05df \u05dc\u05d8\u05e2\u05d5\u05df \u05d0\u05ea \u05e8\u05e9\u05d5\u05de\u05ea \u05d4\u05e2\u05e1\u05e7\u05d0\u05d4.",
+        errSaveFailed  : "\u05e9\u05de\u05d9\u05e8\u05d4 \u05e0\u05db\u05e9\u05dc\u05d4: ",
+        sectionTitle   : "\u05e4\u05e8\u05d8\u05d9 \u05e9\u05d9\u05e8\u05d5\u05ea \u05e1\u05d9\u05d1\u05d9\u05dd",
+        headerActive   : "\u05e9\u05d9\u05e8\u05d5\u05ea \u05e1\u05d9\u05d1\u05d9\u05dd \u05d6\u05de\u05d9\u05df",
+        headerBadge    : "\u05e4\u05e2\u05d9\u05dc",
+        lblOptical     : "\u05e1\u05d9\u05d1\u05d5\u05ea \u05d0\u05d5\u05e4\u05d8\u05d9\u05ea",
+        lblConnType    : "\u05e1\u05d5\u05d2 \u05d7\u05d9\u05d1\u05d5\u05e8",
+        connTypeVal    : "\u05e1\u05d9\u05d1\u05d9\u05dd \u05d0\u05d5\u05e4\u05d8\u05d9",
+        lblFiberSpeed  : "\u05de\u05d4\u05d9\u05e8\u05d5\u05ea \u05e1\u05d9\u05d1\u05d9\u05dd \u05de\u05e7\u05e1\u05d9\u05de\u05dc\u05d9\u05ea",
+        lblCopperSpeed : "\u05de\u05d4\u05d9\u05e8\u05d5\u05ea \u05e0\u05d7\u05d5\u05e9\u05ea \u05de\u05e7\u05e1\u05d9\u05de\u05dc\u05d9\u05ea",
+        footer         : "\u05e9\u05d9\u05e8\u05d5\u05ea \u05de\u05d0\u05d5\u05de\u05ea \u05e2\u05d1\u05d5\u05e8 \u05db\u05ea\u05d5\u05d1\u05ea \u05d6\u05d5",
+        available      : "\u05d6\u05de\u05d9\u05df",
+        unavailable    : "\u05dc\u05d0 \u05d6\u05de\u05d9\u05df",
+        cancel         : "\u05d1\u05d9\u05d8\u05d5\u05dc",
+        next           : "\u05d4\u05de\u05e9\u05da",
+        saving         : "\u05e9\u05d5\u05de\u05e8\u2026",
+        moving         : "\u05de\u05e2\u05d1\u05d9\u05e8\u2026"
+      }
+    };
+
+    var currentLocale = "en_US";
+    function t(key) { return (TRANSLATIONS[currentLocale] || TRANSLATIONS.en_US)[key] || key; }
+
+    var _entityId = null;
+
+    // ─── State helpers ────────────────────────────────────────────────────────
     function showLoading() {
       document.getElementById('state-loading').style.display = 'flex';
-      document.getElementById('state-error').style.display = 'none';
+      document.getElementById('state-error').style.display   = 'none';
       document.getElementById('widget-content').style.display = 'none';
     }
 
     function showError(msg) {
-      document.getElementById('state-loading').style.display = 'none';
-      document.getElementById('state-error').style.display = 'flex';
+      document.getElementById('state-loading').style.display  = 'none';
+      document.getElementById('state-error').style.display    = 'flex';
       document.getElementById('widget-content').style.display = 'none';
-      document.getElementById('error-msg').textContent = msg || 'Unable to load service data.';
+      document.getElementById('error-msg').textContent = msg || t('errDefault');
     }
 
     function showWidget() {
-      document.getElementById('state-loading').style.display = 'none';
-      document.getElementById('state-error').style.display = 'none';
+      document.getElementById('state-loading').style.display  = 'none';
+      document.getElementById('state-error').style.display    = 'none';
       document.getElementById('widget-content').style.display = 'block';
     }
 
-    function renderOpticalWiring(value) {
-      if (value === 'Available') {
-        return `<span class="confirmed-badge">
-          <span class="check-circle">
-            <svg viewBox="0 0 8 8" fill="none">
-              <path d="M1.5 4L3.2 5.8L6.5 2.2" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </span>
-          Available
-        </span>`;
-      }
-      return `<span style="color:#c0392b;font-weight:600;">Unavailable</span>`;
+    // ─── Apply locale to all static strings ───────────────────────────────────
+    function applyLocale() {
+      var isHebrew = currentLocale === 'iw_IL';
+      document.body.classList.toggle('rtl', isHebrew);
+      document.documentElement.setAttribute('lang', isHebrew ? 'he' : 'en');
+
+      setText('txt-loading',     t('loading'));
+      setText('txt-section-title', t('sectionTitle'));
+      setText('lbl-optical',     t('lblOptical'));
+      setText('lbl-conn-type',   t('lblConnType'));
+      setText('txt-conn-type',   t('connTypeVal'));
+      setText('lbl-fiber-speed', t('lblFiberSpeed'));
+      setText('lbl-copper-speed',t('lblCopperSpeed'));
+      setText('txt-footer',      t('footer'));
+      setText('btn-cancel',      t('cancel'));
+      setText('btn-next-label',  t('next'));
     }
 
-    var _entityId = null;
+    function setText(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; }
 
+    // ─── Render optical wiring cell ───────────────────────────────────────────
+    function renderOpticalWiring(value) {
+      var isAvail = (value === 'Available');
+      var label   = isAvail ? t('available') : t('unavailable');
+      if (isAvail) {
+        return '<span class="confirmed-badge">'
+          + '<span class="check-circle"><svg viewBox="0 0 8 8" fill="none">'
+          + '<path d="M1.5 4L3.2 5.8L6.5 2.2" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>'
+          + '</svg></span>' + label + '</span>';
+      }
+      return '<span style="color:#c0392b;font-weight:600;">' + label + '</span>';
+    }
+
+    // ─── Boot ─────────────────────────────────────────────────────────────────
     ZOHO.embeddedApp.on("PageLoad", function(data) {
-      var entityId = data.EntityId;
-      _entityId = entityId;
+      _entityId = data.EntityId;
+      showLoading();
 
-      // Fetch the Deal record to get address fields
-      ZOHO.CRM.API.getRecord({ Entity: "Deals", RecordID: entityId })
+      // Detect locale first, then fetch record
+      ZOHO.CRM.CONFIG.getCurrentUser()
+        .then(function(resp) {
+          var user = resp && resp.users && resp.users[0];
+          var lang = ((user && (user.language || user.Language || user.locale)) || '') + '';
+          currentLocale = (lang.indexOf('iw') === 0 || lang.indexOf('he') === 0) ? 'iw_IL' : 'en_US';
+        })
+        .catch(function() { currentLocale = 'en_US'; })
+        .then(function() {
+          applyLocale();
+          return ZOHO.CRM.API.getRecord({ Entity: "Deals", RecordID: _entityId });
+        })
         .then(function(recordData) {
           var record = recordData.data && recordData.data[0];
-          if (!record) { showError('Deal record not found.'); return; }
+          if (!record) { showError(t('errNoRecord')); return; }
 
-       
-  var address = record['Full_Address']   || '';
-          document.getElementById('address-line').textContent = address || 'No address on record';
+          var address = record['Full_Address'] || '';
+          document.getElementById('address-line').textContent = address || t('errNoAddress');
 
-          // Hardcoded infrastructure values — no external function needed
           window._infraResult = {
             Fibers_Available: 'Available',
             Fiber_Max_Speed:  '1GB',
             Copper_Max_Speed: '250kbs'
           };
 
-          // Always show as active
+          // Header
           document.getElementById('card-header').classList.remove('inactive');
           document.getElementById('pulse-dot').classList.remove('inactive');
-          document.getElementById('header-badge').textContent = 'ACTIVE';
-          document.getElementById('header-title').textContent = 'Fiber Service Available';
+          document.getElementById('header-badge').textContent = t('headerBadge');
+          document.getElementById('header-title').textContent = t('headerActive');
 
+          // Fields
           document.getElementById('optical-wiring').innerHTML = renderOpticalWiring('Available');
-          document.getElementById('fiber-speed').innerHTML   = '<span class="speed-tag">1GB</span>';
-          document.getElementById('copper-speed').innerHTML  = '<span class="speed-tag copper">250kbs</span>';
+          document.getElementById('fiber-speed').innerHTML    = '<span class="speed-tag">1GB</span>';
+          document.getElementById('copper-speed').innerHTML   = '<span class="speed-tag copper">250kbs</span>';
 
           showWidget();
 
-          // Auto-save and advance blueprint immediately on load
+          // Auto-save on load (silent)
           ZOHO.CRM.API.updateRecord({
-            Entity:   "Deals",
+            Entity: "Deals",
             APIData: {
               id:               _entityId,
               Fibers_Available: window._infraResult.Fibers_Available,
@@ -380,36 +395,30 @@
             },
             Trigger: []
           })
-          .then(function(updateResp) {
-            console.log('Auto update response:', updateResp);
-          })
-          .catch(function(err) {
-            console.error('Auto proceed error:', err);
-          });
+          .then(function(r)  { console.log('Auto update:', r); })
+          .catch(function(e) { console.error('Auto update error:', e); });
         })
         .catch(function(err) {
           console.error('Record fetch error:', err);
-          showError('Could not load deal record.');
+          showError(t('errLoadFailed'));
         });
     });
 
-    function handleCancel() {
-      ZOHO.CRM.UI.Popup.close();
-    }
+    // ─── Actions ──────────────────────────────────────────────────────────────
+    function handleCancel() { ZOHO.CRM.UI.Popup.close(); }
 
     function handleNext() {
       var btnNext   = document.getElementById('btn-next');
       var btnCancel = document.getElementById('btn-cancel');
 
-      btnNext.disabled    = true;
-      btnCancel.disabled  = true;
-      btnNext.textContent = 'Saving…';
+      btnNext.disabled   = true;
+      btnCancel.disabled = true;
+      document.getElementById('btn-next-label').textContent = t('saving');
 
       var fields = window._infraResult || {};
 
-      // Step 1 — update Deal fields
       ZOHO.CRM.API.updateRecord({
-        Entity:   "Deals",
+        Entity: "Deals",
         APIData: {
           id:               _entityId,
           Fibers_Available: fields.Fibers_Available,
@@ -418,25 +427,22 @@
         },
         Trigger: []
       })
-      .then(function(updateResp) {
-        console.log('Deal update response:', updateResp);
-        btnNext.textContent = 'Moving…';
-
-        // Immediately proceed blueprint as soon as data is saved
-        ZOHO.CRM.BLUEPRINT.proceed().then(function(blueprintResp) {
-          console.log('Blueprint proceed response:', blueprintResp);
-          ZOHO.CRM.UI.Popup.closeReload().then(function(data) {
-            console.log(data);
-          });
-          setTimeout(function() { ZOHO.CRM.UI.Popup.close(); }, 2000);
-        });
+      .then(function(r) {
+        console.log('Deal update:', r);
+        document.getElementById('btn-next-label').textContent = t('moving');
+        return ZOHO.CRM.BLUEPRINT.proceed();
+      })
+      .then(function(r) {
+        console.log('Blueprint proceed:', r);
+        ZOHO.CRM.UI.Popup.closeReload().then(function(d) { console.log(d); });
+        setTimeout(function() { ZOHO.CRM.UI.Popup.close(); }, 2000);
       })
       .catch(function(err) {
         console.error('Next error:', err);
         btnNext.disabled   = false;
         btnCancel.disabled = false;
-        btnNext.innerHTML  = 'Next <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 6H9.5M6.5 3L9.5 6L6.5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-        showError('Save failed: ' + (err && err.message ? err.message : JSON.stringify(err)));
+        document.getElementById('btn-next-label').textContent = t('next');
+        showError(t('errSaveFailed') + (err && err.message ? err.message : JSON.stringify(err)));
       });
     }
 
