@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Open Sales Orders</title>
+  <script src="https://live.zwidgets.com/js-sdk/1.2/ZohoEmbededAppSDK.min.js"></script>
+  <style>
+    /* ── Reset & base ──────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-size: 13px;
+      background: #ffffff;
+      color: #1a1f36;
+      min-height: 100vh;
+    }
+
+    /* ── Container ─────────────────────────────────────────── */
+    .widget-container {
+      padding: 0;
+      width: 100%;
+    }
+
+    /* ── Header bar ────────────────────────────────────────── */
+    .widget-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      background: #f0f4ff;
+      border-bottom: 1px solid #d6e0ff;
+    }
+
+    .widget-header h2 {
+      font-size: 13px;
+      font-weight: 600;
+      color: #2c5282;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .widget-header h2::before {
+      content: '';
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #48bb78;
+      box-shadow: 0 0 0 2px rgba(72,187,120,0.25);
+    }
+
+    .record-count {
+      font-size: 11px;
+      font-weight: 600;
+      color: #fff;
+      background: #4a6cf7;
+      border-radius: 20px;
+      padding: 1px 8px;
+      min-width: 20px;
+      text-align: center;
+    }
+
+    /* ── States: loading / error / empty ──────────────────── */
+    .state-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px;
+      gap: 10px;
+      color: #718096;
+    }
+
+    .state-container .icon {
+      font-size: 28px;
+      opacity: 0.5;
+    }
+
+    .state-container p {
+      font-size: 12px;
+    }
+
+    /* Spinner */
+    .spinner {
+      width: 28px;
+      height: 28px;
+      border: 3px solid #e2e8f0;
+      border-top-color: #4a6cf7;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Table ─────────────────────────────────────────────── */
+    .table-wrapper {
+      overflow-x: auto;
+      width: 100%;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    thead tr {
+      background: #1e3a8a;
+    }
+
+    thead th {
+      padding: 8px 12px;
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      text-align: left;
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.1s;
+    }
+
+    thead th:hover { background: #1e40af; }
+
+    thead th .sort-icon {
+      display: inline-block;
+      margin-left: 4px;
+      opacity: 0.5;
+      font-size: 9px;
+    }
+
+    thead th.sorted { background: #1e40af; }
+    thead th.sorted .sort-icon { opacity: 1; }
+
+    tbody tr {
+      border-bottom: 1px solid #edf2f7;
+      transition: background 0.12s;
+    }
+
+    tbody tr:last-child { border-bottom: none; }
+
+    tbody tr:hover {
+      background: #ebf4ff;
+      cursor: pointer;
+    }
+
+    tbody td {
+      padding: 8px 12px;
+      vertical-align: middle;
+      color: #2d3748;
+    }
+
+    /* SO Number link style */
+    .so-link {
+      color: #4a6cf7;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .so-link:hover { text-decoration: underline; }
+
+    /* Status badges */
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }
+
+    .badge-new           { background: #bee3f8; color: #1a365d; }
+    .badge-in-transit    { background: #fef3c7; color: #78350f; }
+    .badge-pending       { background: #e9d8fd; color: #44337a; }
+    .badge-confirmed     { background: #c6f6d5; color: #1a4731; }
+    .badge-on-hold       { background: #fed7d7; color: #742a2a; }
+    .badge-default       { background: #e2e8f0; color: #4a5568; }
+
+    /* Quantity column – right-aligned */
+    .qty-cell {
+      text-align: right;
+      font-weight: 600;
+      color: #2b6cb0;
+    }
+
+    /* Date column */
+    .date-cell {
+      white-space: nowrap;
+      color: #4a5568;
+    }
+
+    /* Footer */
+    .widget-footer {
+      padding: 6px 16px;
+      font-size: 10px;
+      color: #a0aec0;
+      border-top: 1px solid #edf2f7;
+      text-align: right;
+      background: #fafbff;
+    }
+  </style>
+</head>
+<body>
+
+<div class="widget-container">
+  <div class="widget-header">
+    <h2>Open Sales Orders</h2>
+    <span class="record-count" id="recordCount">—</span>
+  </div>
+
+  <!-- Loading state -->
+  <div class="state-container" id="loadingState">
+    <div class="spinner"></div>
+    <p>Loading sales orders…</p>
+  </div>
+
+  <!-- Error state -->
+  <div class="state-container" id="errorState" style="display:none">
+    <span class="icon">⚠️</span>
+    <p id="errorMsg">An error occurred while fetching data.</p>
+  </div>
+
+  <!-- Empty state -->
+  <div class="state-container" id="emptyState" style="display:none">
+    <span class="icon">📋</span>
+    <p>No open sales orders found for this product.</p>
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrapper" id="tableWrapper" style="display:none">
+    <table>
+      <thead>
+        <tr>
+          <th data-col="so_number">SO Number <span class="sort-icon">⇅</span></th>
+          <th data-col="status">SO Status <span class="sort-icon">⇅</span></th>
+          <th data-col="so_date">SO Date <span class="sort-icon">⇅</span></th>
+          <th data-col="delivery_date">Delivery Date <span class="sort-icon">⇅</span></th>
+          <th data-col="quantity" style="text-align:right">Qty (Product) <span class="sort-icon">⇅</span></th>
+          <th data-col="account_name">Account Name <span class="sort-icon">⇅</span></th>
+        </tr>
+      </thead>
+      <tbody id="soTableBody"></tbody>
+    </table>
+  </div>
+
+  <div class="widget-footer" id="widgetFooter" style="display:none">
+    Last refreshed: <span id="lastRefreshed">—</span>
+  </div>
+</div>
+
+<script>
+/**
+ * Open Sales Orders Widget – Product Detail Page
+ * -----------------------------------------------
+ * Displays all "open" Sales Orders in which the current Product
+ * appears in the SO sub-form (Products sub-form / line items).
+ *
+ * Columns shown:
+ *   SO Number | SO Status | SO Date | SO Delivery Date
+ *   | Aggregate Qty of this Product | Account Name
+ *
+ * "Open" statuses (adjust OPEN_STATUSES to match your org's picklist):
+ *   New, Created, Confirmed, Pending, In Transit, On Hold,
+ *   Processing, Partially Delivered
+ */
+
+/* ─── Configuration ─────────────────────────────────────── */
+
+/** Statuses considered "open". Add / remove values to match your org. */
+const OPEN_STATUSES = new Set([
+  "New",
+  "Created",
+  "Confirmed",
+  "Approved",
+  "Pending",
+  "In Transit",
+  "On Hold",
+  "Processing",
+  "Partially Delivered"
+]);
+
+/**
+ * API field names for the Sales Order module.
+ * Adjust if your org uses different API names.
+ */
+const SO_FIELDS = [
+  "id",
+  "Subject",        // SO Number / Name
+  "Status",
+  "SO_Date",        // Custom or standard date field — adjust as needed
+  "Due_Date",       // Delivery date — often "Due_Date" or a custom field
+  "Account_Name",
+  "Quoted_Items"    // Sub-form API name — adjust to your org's sub-form name
+].join(",");
+
+/* ─── DOM refs ───────────────────────────────────────────── */
+const loadingState  = document.getElementById("loadingState");
+const errorState    = document.getElementById("errorState");
+const errorMsg      = document.getElementById("errorMsg");
+const emptyState    = document.getElementById("emptyState");
+const tableWrapper  = document.getElementById("tableWrapper");
+const soTableBody   = document.getElementById("soTableBody");
+const recordCount   = document.getElementById("recordCount");
+const widgetFooter  = document.getElementById("widgetFooter");
+const lastRefreshed = document.getElementById("lastRefreshed");
+
+/* ─── State ──────────────────────────────────────────────── */
+let allRows = [];    // processed row data
+let sortCol = null;  // current sort column key
+let sortAsc = true;  // sort direction
+
+/* ─── Helpers ────────────────────────────────────────────── */
+
+function show(el) { el.style.display = ""; }
+function hide(el) { el.style.display = "none"; }
+
+function showError(msg) {
+  hide(loadingState);
+  hide(tableWrapper);
+  hide(emptyState);
+  errorMsg.textContent = msg;
+  show(errorState);
+}
+
+function formatDate(raw) {
+  if (!raw) return "—";
+  try {
+    const d = new Date(raw);
+    if (isNaN(d)) return raw;
+    return d.toLocaleDateString("en-ZA", {
+      day: "2-digit", month: "short", year: "numeric"
+    });
+  } catch { return raw; }
+}
+
+function statusBadgeClass(status) {
+  if (!status) return "badge-default";
+  const s = status.toLowerCase().replace(/\s+/g, "-");
+  const map = {
+    "new":                 "badge-new",
+    "created":             "badge-new",
+    "in-transit":          "badge-in-transit",
+    "pending":             "badge-pending",
+    "confirmed":           "badge-confirmed",
+    "on-hold":             "badge-on-hold",
+    "processing":          "badge-pending",
+    "partially-delivered": "badge-in-transit"
+  };
+  return map[s] || "badge-default";
+}
+
+function escHtml(str) {
+  if (!str) return "—";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+/* ─── Sorting ────────────────────────────────────────────── */
+
+function sortRows(col) {
+  if (sortCol === col) {
+    sortAsc = !sortAsc;
+  } else {
+    sortCol = col;
+    sortAsc = true;
+  }
+
+  document.querySelectorAll("thead th").forEach(th => {
+    th.classList.remove("sorted");
+    th.querySelector(".sort-icon").textContent = "⇅";
+  });
+
+  const activeTh = document.querySelector(`thead th[data-col="${col}"]`);
+  if (activeTh) {
+    activeTh.classList.add("sorted");
+    activeTh.querySelector(".sort-icon").textContent = sortAsc ? "↑" : "↓";
+  }
+
+  allRows.sort((a, b) => {
+    let va = a[col], vb = b[col];
+    if (col === "quantity") {
+      va = Number(va) || 0;
+      vb = Number(vb) || 0;
+      return sortAsc ? va - vb : vb - va;
+    }
+    if (col === "so_date" || col === "delivery_date") {
+      va = va ? new Date(va).getTime() : 0;
+      vb = vb ? new Date(vb).getTime() : 0;
+      return sortAsc ? va - vb : vb - va;
+    }
+    va = (va || "").toString().toLowerCase();
+    vb = (vb || "").toString().toLowerCase();
+    if (va < vb) return sortAsc ? -1 : 1;
+    if (va > vb) return sortAsc ?  1 : -1;
+    return 0;
+  });
+
+  renderTable();
+}
+
+/* ─── Rendering ──────────────────────────────────────────── */
+
+function renderTable() {
+  soTableBody.innerHTML = "";
+
+  allRows.forEach(row => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><a class="so-link" href="#" data-id="${row.id}" title="Open Sales Order">${escHtml(row.so_number)}</a></td>
+      <td><span class="badge ${statusBadgeClass(row.status)}">${escHtml(row.status)}</span></td>
+      <td class="date-cell">${formatDate(row.so_date)}</td>
+      <td class="date-cell">${formatDate(row.delivery_date)}</td>
+      <td class="qty-cell">${row.quantity}</td>
+      <td>${escHtml(row.account_name)}</td>
+    `;
+
+    tr.querySelector(".so-link").addEventListener("click", e => {
+      e.preventDefault();
+      navigateToSO(row.id);
+    });
+
+    soTableBody.appendChild(tr);
+  });
+}
+
+/* ─── Navigation ─────────────────────────────────────────── */
+
+function navigateToSO(soId) {
+  ZOHO.CRM.UI.Record.open({
+    Entity: "Sales_Orders",
+    RecordID: soId
+  }).catch(err => {
+    console.warn("Navigation failed, falling back:", err);
+    const orgMatch = window.location.href.match(/org\d+/);
+    if (orgMatch) {
+      window.open(
+        `https://crm.zoho.com/crm/${orgMatch[0]}/tab/SalesOrders/${soId}`,
+        "_blank"
+      );
+    }
+  });
+}
+
+/* ─── Core data-fetch logic ──────────────────────────────── */
+
+async function fetchOpenSalesOrders(productId, productName) {
+  const PAGE_SIZE = 200;
+  let page = 1;
+  let hasMore = true;
+  const matchedSOs = [];
+
+  const statusCriteria = [...OPEN_STATUSES]
+    .map(s => `(Status:equals:${s})`)
+    .join("OR");
+
+  const criteria = `(${statusCriteria})`;
+
+  while (hasMore) {
+    let response;
+    try {
+      response = await ZOHO.CRM.API.searchRecord({
+        Entity: "Sales_Orders",
+        Type: "criteria",
+        Query: criteria,
+        page: page,
+        per_page: PAGE_SIZE
+      });
+    } catch (err) {
+      throw new Error(`API error fetching SOs: ${err.message || err}`);
+    }
+
+    if (!response || !response.data || response.data.length === 0) {
+      hasMore = false;
+      break;
+    }
+
+    const soIds = response.data.map(so => so.id);
+    const fullRecords = await fetchSOsWithSubform(soIds);
+
+    for (const so of fullRecords) {
+      const result = aggregateProductQty(so, productId, productName);
+      if (result.found) {
+        matchedSOs.push({
+          id:            so.id,
+          so_number:     so.Subject || so.id,
+          status:        so.Status || "—",
+          so_date:       so.SO_Date || so.Created_Time || null,
+          delivery_date: so.Due_Date || so.Delivery_Date || so.Promised_Delivery_Date || null,
+          quantity:      result.totalQty,
+          account_name:  so.Account_Name?.name || so.Account_Name || "—"
+        });
+      }
+    }
+
+    if (response.data.length < PAGE_SIZE) {
+      hasMore = false;
+    } else {
+      page++;
+    }
+  }
+
+  return matchedSOs;
+}
+
+async function fetchSOsWithSubform(soIds) {
+  const BATCH = 5;
+  const results = [];
+
+  for (let i = 0; i < soIds.length; i += BATCH) {
+    const batch = soIds.slice(i, i + BATCH);
+    const fetches = batch.map(id =>
+      ZOHO.CRM.API.getRecord({ Entity: "Sales_Orders", RecordID: id })
+        .then(r => (r?.data?.[0] || null))
+        .catch(() => null)
+    );
+    const resolved = await Promise.all(fetches);
+    results.push(...resolved.filter(Boolean));
+  }
+
+  return results;
+}
+
+/**
+ * Sub-form API key candidates — adjust to match your org.
+ * Inspect a raw SO API response to find the correct key.
+ */
+const SUB_FORM_KEYS = [
+  "Quoted_Items",
+  "Product_Details",
+  "Invoiced_Items",
+  "Sub_Forms"
+];
+
+function aggregateProductQty(so, productId, productName) {
+  let lineItems = null;
+  for (const key of SUB_FORM_KEYS) {
+    if (Array.isArray(so[key]) && so[key].length > 0) {
+      lineItems = so[key];
+      break;
+    }
+  }
+
+  if (!lineItems) return { found: false, totalQty: 0 };
+
+  let totalQty = 0;
+  let found = false;
+
+  for (const item of lineItems) {
+    const itemProductId   = item.product?.id || item.Product?.id || item.product_id;
+    const itemProductName = item.product?.name || item.Product?.name
+                         || item.Product_Name || item.product_name || "";
+
+    const matchById   = itemProductId && itemProductId === productId;
+    const matchByName = productName   && itemProductName.toLowerCase() === productName.toLowerCase();
+
+    if (matchById || matchByName) {
+      found = true;
+      const qty = parseFloat(item.quantity || item.Quantity || 0) || 0;
+      totalQty += qty;
+    }
+  }
+
+  return { found, totalQty };
+}
+
+/* ─── Bootstrap ──────────────────────────────────────────── */
+
+function attachSortHandlers() {
+  document.querySelectorAll("thead th[data-col]").forEach(th => {
+    th.addEventListener("click", () => sortRows(th.dataset.col));
+  });
+}
+
+async function init() {
+  try {
+    await ZOHO.embeddedApp.init();
+
+    const pageContext = await ZOHO.CRM.UI.Record.get();
+    const productId   = pageContext?.data?.id;
+    const productName = pageContext?.data?.Product_Name || "";
+
+    if (!productId) {
+      showError("Could not determine the current Product ID.");
+      return;
+    }
+
+    const rows = await fetchOpenSalesOrders(productId, productName);
+
+    hide(loadingState);
+
+    if (rows.length === 0) {
+      show(emptyState);
+      recordCount.textContent = "0";
+      return;
+    }
+
+    allRows = rows;
+    recordCount.textContent = rows.length.toString();
+
+    renderTable();
+    attachSortHandlers();
+    show(tableWrapper);
+    show(widgetFooter);
+
+    lastRefreshed.textContent = new Date().toLocaleTimeString("en-ZA", {
+      hour: "2-digit", minute: "2-digit"
+    });
+
+  } catch (err) {
+    console.error("Widget init error:", err);
+    showError("Failed to load data. " + (err.message || "Please refresh and try again."));
+  }
+}
+
+/* ─── Entry point ────────────────────────────────────────── */
+ZOHO.embeddedApp.on("PageLoad", init);
+</script>
+</body>
+</html>
